@@ -1,0 +1,676 @@
+<!DOCTYPE html> 
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.12/lunar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    
+    <title>Modern Note App - IndexedDB</title>
+    <style>
+        .ql-toolbar.ql-snow { padding: 4px !important; border-radius: 12px 12px 0 0; }
+        .ql-container.ql-snow { border-radius: 0 0 12px 12px; }
+        .sortable-ghost { opacity: 0.4; border: 2px dashed #3b82f6; }
+.ql-toolbar button svg{
+    transition:.2s;
+}
+
+.ql-toolbar button:hover svg{
+    transform:scale(1.15);
+}
+
+.ql-toolbar .ql-bold svg{
+    color:#2563eb;
+}
+
+.ql-toolbar .ql-italic svg{
+    color:#9333ea;
+}
+
+.ql-toolbar .ql-underline svg{
+    color:#16a34a;
+}
+
+.ql-toolbar .ql-strike svg{
+    color:#dc2626;
+}
+
+.ql-toolbar .ql-link svg{
+    color:#0891b2;
+}
+
+.ql-toolbar .ql-size{
+    color:#f59e0b;
+}
+
+.ql-toolbar .ql-color svg,
+.ql-toolbar .ql-background svg{
+    color:#ec4899;
+}
+
+.ql-toolbar button:hover{
+    background:#f3f4f6;
+    border-radius:8px;
+}
+    </style>
+</head>
+<body class="bg-gray-100 p-4 md:p-10 font-sans">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+        <h1 class="text-2xl font-bold mb-6 text-gray-800 flex items-center justify-between">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-blue-500"></i> Ghi Chú Cá Nhân</span>
+            <div class="flex gap-2">
+                <button onclick="toggleView('grid')" class="text-sm p-2 bg-gray-100 rounded-lg"><i class="fa-solid fa-border-all"></i></button>
+                <button onclick="toggleView('list')" class="text-sm p-2 bg-gray-100 rounded-lg"><i class="fa-solid fa-list"></i></button>
+            </div>
+        </h1>
+
+        <div id="statsContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"></div>
+        
+        <div class="flex flex-wrap gap-2 mb-4">
+            <div class="relative flex-1"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="searchInput" oninput="renderNotes()" placeholder="Tìm kiếm ghi chú..." class="w-full p-2 pl-10 border rounded-xl outline-none"></div>
+            
+<div class="relative">
+    <button onclick="toggleSortMenu()" class="p-2 border rounded-xl hover:bg-gray-100 text-gray-600">
+        <i class="fa-solid fa-arrow-down-wide-short"></i>
+    </button>
+
+    <div id="sortMenu" class="hidden absolute z-50 mt-2 right-0 bg-white border rounded-xl shadow-xl p-2 w-48">
+
+        <button onclick="changeSort('newest')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
+            <i class="fa-solid fa-clock text-blue-500 mr-2"></i> Mới nhất
+        </button>
+
+        <button onclick="changeSort('oldest')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
+            <i class="fa-solid fa-clock-rotate-left text-gray-500 mr-2"></i> Cũ nhất
+        </button>
+
+        <button onclick="changeSort('title')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
+            <i class="fa-solid fa-font text-green-500 mr-2"></i> Theo tiêu đề
+        </button>
+
+        <button onclick="changeSort('date')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
+            <i class="fa-solid fa-calendar-days text-red-500 mr-2"></i> Theo ngày hẹn
+        </button>
+
+        <button onclick="changeSort('color')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
+            <i class="fa-solid fa-palette text-purple-500 mr-2"></i> Theo màu
+        </button>
+
+    </div>
+</div>
+
+           <button onclick="toggleTrash()" class="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-200 hover:text-red-600 active:bg-gray-300 transition-all"><i class="fa-solid fa-trash-can text-lg"></i></button>
+        </div>
+        
+        <input id="title" type="text" placeholder="Tiêu đề..." class="w-full p-3 mb-2 border rounded-xl outline-none">
+        
+        <div class="flex flex-wrap gap-2 mb-2 items-center">
+            <div class="relative">
+                <button onclick="document.getElementById('bgColor').click()" class="h-10 w-12 flex items-center justify-center border border-orange-500 text-orange-600 rounded-lg hover:bg-orange-50 transition">
+                    <i class="fa-solid fa-palette"></i>
+                </button>
+                <input type="color" id="bgColor" value="#f9fafb" class="hidden">
+            </div>
+
+            <div class="relative">
+                <button onclick="document.getElementById('fontSizeMenu').classList.toggle('hidden')" class="h-10 px-4 border border-yellow-500 text-yellow-600 rounded-lg hover:bg-yellow-50 transition">
+                    <i class="fa-solid fa-heading"></i>
+                </button>
+                <div id="fontSizeMenu" class="hidden absolute z-50 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl p-2 w-40">
+                    <button onclick="setFontSize('text-base')" class="block w-full text-left p-2 hover:bg-gray-100 rounded">Chữ thường</button>
+                    <button onclick="setFontSize('text-lg')" class="block w-full text-left p-2 hover:bg-gray-100 rounded">Chữ lớn</button>
+                    <button onclick="setFontSize('text-xl')" class="block w-full text-left p-2 hover:bg-gray-100 rounded">Chữ rất lớn</button>
+                </div>
+                <input type="hidden" id="fontSize" value="text-base">
+            </div>
+
+            <div class="relative">
+               <button onclick="toggleEmojiPicker()" class="w-10 h-10 flex items-center justify-center rounded-lg text-amber-400 hover:bg-gray-200 hover:text-amber-500 active:bg-gray-300 transition-all" title="Emoji"><i class="fa-solid fa-face-smile text-lg"></i></button>
+                <emoji-picker id="emojiPicker" class="hidden absolute z-50 top-12"></emoji-picker>
+            </div>
+            <input type="file" id="imageInput" class="hidden" accept="image/*" onchange="insertImage(this)">
+            <button onclick="document.getElementById('imageInput').click()" class="w-10 h-10 flex items-center justify-center rounded-lg text-blue-400 hover:bg-gray-200 hover:text-blue-500 active:bg-gray-300 transition-all" title="Chèn ảnh"><i class="fa-solid fa-images text-lg"></i></button>
+           <button onclick="openQR()" class="w-10 h-10 flex items-center justify-center rounded-lg text-purple-600 hover:bg-purple-100 active:bg-purple-200 transition-all"><i class="fa-solid fa-qrcode text-lg"></i></button>
+           <button onclick="openAI()" class="w-10 h-10 flex items-center justify-center rounded-lg text-indigo-600 hover:bg-indigo-100 active:bg-indigo-200 transition-all"><i class="fa-solid fa-robot text-lg"></i></button>
+        </div>
+
+        <div id="editor" class="h-40 mb-4 rounded-xl overflow-hidden border"></div>
+        
+        <div class="flex flex-wrap gap-3 mb-8">
+            <div class="relative flex items-center">
+                <i class="fa-solid fa-calendar-days absolute left-3 text-red-500"></i>
+                <input type="text" id="datePicker" placeholder="Thêm ngày hẹn" class="p-2 border border-red-500 rounded-full w-48 pl-10 pr-4 outline-none">
+            </div>
+            <button id="saveBtn" onclick="saveNote()" class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition"><i class="fa-solid fa-floppy-disk"></i> Lưu</button>
+            <button id="cancelBtn" onclick="resetForm()" class="hidden bg-gray-500 text-white px-6 py-2 rounded-full hover:bg-gray-600 transition">Hủy</button>
+        </div>
+
+        <div id="notesContainer" class="grid grid-cols-1 gap-4"></div>
+        <div id="pagination" class="flex justify-center gap-2 mt-6"></div>
+    </div>
+
+<div id="qrModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+
+    <div class="bg-white rounded-3xl p-6 w-80 shadow-xl">
+
+        <h2 class="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
+            <i class="fa-solid fa-qrcode text-purple-600"></i>
+            Tạo mã QR
+        </h2>
+
+        <input id="qrText" class="w-full border rounded-xl p-2 mb-3" placeholder="Nhập nội dung QR">
+
+        <label class="text-sm text-gray-600">Màu QR</label>
+        <input id="qrColor" type="color" value="#000000" class="w-full h-10 mb-3">
+
+        <div id="qrcode" class="flex justify-center mb-4"></div>
+
+        <div class="flex gap-2">
+
+            <button onclick="createQR()" class="flex-1 bg-purple-600 text-white rounded-xl p-2">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo
+            </button>
+
+            <button onclick="downloadQR()" class="flex-1 bg-green-600 text-white rounded-xl p-2">
+                <i class="fa-solid fa-download"></i> Tải
+            </button>
+
+        </div>
+
+        <button onclick="closeQR()" class="mt-3 w-full bg-gray-200 rounded-xl p-2">
+            Đóng
+        </button>
+
+    </div>
+
+</div>
+<!-- ================= AI Modal ================= -->
+<div id="aiModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+
+    <div class="bg-white rounded-3xl p-6 w-96 shadow-xl">
+
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles text-indigo-600"></i>
+            Trợ lý AI
+        </h2>
+
+        <textarea id="aiText"
+        class="w-full border rounded-xl p-3 h-32"
+        placeholder="Nhập nội dung cần AI hỗ trợ..."></textarea>
+
+        <div class="flex gap-2 mt-4">
+
+            <button onclick="askAI()"
+            class="flex-1 bg-indigo-600 text-white rounded-xl p-2">
+                <i class="fa-solid fa-paper-plane"></i> Gửi
+            </button>
+
+            <button onclick="closeAI()"
+            class="flex-1 bg-gray-200 rounded-xl p-2">
+                Đóng
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        // --- IndexedDB Logic ---
+        let db;
+        const request = indexedDB.open("NotesDB", 1);
+        request.onupgradeneeded = e => { db = e.target.result; db.createObjectStore("notes", { keyPath: "id" }); };
+        request.onsuccess=async e=>{db=e.target.result;if("Notification"in window&&Notification.permission==="default")await Notification.requestPermission();renderNotes();checkReminders();};
+
+        const dbAction = (mode, callback) => {
+            const tx = db.transaction("notes", mode);
+            const store = tx.objectStore("notes");
+            return new Promise(resolve => {
+                const req = callback(store);
+                req.onsuccess = () => resolve(req.result);
+                tx.oncomplete = () => {};
+            });
+        };
+
+        const getAllNotes = () => dbAction("readonly", s => s.getAll());
+        const saveNotesToDB = (notes) => {
+            const tx = db.transaction("notes", "readwrite");
+            const store = tx.objectStore("notes");
+            store.clear();
+            notes.forEach(n => store.put(n));
+        };
+        // -----------------------
+
+        const toolbarOptions=[[{'header':['1','2','3',false]}],[{'size':['small',false,'large','huge']}],['bold','italic','underline','strike'],[{'script':'sub'},{'script':'super'}],[{'color':[]},{'background':[]}],[{'align':[]}],[{'list':'ordered'},{'list':'bullet'}],['link','image']];
+        const quill = new Quill('#editor', { theme: 'snow', modules: { toolbar: toolbarOptions } });
+        const datePickerInstance = flatpickr("#datePicker", { enableTime: true, dateFormat: "Y-m-d H:i" });
+        let editingId = null;
+        let showTrash = false;
+        let viewMode = 'grid';
+
+        const container = document.getElementById('notesContainer');
+        new Sortable(container, { animation: 150, onEnd: updateOrder });
+
+        function toggleView(mode) { viewMode = mode; renderNotes(); }
+
+        async function updateStats() {
+            const notes = await getAllNotes();
+            const now = new Date();
+            const activeNotes = notes.filter(n => !n.deleted);
+            
+            const stats = {
+                total: activeNotes.length,
+                scheduled: activeNotes.filter(n => n.date).length,
+                overdue: activeNotes.filter(n => n.date && new Date(n.date) < now).length,
+                pinned: activeNotes.filter(n => n.pinned).length
+            };
+
+            const statsContainer = document.getElementById('statsContainer');
+            statsContainer.innerHTML = `
+                <div class="bg-blue-50 p-4 rounded-2xl flex items-center gap-3 border border-blue-100">
+                    <i class="fa-solid fa-note-sticky text-blue-500 text-xl"></i>
+                    <div><div class="text-xs text-gray-500">Tổng ghi chú</div><div class="font-bold">${stats.total}</div></div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-2xl flex items-center gap-3 border border-purple-100">
+                    <i class="fa-solid fa-calendar-check text-purple-500 text-xl"></i>
+                    <div><div class="text-xs text-gray-500">Có lịch</div><div class="font-bold">${stats.scheduled}</div></div>
+                </div>
+                <div class="bg-red-50 p-4 rounded-2xl flex items-center gap-3 border border-red-100">
+                    <i class="fa-solid fa-clock text-red-500 text-xl"></i>
+                    <div><div class="text-xs text-gray-500">Quá hạn</div><div class="font-bold">${stats.overdue}</div></div>
+                </div>
+                <div class="bg-yellow-50 p-4 rounded-2xl flex items-center gap-3 border border-yellow-100">
+                    <i class="fa-solid fa-thumbtack text-yellow-500 text-xl"></i>
+                    <div><div class="text-xs text-gray-500">Đã ghim</div><div class="font-bold">${stats.pinned}</div></div>
+                </div>
+            `;
+        }
+
+async function checkReminders() {
+    const notes = await getAllNotes();
+    const now = new Date();
+
+    notes.forEach(note => {
+        if (note.date && !note.deleted) {
+            const noteDate = new Date(note.date);
+
+            if (noteDate > now && noteDate - now < 60000) {
+
+                if ("Notification" in window && Notification.permission === "granted") {
+                    new Notification("⏰ Nhắc nhở", {
+                        body: note.title,
+                        icon: "https://cdn-icons-png.flaticon.com/512/1827/1827392.png"
+                    });
+                } else {
+                    alert(`⏰ Nhắc nhở: ${note.title}`);
+                }
+
+            }
+        }
+    });
+}
+
+setInterval(checkReminders, 30000);
+
+        async function updateOrder() {
+            let notes = await getAllNotes();
+            const items = Array.from(container.children);
+            const newOrder = items.map(item => parseInt(item.dataset.id));
+            const reordered = newOrder.map(id => notes.find(n => n.id === id)).filter(n => n);
+            const others = notes.filter(n => !newOrder.includes(n.id));
+            saveNotesToDB([...reordered, ...others]);
+        }
+
+        function setFontSize(val) {
+            document.getElementById('fontSize').value = val;
+            document.getElementById('fontSizeMenu').classList.add('hidden');
+        }
+
+        document.querySelector('emoji-picker').addEventListener('emoji-click', e => {
+            const index = quill.getSelection()?.index || 0;
+            quill.insertText(index, e.detail.unicode);
+            toggleEmojiPicker();
+        });
+
+        function toggleEmojiPicker() { document.getElementById('emojiPicker').classList.toggle('hidden'); }
+// ================= QR CODE =================
+
+let qrCode=null;
+
+function openQR(){
+    document.getElementById("qrModal").classList.remove("hidden");
+}
+
+function closeQR(){
+    document.getElementById("qrModal").classList.add("hidden");
+}
+
+function createQR(){
+
+    const text=document.getElementById("qrText").value || "Ghi chú cá nhân";
+
+    const color=document.getElementById("qrColor").value;
+
+    if(typeof QRCode==="undefined"){
+        alert("Chưa tải thư viện QR Code!");
+        return;
+    }
+
+    const qrBox=document.getElementById("qrcode");
+
+    qrBox.innerHTML="";
+
+    qrCode=new QRCode(qrBox,{
+        text:text,
+        width:200,
+        height:200,
+        colorDark:color,
+        colorLight:"#ffffff"
+    });
+
+}
+
+function downloadQR(){
+
+    const img=document.querySelector("#qrcode img");
+
+    if(!img){
+        alert("Vui lòng tạo QR trước!");
+        return;
+    }
+
+    const link=document.createElement("a");
+
+    link.href=img.src;
+
+    link.download="QRCode.png";
+
+    link.click();
+
+}
+
+// ================= AI =================
+
+function openAI(){
+    document.getElementById("aiModal").classList.remove("hidden");
+}
+
+function closeAI(){
+    document.getElementById("aiModal").classList.add("hidden");
+}
+
+function askAI(){
+
+    const text=document.getElementById("aiText").value;
+
+    if(!text){
+        alert("Nhập nội dung cần hỏi AI!");
+        return;
+    }
+
+    const url="https://chat.openai.com/?q="+encodeURIComponent(text);
+
+    window.open(url,"_blank");
+}
+
+function insertImage(input){
+    const file=input.files[0];
+    if(!file)return;
+
+    const reader=new FileReader();
+
+    reader.onload=e=>{
+        const range=quill.getSelection();
+        quill.insertEmbed(range?range.index:quill.getLength(),'image',e.target.result);
+    };
+
+    reader.readAsDataURL(file);
+}
+
+        let currentPage = 1;
+        const notesPerPage = 10;
+        function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
+function getLunarDate(dateString) {
+    if (!dateString) return '';
+    const d = new Date(dateString);
+    if (isNaN(d)) return '';
+    const l = Solar.fromYmd(d.getFullYear(), d.getMonth() + 1, d.getDate()).getLunar();
+    return `Âm Lịch: Ngày ${l.getDay()} Tháng ${l.getMonth()}`;
+}
+
+        async function saveNote() {
+            const title = document.getElementById('title').value;
+            const content = quill.root.innerHTML;
+            const date = document.getElementById('datePicker').value;
+            const bgColor = document.getElementById('bgColor').value;
+            const fontSize = document.getElementById('fontSize').value;
+            if(!title) return alert("Vui lòng nhập tiêu đề!");
+            
+            let notes = await getAllNotes();
+            if (editingId) {
+                notes=notes.map(n=>n.id===editingId?{...n,title,content,date,bgColor,fontSize,reminded:false,updated:new Date().toISOString()}:n);
+            } else {
+                notes.unshift({id:Date.now(),title,content,date,bgColor,fontSize,deleted:false,pinned:false,reminded:false,created:new Date().toISOString(),updated:new Date().toISOString()});
+            }
+            saveNotesToDB(notes);
+            resetForm();
+            renderNotes();
+        }
+
+        async function editNote(id) {
+            const notes = await getAllNotes();
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+            editingId = id;
+            document.getElementById('title').value = note.title;
+            quill.root.innerHTML = note.content;
+            document.getElementById('datePicker').value = note.date;
+            datePickerInstance.setDate(note.date);
+            document.getElementById('bgColor').value = note.bgColor;
+            document.getElementById('fontSize').value = note.fontSize;
+            document.getElementById('saveBtn').innerHTML = '<i class="fa-solid fa-check"></i> Cập nhật';
+            document.getElementById('cancelBtn').classList.remove('hidden');
+        }
+
+        function resetForm() {
+            editingId = null;
+            document.getElementById('title').value = '';
+            quill.setContents([]);
+            datePickerInstance.clear();
+            document.getElementById('saveBtn').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Lưu';
+            document.getElementById('cancelBtn').classList.add('hidden');
+            document.getElementById('fontSize').value = 'text-base';
+        }
+
+        function toggleTrash() { showTrash = !showTrash; renderNotes(); }
+
+        async function togglePin(id) {
+            let notes = await getAllNotes();
+            notes = notes.map(n => n.id === id ? {...n, pinned: !n.pinned} : n);
+            saveNotesToDB(notes);
+            renderNotes();
+        }
+
+function toggleSortMenu(){
+    document.getElementById("sortMenu").classList.toggle("hidden");
+}
+
+function changeSort(value){
+
+    document.getElementById("sortMenu").classList.add("hidden");
+
+    document.getElementById("sortSelect")?.remove();
+
+    window.sortValue=value;
+
+    renderNotes();
+}
+
+        async function deleteNote(id) {
+            let notes = await getAllNotes();
+            if (showTrash) {
+                if(!confirm('Xóa vĩnh viễn ghi chú này?')) return;
+                notes = notes.filter(n => n.id !== id);
+            } else {
+                notes = notes.map(n => n.id === id ? {...n, deleted: true} : n);
+            }
+            saveNotesToDB(notes);
+            renderNotes();
+        }
+
+        async function restoreNote(id) {
+            let notes = await getAllNotes();
+            notes = notes.map(n => n.id === id ? {...n, deleted: false} : n);
+            saveNotesToDB(notes);
+            renderNotes();
+        }
+
+async function exportFile(id, type) {
+
+    const notes = await getAllNotes();
+    const note = notes.find(n => n.id === id);
+
+    if (!note) return;
+
+    if (type === 'txt') {
+
+        const blob = new Blob(
+            [`${note.title}\n\n${note.content.replace(/<[^>]*>/g,'')}`],
+            {type:"text/plain;charset=utf-8"}
+        );
+
+        const link=document.createElement("a");
+        link.href=URL.createObjectURL(blob);
+        link.download=`${note.title}.txt`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+
+    } else {
+
+        const noteDiv=document.querySelector(`[data-id="${id}"]`);
+
+        if(!noteDiv){
+            alert("Không tìm thấy ghi chú!");
+            return;
+        }
+
+        const canvas=await html2canvas(noteDiv,{
+            scale:2,
+            useCORS:true,
+            backgroundColor:"#ffffff"
+        });
+
+        const img=canvas.toDataURL("image/png");
+
+        const { jsPDF }=window.jspdf;
+        const pdf=new jsPDF("p","mm","a4");
+
+        const pageWidth=190;
+        const pageHeight=canvas.height*pageWidth/canvas.width;
+
+        pdf.addImage(img,"PNG",10,10,pageWidth,pageHeight);
+
+        pdf.save(`${note.title}.pdf`);
+    }
+
+}
+
+        async function renderNotes() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+           const sortVal = window.sortValue || "newest";
+            let notes = await getAllNotes();
+            
+            notes=notes.filter(n=>(showTrash?n.deleted:!n.deleted)&&(((n.title||"")+" "+(n.content||"").replace(/<[^>]*>/g,"")+" "+(n.date||"")).toLowerCase().includes(searchTerm)));
+            
+            if (sortVal === 'newest') notes.sort((a, b) => b.id - a.id);
+            if (sortVal === 'oldest') notes.sort((a, b) => a.id - b.id);
+            if (sortVal === 'title') notes.sort((a, b) => a.title.localeCompare(b.title));
+            if (sortVal === 'date') notes.sort((a, b) => new Date(a.date || '9999') - new Date(b.date || '9999'));
+            if (sortVal === 'color') notes.sort((a, b) => a.bgColor.localeCompare(b.bgColor));
+            
+            notes.sort((a, b) => b.pinned - a.pinned);
+            
+            const start = (currentPage - 1) * notesPerPage;
+            const paginated = notes.slice(start, start + notesPerPage);
+            
+            container.className = viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'grid grid-cols-1 gap-4';
+            container.innerHTML = paginated.map(n => `
+                <div data-id="${n.id}" class="p-5 border rounded-3xl ${n.fontSize} cursor-move" style="background-color: ${n.bgColor}">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg">${capitalize(n.title)}</h3>
+                        <div class="flex gap-2">
+                            ${!n.deleted ? `
+                                <button onclick="togglePin(${n.id})" class="${n.pinned ? 'text-yellow-500' : 'text-gray-400'}"><i class="fa-solid fa-thumbtack"></i></button>
+                                <button onclick="exportFile(${n.id}, 'pdf')" class="text-red-600"><i class="fa-solid fa-file-pdf"></i></button>
+                                <button onclick="exportFile(${n.id}, 'txt')" class="text-gray-600"><i class="fa-solid fa-file-lines"></i></button>
+                                <button onclick="editNote(${n.id})" class="text-blue-500"><i class="fa-solid fa-pen-to-square"></i></button>
+                            ` : `<button onclick="restoreNote(${n.id})" class="text-green-500"><i class="fa-solid fa-trash-arrow-up"></i></button>`}
+                            <button onclick="deleteNote(${n.id})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-4 font-medium italic">
+                        ${n.date ? `<i class="fa-solid fa-calendar-days"></i> ${n.date} | ${getLunarDate(n.date)}` : 'Không có ngày hẹn'}
+                    </p>
+                    <div class="text-gray-700 ql-editor p-0">${n.content}</div>
+                </div>
+            `).join('');
+            
+            renderPagination(notes.length);
+            updateStats();
+        }
+
+function renderPagination(total){
+
+    const count=Math.ceil(total/notesPerPage)||1;
+
+    if(currentPage>count) currentPage=count;
+
+    let html="";
+
+    const addPage=p=>{
+        html+=`<button onclick="currentPage=${p};renderNotes()" class="px-3 py-1 border rounded ${currentPage===p?'bg-blue-600 text-white':''}">${p}</button>`;
+    };
+
+    if(count<=10){
+
+        for(let i=1;i<=count;i++) addPage(i);
+
+    }else{
+
+        addPage(1);
+
+        if(currentPage>4)
+            html+=`<span class="px-2">...</span>`;
+
+        const start=Math.max(2,currentPage-1);
+        const end=Math.min(count-1,currentPage+1);
+
+        for(let i=start;i<=end;i++)
+            addPage(i);
+
+        if(currentPage<count-3)
+            html+=`<span class="px-2">...</span>`;
+
+        addPage(count);
+
+    }
+
+    const pagination=document.getElementById("pagination");
+
+    if(pagination)
+        pagination.innerHTML=html;
+
+}
+    </script>
+</body>
+</html>
