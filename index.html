@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
@@ -11,6 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     
     <title>Modern Note App - IndexedDB</title>
@@ -59,6 +61,41 @@
     background:#f3f4f6;
     border-radius:8px;
 }
+.ql-editor .colored-icon {
+    display:inline-block;
+    padding:0 4px;
+    cursor:pointer;
+}
+
+.icon-scroll {
+    max-height:60vh;
+    overflow-y:auto;
+    scrollbar-width:thin;
+}
+
+.icon-scroll::-webkit-scrollbar {
+    width:6px;
+}
+
+.icon-scroll::-webkit-scrollbar-thumb {
+    background:#cbd5e1;
+    border-radius:10px;
+}
+
+[title]:hover::after {
+    content:attr(title);
+    position:absolute;
+    bottom:100%;
+    left:50%;
+    transform:translateX(-50%);
+    background:#333;
+    color:#fff;
+    padding:4px 8px;
+    border-radius:4px;
+    font-size:10px;
+    white-space:nowrap;
+    z-index:100;
+}
     </style>
 </head>
 <body class="bg-gray-100 p-4 md:p-10 font-sans">
@@ -106,7 +143,7 @@
     </div>
 </div>
 
-           <button onclick="toggleTrash()" class="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-200 hover:text-red-600 active:bg-gray-300 transition-all"><i class="fa-solid fa-trash-can text-lg"></i></button>
+           <button onclick="toggleTrash()" class="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-200 hover:text-red-600 active:bg-gray-300 transition-all"><i class="fa-solid fa-trash"></i></button>
         </div>
         
         <input id="title" type="text" placeholder="Tiêu đề..." class="w-full p-3 mb-2 border rounded-xl outline-none">
@@ -114,7 +151,7 @@
         <div class="flex flex-wrap gap-2 mb-2 items-center">
             <div class="relative">
                 <button onclick="document.getElementById('bgColor').click()" class="h-10 w-12 flex items-center justify-center border border-orange-500 text-orange-600 rounded-lg hover:bg-orange-50 transition">
-                    <i class="fa-solid fa-palette"></i>
+                    <i class="fa-solid fa-brush"></i>
                 </button>
                 <input type="color" id="bgColor" value="#f9fafb" class="hidden">
             </div>
@@ -136,8 +173,11 @@
                 <emoji-picker id="emojiPicker" class="hidden absolute z-50 top-12"></emoji-picker>
             </div>
             <input type="file" id="imageInput" class="hidden" accept="image/*" onchange="insertImage(this)">
-            <button onclick="document.getElementById('imageInput').click()" class="w-10 h-10 flex items-center justify-center rounded-lg text-blue-400 hover:bg-gray-200 hover:text-blue-500 active:bg-gray-300 transition-all" title="Chèn ảnh"><i class="fa-solid fa-images text-lg"></i></button>
-           <button onclick="openQR()" class="w-10 h-10 flex items-center justify-center rounded-lg text-purple-600 hover:bg-purple-100 active:bg-purple-200 transition-all"><i class="fa-solid fa-qrcode text-lg"></i></button>
+          <button onclick="openIconModal()" class="w-10 h-10 flex items-center justify-center text-indigo-400 hover:text-indigo-500 active:text-indigo-600 transition-all" title="Icon"><i class="fa-brands fa-font-awesome"></i></button>
+          <button onclick="document.getElementById('imageInput').click()" class="w-10 h-10 flex items-center justify-center text-blue-400 hover:text-blue-500 active:text-blue-600 transition-all" title="Chèn ảnh"><i class="fa-solid fa-images text-lg"></i></button>
+          <button onclick="openQR()" class="w-10 h-10 flex items-center justify-center rounded-lg text-purple-600 hover:bg-purple-100 active:bg-purple-200 transition-all" title="Tạo mã QR"><i class="fa-solid fa-qrcode text-lg"></i></button>
+         <button onclick="openBarcode()" class="w-10 h-10 flex items-center justify-center rounded-lg text-blue-600 hover:bg-blue-100 active:bg-blue-200 transition-all" title="Mã vạch"><i class="fa-solid fa-barcode text-lg"></i></button>
+        <button onclick="openSymbolModal()" class="w-10 h-10 flex items-center justify-center rounded-lg text-indigo-600 hover:bg-indigo-100 active:bg-indigo-200 transition-all" title="Symbol"><i class="fa-solid fa-square-root-variable text-lg"></i></button>
           <div class="relative">
 	<button onclick="toggleCaseMenu()" class="w-10 h-10 flex items-center justify-center rounded-lg text-sky-500 hover:bg-gray-200 hover:text-sky-600 active:bg-gray-300 transition-all" title="Đổi kiểu chữ"><i class="fa-solid fa-a"></i></button>
 	 <div id="caseMenu" class="hidden absolute z-50 mt-2 bg-white border rounded-xl shadow-xl p-2 w-56">
@@ -148,7 +188,8 @@
 		<button onclick="changeCase('toggle')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100"><i class="fa-solid fa-repeat text-red-500 mr-2"></i> Đảo HOA / thường</button>
 	</div>
          </div>
-           <button onclick="openAI()" class="w-10 h-10 flex items-center justify-center rounded-lg text-indigo-600 hover:bg-indigo-100 active:bg-indigo-200 transition-all"><i class="fa-solid fa-robot text-lg"></i></button>
+          <button onclick="openAI()" class="w-10 h-10 flex items-center justify-center rounded-lg text-indigo-600 hover:bg-indigo-100 active:bg-indigo-200 transition-all" title="ChatGPT"><i class="fa-solid fa-microchip text-lg"></i></button>
+         <button onclick="openCalendar()" class="w-10 h-10 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-100 transition" title="Calendar"><i class="fa-solid fa-calendar-days text-lg"></i></button>
         </div>
 
         <div id="editor" class="h-40 mb-4 rounded-xl overflow-hidden border"></div>
@@ -201,6 +242,89 @@
     </div>
 
 </div>
+<!-- ================= Barcode ================= -->
+<div id="barcodeModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+
+    <div class="bg-white rounded-3xl p-6 w-96 shadow-xl">
+
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-barcode text-blue-600"></i>
+            Tạo Barcode
+        </h2>
+
+        <input id="barcodeText"
+               class="w-full border rounded-xl p-2 mb-3"
+               placeholder="Nhập mã">
+
+        <select id="barcodeType"
+                class="w-full border rounded-xl p-2 mb-3">
+            <option value="CODE128">CODE128</option>
+            <option value="EAN13">EAN13</option>
+        </select>
+
+        <label class="text-sm text-gray-600">Màu Barcode</label>
+        <input id="barcodeColor"
+               type="color"
+               value="#000000"
+               class="w-full h-10 mb-3 rounded-lg border">
+
+        <label class="text-sm text-gray-600">Màu nền</label>
+        <input id="barcodeBg"
+               type="color"
+               value="#ffffff"
+               class="w-full h-10 mb-4 rounded-lg border">
+
+        <div class="flex justify-center border rounded-xl bg-gray-50 p-4 mb-4">
+            <svg id="barcodeSvg"></svg>
+        </div>
+
+        <div class="flex gap-2">
+
+            <button onclick="createBarcode()"
+                    class="flex-1 bg-blue-600 text-white rounded-xl p-2 hover:bg-blue-700">
+                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>
+                Tạo
+            </button>
+
+            <button onclick="downloadBarcode()"
+                    class="flex-1 bg-green-600 text-white rounded-xl p-2 hover:bg-green-700">
+                <i class="fa-solid fa-download mr-1"></i>
+                Tải
+            </button>
+
+        </div>
+
+        <button onclick="closeBarcode()"
+                class="mt-3 w-full bg-gray-200 hover:bg-gray-300 rounded-xl p-2">
+            Đóng
+        </button>
+
+    </div>
+
+</div>
+<!-- ================= Symbol================= -->
+<div id="symbolModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+
+<div class="bg-white rounded-3xl w-[650px] max-h-[80vh] flex flex-col shadow-2xl">
+
+<div class="p-5 border-b flex justify-between items-center">
+
+<h2 class="text-xl font-bold">
+<i class="fa-solid fa-square-root-variable text-lg"></i>
+Unicode Symbol
+</h2>
+
+<button onclick="closeSymbolModal()">
+<i class="fa-solid fa-xmark text-xl"></i>
+</button>
+
+</div>
+
+<div id="symbolGrid" class="grid grid-cols-10 gap-2 p-5 overflow-auto"></div>
+
+</div>
+
+</div>
 <!-- ================= AI Modal ================= -->
 <div id="aiModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
 
@@ -232,7 +356,66 @@
     </div>
 
 </div>
+<!-- ================= Calender ================= -->
+<div id="calendarModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
 
+    <div class="bg-white rounded-3xl p-6 w-96 shadow-xl">
+
+        <h2 class="text-xl font-bold mb-4">
+            <i class="fa-solid fa-calendar-days text-green-600"></i>
+            Calendar
+        </h2>
+
+        <input id="calendarInput"
+               class="w-full border rounded-xl p-3 mb-4"
+               placeholder="Chọn ngày">
+
+        <div class="flex gap-2">
+
+            <button onclick="insertCalendar()"
+                    class="flex-1 bg-green-600 text-white rounded-xl p-2">
+                <i class="fa-solid fa-check mr-1"></i>
+                Chèn
+            </button>
+
+            <button onclick="todayCalendar()"
+                    class="bg-blue-600 text-white rounded-xl px-4">
+                Hôm nay
+            </button>
+
+        </div>
+
+        <button onclick="closeCalendar()"
+                class="w-full mt-3 bg-gray-200 rounded-xl p-2">
+            Đóng
+        </button>
+
+    </div>
+
+</div>
+    <!-- Modal -->
+    <div id="iconModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <div class="bg-white p-8 rounded-3xl w-full max-w-5xl h-[80vh] flex flex-col shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold text-2xl text-slate-700">Kho Icon</h3>
+                <div class="flex items-center gap-4 bg-slate-100 p-2 rounded-2xl">
+                    <span class="text-xs font-bold text-slate-500 ml-2">MÀU TÙY CHỈNH:</span>
+                    <button id="colorToggle" onclick="toggleColorMode()" class="px-4 py-1.5 bg-white shadow rounded-xl text-xs font-bold">OFF</button>
+                    <input type="color" id="colorPicker" value="#2563eb" class="w-8 h-8 rounded-full cursor-pointer hidden">
+                </div>
+                <button onclick="document.getElementById('iconModal').classList.add('hidden')" class="text-2xl text-slate-400 hover:text-slate-600">✕</button>
+            </div>
+            
+            <div class="icon-scroll flex-1 pr-2">
+                <div id="recentIconsSection" class="mb-8 hidden">
+                    <h4 class="text-sm uppercase tracking-widest font-bold text-slate-400 mb-3">Gần đây</h4>
+                    <div id="recentIconsGrid" class="grid grid-cols-8 md:grid-cols-12 gap-3"></div>
+                </div>
+                <h4 class="text-sm uppercase tracking-widest font-bold text-slate-400 mb-3">Tất cả icon</h4>
+                <div id="iconGrid" class="grid grid-cols-8 md:grid-cols-12 gap-3"></div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
@@ -263,6 +446,91 @@
 
         const toolbarOptions=[[{'header':['1','2','3',false]}],[{'size':['small',false,'large','huge']}],['bold','italic','underline','strike'],[{'script':'sub'},{'script':'super'}],[{'color':[]},{'background':[]}],[{'align':[]}],[{'list':'ordered'},{'list':'bullet'}],['link','image']];
         const quill = new Quill('#editor', { theme: 'snow', modules: { toolbar: toolbarOptions } });
+// DÁN Ở ĐÂY
+function openIconModal(){
+    document.getElementById("iconModal").classList.remove("hidden");
+}
+
+function closeIconModal(){
+    document.getElementById("iconModal").classList.add("hidden");
+}
+
+
+const iconSource = ['folder-plus', 'horse-head', 'book-medical', 'chess-pawn', 'democrat', 'network-wired', 'compress', 'neuter', 'info', 'kiwi-bird', 'transgender-alt', 'star-and-crescent', 'skiing-nordic', 'box-open', 'sort-up', 'check-circle', 'fire-alt', 'low-vision', 'parachute-box', 'hourglass-end', 'dungeon', 'bus', 'chart-line', 'fax', 'play', 'square', 'ambulance', 'hand-holding-usd', 'city', 'surprise', 'weight-hanging', 'hamburger', 'cross', 'satellite-dish', 'caret-down', 'crutch', 'car-crash', 'i-cursor', 'chair', 'font', 'heart-broken', 'expand-alt', 'power-off', 'forward', 'user-ninja', 'hat-cowboy-side', 'map-marked', 'digital-tachograph', 'long-arrow-alt-right', 'mail-bulk', 'users', 'hands', 'file-word', 'bell', 'mug-hot', 'mars-double', 'hippo', 'car', 'snowplow', 'notes-medical', 'swimming-pool', 'envelope-square', 'dragon', 'long-arrow-alt-left', 'play-circle', 'funnel-dollar', 'quidditch', 'record-vinyl', 'snowflake', 'mitten', 'address-book', 'bible', 'hot-tub', 'piggy-bank', 'heading', 'server', 'user-graduate', 'vector-square', 'money-bill', 'filter', 'music', 'skull-crossbones', 'stop', 'grin-hearts', 'clipboard-check', 'hand-lizard', 'dumbbell', 'smile-wink', 'anchor', 'microphone', 'igloo', 'smile-beam', 'people-arrows', 'hand-holding', 'user-clock', 'external-link-alt', 'tablet-alt', 'splotch', 'glass-cheers', 'ad', 'plus-circle', 'question', 'hospital', 'camera', 'window-minimize', 'parking', 'hands-helping', 'swimmer', 'dolly', 'train', 'disease', 'monument', 'allergies', 'unlink', 'venus-double', 'th-list', 'shekel-sign', 'church', 'laptop-code', 'syringe', 'sms', 'hourglass', 'calendar-week', 'indent', 'battery-empty', 'transgender', 'file-export', 'box-tissue', 'drum', 'search-minus', 'balance-scale', 'chevron-circle-right', 'fan', 'golf-ball', 'fast-backward', 'map-signs', 'bag-shopping', 'synagogue', 'calendar-alt', 'robot', 'ruler-horizontal', 'grip-lines-vertical', 'signal', 'first-aid', 'child', 'rainbow', 'times', 'sign', 'gopuram', 'bacteria', 'exchange-alt', 'blender', 'poo-storm', 'long-arrow-alt-up', 'level-up-alt', 'square-root-alt', 'share-alt-square', 'tablet', 'comment-slash', 'leaf', 'user-nurse', 'bullseye', 'cloud-showers-heavy', 'caret-square-down', 'star-of-david', 'fire', 'vial', 'grin-squint', 'gift', 'lock-open', 'dice-six', 'luggage-cart', 'poll', 'thumbs-up', 'pager', 'plane-arrival', 'download', 'calendar-times', 'tachometer-alt', 'ice-cream', 'life-ring', 'mars', 'user-lock', 'pause', 'remove-format', 'football-ball', 'camera-retro', 'circle-notch', 'capsules', 'coffee', 'head-side-cough', 'arrow-circle-left', 'map-marked-alt', 'moon', 'wrench', 'headphones-alt', 'eject', 'circle-check', 'comment-alt', 'dice-five', 'cloud-download-alt', 'sitemap', 'phone-square', 'minus-square', 'phone-alt', 'chess-rook', 'house-damage', 'inbox', 'portrait', 'address-card', 'chart-simple', 'joint', 'hamsa', 'ring', 'terminal', 'border-all', 'expand', 'exclamation-circle', 'toilet-paper-slash', 'tablets', 'birthday-cake', 'spinner', 'yin-yang', 'dna', 'file-medical', 'thermometer-three-quarters', 'lightbulb', 'worm', 'shield-halved', 'microscope', 'thumbtack', 'wifi', 'money-bill-wave', 'ribbon', 'water', 'hanukiah', 'shoe-prints', 'reply-all', 'pump-medical', 'glass-whiskey', 'hammer', 'receipt', 'cocktail', 'plug', 'gavel', 'medkit', 'file-invoice-dollar', 'thumbs-down', 'user-injured', 'user-secret', 'expand-arrows-alt', 'comment-dots', 'phone-volume', 'screwdriver', 'pen-alt', 'venus-mars', 'font-awesome', 'broom', 'mars-stroke-h', 'mortar-pestle', 'poll-h', 'wine-glass-alt', 'paste', 'user-times', 'battery-three-quarters', 'mask', 'praying-hands', 'glass-martini', 'video-slash', 'gifts', 'fish', 'greater-than', 'toilet-paper', 'brain', 'user-plus', 'arrows-alt-v', 'at', 'external-link-square-alt', 'shield-virus', 'skiing', 'hand-scissors', 'trash-restore', 'glasses', 'chalkboard', 'industry', 'eye-slash', 'air-freshener', 'plane-slash', 'house-user', 'reply', 'screwdriver-wrench', 'list-ol', 'object-ungroup', 'volume-up', 'trailer', 'wine-bottle', 'barcode', 'arrow-alt-circle-down', 'sliders-h', 'pray', 'blog', 'bars', 'cogs', 'head-side-virus', 'divide', 'cube', 'candy-cane', 'user-md', 'door-open', 'puzzle-piece', 'file-excel', 'globe-africa', 'keyboard', 'file-csv', 'less-than-equal', 'plane', 'globe-americas', 'crow', 'broadcast-tower', 'suitcase-rolling', 'comment-dollar', 'battery-full', 'holly-berry', 'compress-alt', 'shopping-cart', 'comment', 'cart-plus', 'pen-square', 'bicycle', 'square-full', 'folder-open', 'medal', 'prescription-bottle-alt', 'store-alt', 'microphone-alt', 'binoculars', 'question-circle', 'comments', 'code', 'podcast', 'deaf', 'venus', 'campground', 'id-card', 'sign-out-alt', 'blind', 'apple-whole', 'pen-nib', 'fingerprint', 'sort-numeric-up', 'cog', 'sad-cry', 'quran', 'thermometer-quarter', 'bomb', 'image', 'sort', 'space-shuttle', 'sort-numeric-down', 'hard-hat', 'prescription-bottle', 'hotdog', 'subscript', 'clipboard-list', 'file-download', 'envelope-open', 'stamp', 'chess-board', 'images', 'person-digging', 'handshake-slash', 'random', 'baby-carriage', 'viruses', 'chevron-circle-left', 'frown-open', 'ruble-sign', 'car-alt', 'university', 'dot-circle', 'mobile', 'cloud-sun', 'yen-sign', 'hand-pointer', 'clock', 'calendar-day', 'database', 'retweet', 'arrow-circle-up', 'think-peaks', 'swatchbook', 'step-forward', 'calendar', 'braille', 'toggle-on', 'laugh', 'shopping-basket', 'caret-right', 'ghost', 'pen', 'bone', 'mobile-alt', 'calendar-minus', 'spa', 'trash-restore-alt', 'lock', 'toilet', 'won-sign', 'edit', 'meh', 'street-view', 'grin', 'soap', 'file-powerpoint', 'hospital-symbol', 'cloud-rain', 'money-check', 'search-plus', 'restroom', 'cloud-sun-rain', 'arrow-alt-circle-right', 'vihara', 'jedi', 'donate', 'quote-left', 'shuttle-van', 'carrot', 'save', 'american-sign-language-interpreting', 'cloud-meatball', 'microchip', 'file-signature', 'long-arrow-alt-down', 'columns', 'glass-martini-alt', 'step-backward', 'tree', 'marker', 'handshake', 'concierge-bell', 'stream', 'file-alt', 'language', 'procedures', 'dice-three', 'stopwatch', 'chess-bishop', 'pills', 'cookie-bite', 'person-booth', 'greater-than-equal', 'draw-polygon', 'ban', 'smoking', 'meh-blank', 'flag', 'chess', 'x-ray', 'user-alt', 'window-restore', 'file-image', 'utensil-spoon', 'laugh-squint', 'dumpster-fire', 'mouse', 'crosshairs', 'object-group', 'tv', 'lemon', 'search-dollar', 'grin-tongue', 'money-check-alt', 'user-friends', 'landmark', 'hands-wash', 'star', 'dumpster', 'slash', 'burn', 'arrow-up', 'shrimp', 'meh-rolling-eyes', 'map-marker-alt', 'toolbox', 'chalkboard-teacher', 'icicles', 'volume-off', 'bowling-ball', 'bath', 'globe-europe', 'walking', 'percentage', 'trophy', 'vials', 'home', 'clone', 'redo-alt', 'tooth', 'smoking-ban', 'plane-departure', 'sd-card', 'money-check-dollar', 'arrow-left', 'copyright', 'truck', 'map-pin', 'people-carry', 'cubes', 'hat-cowboy', 'shipping-fast', 'pepper-hot', 'futbol', 'folder-minus', 'hospital-alt', 'file-audio', 'briefcase', 'bezier-curve', 'compass', 'pump-soap', 'eye', 'biohazard', 'desktop', 'theater-masks', 'bus-alt', 'bookmark', 'hiking', 'align-right', 'tram', 'thermometer-empty', 'ship', 'fill', 'grin-stars', 'book', 'bell-slash', 'strikethrough', 'umbrella-beach', 'frown', 'dice-d6', 'box', 'truck-moving', 'tty', 'photo-video', 'border-style', 'fill-drip', 'caret-square-up', 'weight', 'paint-brush', 'hand-paper', 'mountain', 'hryvnia', 'id-badge', 'rss-square', 'grin-tears', 'socks', 'code-compare', 'dice-d20', 'crop-alt', 'align-center', 'directions', 'coins', 'shopping-bag', 'award', 'satellite', 'times-circle', 'chevron-up', 'file-code', 'scroll', 'head-side-cough-slash', 'helicopter', 'volleyball-ball', 'sort-down', 'voicemail', 'newspaper', 'tractor', 'sort-amount-down', 'paperclip', 'cat', 'flushed', 'gamepad', 'drumstick-bite', 'chevron-left', 'user-shield', 'rupee-sign', 'biking', 'check', 'magnet', 'palette', 'comments-dollar', 'journal-whills', 'plus', 'code-branch', 'minus', 'cookie', 'grin-tongue-squint', 'hand-holding-medical', 'money-bill-alt', 'user-cog', 'cut', 'user-circle', 'align-justify', 'subway', 'folder', 'infinity', 'registered', 'lira-sign', 'hand-spock', 'file-video', 'history', 'vr-cardboard', 'eraser', 'boxes', 'ruler-combined', 'solar-panel', 'baseball-ball', 'tape', 'sleigh', 'laptop', 'window-maximize', 'bahai', 'icons', 'calculator', 'store-slash', 'warehouse', 'microphone-alt-slash', 'hockey-puck', 'plus-square', 'flag-usa', 'kiss-beam', 'meteor', 'store', 'equals', 'sticky-note', 'radiation', 'file-invoice', 'tshirt', 'unlock', 'grin-wink', 'dog', 'file-contract', 'briefcase-medical', 'torii-gate', 'gem', 'pallet', 'star-of-life', 'grin-beam-sweat', 'highlighter', 'stop-circle', 'taxi', 'feather-alt', 'brush', 'head-side-mask', 'sign-language', 'sync', 'file-import', 'grip-vertical', 'graduation-cap', 'circle', 'arrows-alt', 'volleyball', 'hdd', 'sort-alpha-down', 'dice', 'user', 'cloud-upload-alt', 'location-arrow', 'caret-square-left', 'chevron-circle-up', 'virus', 'volume-down', 'upload', 'spray-can', 'archway', 'bug', 'sun', 'cash-register', 'charging-station', 'compact-disc', 'layer-group', 'pen-fancy', 'battery-half', 'dollar-sign', 'truck-monster', 'trash', 'poo', 'video', 'ruler', 'envelope-open-text', 'gas-pump', 'grin-squint-tears', 'list', 'truck-pickup', 'minus-circle', 'dice-one', 'sort-amount-up', 'search', 'chevron-circle-down', 'spider', 'percent', 'trademark', 'temperature-high', 'headset', 'staff-snake', 'laptop-house', 'tasks', 'laptop-medical', 'prescription', 'calendar-check', 'om', 'torah', 'handshake-alt-slash', 'mars-stroke', 'asterisk', 'tenge', 'italic', 'poop', 'bed', 'seedling', 'ethernet', 'chevron-right', 'user-check', 'hotel', 'crown', 'tint-slash', 'genderless', 'book-dead', 'arrow-alt-circle-up', 'band-aid', 'rug', 'film', 'sad-tear', 'cloud-moon', 'virus-slash', 'dharmachakra', 'door-closed', 'compress-arrows-alt', 'dove', 'temperature-low', 'comment-medical', 'file-medical-alt', 'file', 'laugh-beam', 'project-diagram', 'tag', 'closed-captioning', 'sim-card', 'heartbeat', 'shield-alt', 'fire-extinguisher', 'wheelchair', 'paper-plane', 'copy', 'menorah', 'chevron-down', 'basketball-ball', 'level-down-alt', 'school', 'shower', 'suitcase', 'pound-sign', 'table-tennis', 'window-close', 'drum-steelpan', 'align-left', 'bold', 'certificate', 'phone-square-alt', 'magic', 'mosque', 'feather', 'fist-raised', 'baby', 'info-circle', 'radiation-alt', 'sign-in-alt', 'pencil-alt', 'user-slash', 'kiss-wink-heart', 'users-slash', 'file-upload', 'link', 'soccer-ball', 'motorcycle', 'table', 'building', 'chart-pie', 'outdent', 'fast-forward', 'list-ul', 'horse', 'grin-beam', 'microphone-slash', 'bolt', 'atlas', 'grip-lines', 'hand-holding-heart', 'grin-tongue-wink', 'mars-stroke-v', 'exclamation-triangle', 'phone-slash', 'eye-dropper', 'rocket', 'globe', 'thermometer', 'bacterium', 'cannabis', 'ellipsis-v', 'car-side', 'list-alt', 'grip-horizontal', 'hourglass-start', 'peace', 'signature', 'smile', 'female', 'th-large', 'spell-check', 'arrow-right', 'text-width', 'hat-wizard', 'beer', 'faucet', 'fighter-jet', 'football', 'arrows-alt-h', 'cart-arrow-down', 'globe-asia', 'tags', 'check-double', 'hand-middle-finger', 'kaaba', 'paragraph', 'skating', 'thermometer-half', 'cloud', 'check-square', 'exclamation', 'id-card-alt', 'ticket-alt', 'text-height', 'share-square', 'frog', 'wind', 'adjust', 'hourglass-half', 'otter', 'pastafarianism', 'ruler-vertical', 'recycle', 'file-pdf', 'umbrella', 'flask', 'laugh-wink', 'burger', 'route', 'grimace', 'sort-alpha-up', 'unlock-alt', 'dizzy', 'not-equal', 'book-open', 'memory', 'hand-peace', 'tint', 'caret-up', 'hand-rock', 'headphones', 'male', 'khanda', 'arrow-circle-down', 'undo-alt', 'stroopwafel', 'user-edit', 'caret-left', 'qrcode', 'print', 'arrow-circle-right', 'chess-king', 'hospital-user', 'caret-square-right', 'republican', 'teeth', 'toggle-off', 'stethoscope', 'book-reader', 'less-than', 'ellipsis-h', 'utensils', 'tools', 'mercury', 'envelope', 'wine-glass', 'road', 'kiss', 'caravan', 'chart-area', 'underline', 'traffic-light', 'wallet', 'tired', 'th', 'business-time', 'cheese', 'clinic-medical', 'user-alt-slash', 'blender-phone', 'place-of-worship', 'user-astronaut', 'user-tag', 'chart-bar', 'couch', 'redo', 'map-marker', 'user-minus', 'crop', 'code-commit', 'plug-circle-bolt', 'dice-four', 'share', 'assistive-listening-systems', 'paint-roller', 'oil-can', 'egg', 'superscript', 'car-battery', 'rss', 'chess-queen', 'shapes', 'truck-loading', 'store-alt-slash', 'users-cog', 'running', 'cloud-moon-rain', 'flag-checkered', 'drafting-compass', 'wave-square', 'hand-holding-water', 'user-tie', 'hand-sparkles', 'mouse-pointer', 'heart', 'volume-mute', 'clipboard', 'dolly-flatbed', 'diagnoses', 'arrow-down', 'sync-alt', 'thermometer-full', 'border-none', 'chess-knight', 'map', 'file-archive', 'audio-description', 'smog', 'jar', 'stopwatch-20', 'hashtag', 'arrow-alt-circle-left', 'key', 'bullhorn', 'skull', 'search-location', 'pizza-slice', 'battery-quarter', 'credit-card', 'pause-circle', 'paw', 'quote-right', 'share-alt', 'passport', 'phone', 'trash-alt', 'guitar', 'grin-alt', 'sink', 'euro-sign', 'undo', 'calendar-plus', 'vote-yea', 'teeth-open', 'money-bill-wave-alt'];
+const brandIcons = ['facebook','facebook-f','facebook-messenger','instagram','twitter','x-twitter','youtube','youtube-square','tiktok','linkedin','linkedin-in','github','github-alt','github-square','gitlab','gitlab-square','telegram','telegram-plane','whatsapp','whatsapp-square','discord','reddit','reddit-alien','pinterest','pinterest-p','snapchat','snapchat-ghost','skype','slack','twitch','spotify','steam','steam-symbol','paypal','amazon','chrome','edge','firefox','firefox-browser','safari','opera','internet-explorer','apple','apple-pay','microsoft','windows','android','linux','ubuntu','raspberry-pi','fedora','centos','debian','redhat','html5','css3','css3-alt','js','python','java','php','react','reacteurope','vuejs','angular','bootstrap','sass','less','npm','node','node-js','yarn','git','git-alt','bitbucket','gitkraken','docker','aws','digital-ocean','stripe','stripe-s','bitcoin','btc','ethereum','alipay','cc-visa','cc-mastercard','cc-paypal','cc-apple-pay','cc-amazon-pay','cc-discover','cc-amex','cc-jcb','soundcloud','bandcamp','itunes','itunes-note','vimeo','vimeo-v','vimeo-square','vine','flickr','foursquare','tumblr','tumblr-square','yahoo','yandex','yandex-international','dropbox','box','dribbble','dribbble-square','behance','behance-square','medium','medium-m','quora','vk','weibo','weixin','zhihu','goodreads','goodreads-g','hacker-news','hacker-news-square','hackerrank','stack-overflow','stack-exchange','codepen','jsfiddle','dev','free-code-camp','wordpress','wordpress-simple','joomla','drupal','magento','shopify','wix','squarespace','elementor','mailchimp','hubspot','salesforce','google','google-drive','google-play','google-pay','google-wallet','google-plus','google-plus-g','app-store','app-store-ios','jira','trello','confluence','atlassian','evernote','patreon','kickstarter','kickstarter-k','etsy','ebay','shopify','airbnb','uber','lyft','yelp','imdb','wikipedia-w','playstation','xbox','unity','battle-net','qq','line','viber','xing','mastodon','mixcloud','slideshare','product-hunt','stumbleupon','stumbleupon-circle','lastfm','lastfm-square','napster','deezer','pied-piper','pied-piper-alt','pied-piper-hat','fort-awesome','fort-awesome-alt','d-and-d','d-and-d-beyond'];
+const symbolSource=['✓','✔','✕','✖','✗','✘','☑','☒','☐','☑','☒','☓','☔','☕','☖','☗','☘','☙','★','☆','⭐','✪','✫','✬','✭','✮','✯','✰','✵','✶','✷','✸','✹','✺','✻','✼','❤','♥','♡','❥','❣','💕','💖','💗','💘','💙','💚','💛','🧡','💜','🖤','🤍','🤎','→','←','↑','↓','↔','↕','⇒','⇐','⇑','⇓','⇔','➜','➝','➞','➟','➠','➡','➤','➥','➦','➧','➨','➩','➪','➫','➬','➭','➮','➯','▲','△','▼','▽','◀','◁','▶','▷','◆','◇','■','□','▪','▫','●','○','◉','◎','◌','◍','◐','◑','◒','◓','◔','◕','◖','◗','◘','◙','♠','♣','♦','♥','♤','♧','♢','♡','♔','♕','♖','♗','♘','♙','♚','♛','♜','♝','♞','♟','☎','☏','✆','📞','📱','✉','📧','📨','📩','📬','📭','📮','📯','⌚','⏰','⌛','⏳','⏱','⏲','🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚','🕛','☀','☁','⛅','⛈','🌧','🌩','🌨','❄','☃','☂','⚡','🔥','🌈','🌙','⭐','☕','⚽','🏀','🏈','⚾','🎾','🏐','🏉','🎱','🎳','🎲','🎯','🎮','🎵','🎶','🎼','🎹','🎸','🎺','🎷','⚠','❗','❕','❓','❔','‼','⁉','☢','☣','⚕','⚖','⚗','⚙','⚒','⚔','⚰','⚱','⚓','⚜','⚛','∞','≈','≠','≤','≥','±','÷','×','√','∑','∏','∫','∂','∆','∇','∝','∴','∵','∈','∉','∩','∪','⊂','⊃','⊆','⊇','∅','π','µ','Ω','α','β','γ','δ','ε','ζ','η','θ','ι','κ','λ','μ','ν','ξ','ο','π','ρ','σ','τ','υ','φ','χ','ψ','ω','Α','Β','Γ','Δ','Ε','Ζ','Η','Θ','Ι','Κ','Λ','Μ','Ν','Ξ','Ο','Π','Ρ','Σ','Τ','Υ','Φ','Χ','Ψ','Ω','©','®','™','℠','§','¶','№','℗','℉','℃','℅','℞','₫','$','€','£','¥','₩','₹','₽','₴','₺','₦','₱','₿','¢','①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩','⑪','⑫','⑬','⑭','⑮','⑯','⑰','⑱','⑲','⑳','⓪','⓵','⓶','⓷','⓸','⓹','⓺','⓻','⓼','⓽','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ','Ⅷ','Ⅸ','Ⅹ','Ⅺ','Ⅻ','♂','♀','⚥','⚢','⚣','⚤','☮','☯','✡','☪','☦','✝','☸','☭','☬','☥','♪','♫','♩','♬','♭','♯','𝄞','𝄢','⌂','⌘','⌥','⌫','⌦','⌧','⌨','⌬','⌭','⌮','⌯','╔','╗','╚','╝','═','║','╠','╣','╦','╩','╬','┌','┐','└','┘','─','│','├','┤','┬','┴','┼','█','▓','▒','░','▌','▐','▀','▄','▖','▗','▘','▙','▚','▛','▜','▝','▞','▟'];
+
+        const colors = ['text-red-500', 'text-blue-500', 'text-green-600', 'text-yellow-500', 'text-purple-600', 'text-pink-500', 'text-teal-600', 'text-indigo-500'];
+
+        const Embed = Quill.import('blots/embed');
+        class ColorIconBlot extends Embed {
+            static create(value) {
+                let node = super.create();
+                node.setAttribute('class', 'colored-icon relative');
+                node.setAttribute('title', value.icon);
+                if (value.color.startsWith('#')) node.style.color = value.color;
+                else node.classList.add(value.color);
+                node.innerHTML = `<i class="${value.icon}"></i>`;
+                return node;
+            }
+            static value(node){const i=node.querySelector("i");const color=node.style.color||[...node.classList].find(c=>c.startsWith("text-"))||"";return{icon:[...i.classList].join(" "),color};}
+        }
+        ColorIconBlot.blotName = 'coloredIcon'; ColorIconBlot.tagName = 'span';
+        Quill.register(ColorIconBlot);
+  let isColorPickerOn = false, counter = 0, recentIcons = [];
+
+        function toggleColorMode() {
+            isColorPickerOn = !isColorPickerOn;
+            const btn = document.getElementById('colorToggle');
+            btn.innerText = isColorPickerOn ? "ON" : "OFF";
+            btn.className = `px-4 py-1.5 shadow rounded-xl text-xs font-bold ${isColorPickerOn ? 'bg-indigo-600 text-white' : 'bg-white'}`;
+            document.getElementById('colorPicker').classList.toggle('hidden', !isColorPickerOn);
+        }
+
+function createIconBtn(icon, color) {
+    const btn = document.createElement('button');
+
+    btn.className = "p-3 bg-white hover:bg-indigo-50 rounded-xl border border-slate-100 transition text-lg relative";
+
+    btn.title = icon;
+
+    // Không thêm fa-solid nữa vì icon đã có sẵn prefix
+    btn.innerHTML = color.startsWith('#')
+        ? `<i class="${icon}" style="color:${color}"></i>`
+        : `<i class="${icon} ${color}"></i>`;
+
+btn.onclick = () => {
+
+    const selectedColor = isColorPickerOn
+        ? document.getElementById("colorPicker").value
+        : color;
+
+    quill.insertEmbed(
+        quill.getSelection()?.index || 0,
+        'coloredIcon',
+        {
+            icon,
+            color: selectedColor
+        }
+    );
+
+    updateRecentIcons(icon, selectedColor);
+
+    document.getElementById("iconModal").classList.add("hidden");
+};
+
+    return btn;
+}
+
+        function updateRecentIcons(icon, color) {
+            recentIcons = [{icon, color}, ...recentIcons.filter(i => i.icon !== icon)].slice(0, 10);
+            const section = document.getElementById('recentIconsSection');
+            const grid = document.getElementById('recentIconsGrid');
+            section.classList.remove('hidden');
+            grid.innerHTML = '';
+            recentIcons.forEach(item => grid.appendChild(createIconBtn(item.icon, item.color)));
+        }
+
         const datePickerInstance = flatpickr("#datePicker", { enableTime: true, dateFormat: "Y-m-d H:i" });
         let editingId = null;
         let showTrash = false;
@@ -408,7 +676,152 @@ function downloadQR(){
     link.click();
 
 }
+// ================= BARCODE =================
+function openBarcode(){
+    document.getElementById("barcodeModal").classList.remove("hidden");
+}
 
+function closeBarcode(){
+    document.getElementById("barcodeModal").classList.add("hidden");
+}
+
+function createBarcode(){
+
+    let text=document.getElementById("barcodeText").value.trim();
+
+    const type=document.getElementById("barcodeType").value;
+
+    const color=document.getElementById("barcodeColor").value;
+
+    const bg=document.getElementById("barcodeBg").value;
+
+    if(!text){
+        alert("Nhập dữ liệu.");
+        return;
+    }
+
+    if(type==="EAN13" && !/^\d{12,13}$/.test(text)){
+        alert("EAN13 phải gồm 12 hoặc 13 số.");
+        return;
+    }
+
+    JsBarcode("#barcodeSvg",text,{
+        format:type,
+        lineColor:color,
+        background:bg,
+        width:2,
+        height:80,
+        margin:10,
+        displayValue:true
+    });
+
+}
+// DÁN HÀM NÀY NGAY TẠI ĐÂY
+function downloadBarcode(){
+
+    const svg=document.getElementById("barcodeSvg");
+
+    if(!svg.innerHTML){
+        alert("Hãy tạo Barcode trước.");
+        return;
+    }
+
+    const serializer=new XMLSerializer();
+
+    const source=serializer.serializeToString(svg);
+
+    const img=new Image();
+
+    img.onload=function(){
+
+        const canvas=document.createElement("canvas");
+
+        canvas.width=img.width;
+
+        canvas.height=img.height;
+
+        const ctx=canvas.getContext("2d");
+
+        // Nên lấy màu nền đang chọn
+        ctx.fillStyle=document.getElementById("barcodeBg").value;
+
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        ctx.drawImage(img,0,0);
+
+        const a=document.createElement("a");
+
+        a.download="Barcode.png";
+
+        a.href=canvas.toDataURL("image/png");
+
+        a.click();
+
+    };
+
+    img.src="data:image/svg+xml;base64,"+btoa(unescape(encodeURIComponent(source)));
+
+}
+// ===== SYMBOL =====
+function openSymbolModal(){
+
+    document.getElementById("symbolModal").classList.remove("hidden");
+
+}
+
+function closeSymbolModal(){
+
+    document.getElementById("symbolModal").classList.add("hidden");
+
+}
+// ================= CALENDAR =================
+let calendarPicker;
+
+function openCalendar(){
+
+    document.getElementById("calendarModal").classList.remove("hidden");
+
+    if(!calendarPicker){
+
+        calendarPicker = flatpickr("#calendarInput",{
+
+            dateFormat:"d/m/Y",
+
+            defaultDate:new Date(),
+
+            locale:"vn"
+
+        });
+
+    }
+
+}
+
+function closeCalendar(){
+
+    document.getElementById("calendarModal").classList.add("hidden");
+
+}
+
+function todayCalendar(){
+
+    calendarPicker.setDate(new Date(),true);
+
+}
+
+function insertCalendar(){
+
+    const value=document.getElementById("calendarInput").value;
+
+    if(!value) return;
+
+    const range=quill.getSelection(true);
+
+    quill.insertText(range ? range.index : quill.getLength(),`📅 ${value}`);
+
+    closeCalendar();
+
+}
 // ================= AI =================
 
 function openAI(){
@@ -650,7 +1063,55 @@ async function exportFile(id, type) {
     }
 
 }
+const grid = document.getElementById('iconGrid');
 
+
+// ICON SOLID
+iconSource.forEach(iconName => {
+
+    grid.appendChild(
+        createIconBtn(
+            'fa-solid fa-' + iconName,
+            colors[counter++ % colors.length]
+        )
+    );
+
+});
+// ===== SYMBOL =====
+const symbolGrid = document.getElementById("symbolGrid");
+
+symbolSource.forEach(symbol => {
+
+    const btn = document.createElement("button");
+
+    btn.className = "h-12 rounded-xl border hover:bg-indigo-50 text-2xl";
+
+    btn.innerHTML = symbol;
+
+    btn.onclick = () => {
+
+        const range = quill.getSelection(true);
+
+        quill.insertText(range ? range.index : 0, symbol);
+
+        closeSymbolModal();
+
+    };
+
+    symbolGrid.appendChild(btn);
+
+});
+// ICON BRAND
+brandIcons.forEach(iconName => {
+
+    grid.appendChild(
+        createIconBtn(
+            'fa-brands fa-' + iconName,
+            colors[counter++ % colors.length]
+        )
+    );
+
+});
         async function renderNotes() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
            const sortVal = window.sortValue || "newest";
