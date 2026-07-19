@@ -142,10 +142,7 @@
 
     </div>
 </div>
-
-           <button onclick="toggleTrash()" class="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-200 hover:text-red-600 active:bg-gray-300 transition-all"><i class="fa-solid fa-trash"></i></button>
-        </div>
-        
+     </div>
         <input id="title" type="text" placeholder="Tiêu đề..." class="w-full p-3 mb-2 border rounded-xl outline-none">
         
         <div class="flex flex-wrap gap-2 mb-2 items-center">
@@ -393,32 +390,89 @@ Unicode Symbol
     </div>
 
 </div>
-    <!-- Modal -->
-    <div id="iconModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-        <div class="bg-white p-8 rounded-3xl w-full max-w-5xl h-[80vh] flex flex-col shadow-2xl">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-bold text-2xl text-slate-700">Kho Icon</h3>
-                <div class="flex items-center gap-4 bg-slate-100 p-2 rounded-2xl">
-                    <span class="text-xs font-bold text-slate-500 ml-2">MÀU TÙY CHỈNH:</span>
-                    <button id="colorToggle" onclick="toggleColorMode()" class="px-4 py-1.5 bg-white shadow rounded-xl text-xs font-bold">OFF</button>
-                    <input type="color" id="colorPicker" value="#2563eb" class="w-8 h-8 rounded-full cursor-pointer hidden">
-                </div>
-                <button onclick="document.getElementById('iconModal').classList.add('hidden')" class="text-2xl text-slate-400 hover:text-slate-600">✕</button>
+<!-- Modal -->
+<div id="iconModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+    <div class="bg-white p-8 rounded-3xl w-full max-w-5xl h-[80vh] flex flex-col shadow-2xl">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-bold text-2xl text-slate-700">
+                <i class="fa-brands fa-font-awesome text-indigo-500 mr-2"></i>
+               Font Awesome
+            </h3>
+
+            <div class="flex items-center gap-4 bg-slate-100 p-2 rounded-2xl">
+                <span class="text-xs font-bold text-slate-500 ml-2">
+                    Chọn Màu Cho Icon:
+                </span>
+
+                <button id="colorToggle"
+                        onclick="toggleColorMode()"
+                        class="px-4 py-1.5 bg-white shadow rounded-xl text-xs font-bold">
+                    OFF
+                </button>
+
+                <input type="color"
+                       id="colorPicker"
+                       value="#2563eb"
+                       class="w-8 h-8 rounded-full cursor-pointer hidden">
             </div>
-            
-            <div class="icon-scroll flex-1 pr-2">
-                <div id="recentIconsSection" class="mb-8 hidden">
-                    <h4 class="text-sm uppercase tracking-widest font-bold text-slate-400 mb-3">Gần đây</h4>
-                    <div id="recentIconsGrid" class="grid grid-cols-8 md:grid-cols-12 gap-3"></div>
-                </div>
-                <h4 class="text-sm uppercase tracking-widest font-bold text-slate-400 mb-3">Tất cả icon</h4>
-                <div id="iconGrid" class="grid grid-cols-8 md:grid-cols-12 gap-3"></div>
-            </div>
+
+            <button onclick="closeIconModal()"
+                    class="text-2xl text-slate-400 hover:text-slate-600">
+                ✕
+            </button>
         </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-2 mb-5">
+
+            <button id="tabGeneral"
+                    onclick="showIconTab('general')"
+                    class="px-5 py-2 rounded-xl bg-indigo-600 text-white font-semibold transition">
+                ⭐ Icon chung
+            </button>
+
+            <button id="tabBrand"
+                    onclick="showIconTab('brand')"
+                    class="px-5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 font-semibold transition">
+                🌐 Mạng xã hội
+            </button>
+
+        </div>
+
+        <!-- Nội dung -->
+        <div class="icon-scroll flex-1 pr-2">
+
+            <!-- Gần đây -->
+            <div id="recentIconsSection" class="mb-8 hidden">
+                <h4 class="text-sm uppercase tracking-widest font-bold text-slate-400 mb-3">
+                    Gần đây
+                </h4>
+
+                <div id="recentIconsGrid"
+                     class="grid grid-cols-8 md:grid-cols-12 gap-3">
+                </div>
+            </div>
+
+            <!-- Danh sách -->
+            <h4 id="iconTitle"
+                class="text-sm uppercase tracking-widest font-bold text-slate-400 mb-3">
+                ⭐ ICON CHUNG
+            </h4>
+
+            <div id="iconGrid"
+                 class="grid grid-cols-8 md:grid-cols-12 gap-3">
+            </div>
+
+        </div>
+
     </div>
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script>
+</div>
+
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
         // --- IndexedDB Logic ---
         let db;
         const request = indexedDB.open("NotesDB", 1);
@@ -448,7 +502,11 @@ Unicode Symbol
         const quill = new Quill('#editor', { theme: 'snow', modules: { toolbar: toolbarOptions } });
 // DÁN Ở ĐÂY
 function openIconModal(){
+
     document.getElementById("iconModal").classList.remove("hidden");
+
+    showIconTab("general");
+
 }
 
 function closeIconModal(){
@@ -483,7 +541,7 @@ const symbolSource=['✓','✔','✕','✖','✗','✘','☑','☒','☐','☑',
             isColorPickerOn = !isColorPickerOn;
             const btn = document.getElementById('colorToggle');
             btn.innerText = isColorPickerOn ? "ON" : "OFF";
-            btn.className = `px-4 py-1.5 shadow rounded-xl text-xs font-bold ${isColorPickerOn ? 'bg-indigo-600 text-white' : 'bg-white'}`;
+           btn.className=`px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 ${isColorPickerOn?'bg-green-500 text-white shadow-lg shadow-green-300':'bg-white text-gray-700 shadow border border-gray-200'}`;
             document.getElementById('colorPicker').classList.toggle('hidden', !isColorPickerOn);
         }
 
@@ -520,6 +578,47 @@ btn.onclick = () => {
 };
 
     return btn;
+}
+
+//==============================
+// Chuyển tab Icon
+//==============================
+function showIconTab(type){
+
+    const grid=document.getElementById("iconGrid");
+    grid.innerHTML="";
+
+    counter=0;
+
+    const list = type==="brand"
+        ? brandIcons
+        : iconSource;
+
+    list.forEach(name=>{
+
+        const icon = type==="brand"
+            ? "fa-brands fa-"+name
+            : "fa-solid fa-"+name;
+
+        grid.appendChild(
+            createIconBtn(
+                icon,
+                colors[counter++ % colors.length]
+            )
+        );
+
+    });
+
+    document.getElementById("tabGeneral").className =
+        type==="general"
+        ? "px-4 py-2 rounded-xl bg-indigo-600 text-white"
+        : "px-4 py-2 rounded-xl bg-gray-200";
+
+    document.getElementById("tabBrand").className =
+        type==="brand"
+        ? "px-4 py-2 rounded-xl bg-indigo-600 text-white"
+        : "px-4 py-2 rounded-xl bg-gray-200";
+
 }
 
         function updateRecentIcons(icon, color) {
@@ -973,6 +1072,31 @@ function getLunarDate(dateString) {
 
         function toggleTrash() { showTrash = !showTrash; renderNotes(); }
 
+async function emptyTrash() {
+
+    let notes = await getAllNotes();
+
+    const trashCount = notes.filter(n => n.deleted).length;
+
+    if (trashCount === 0) {
+        alert("Thùng rác đang trống.");
+        return;
+    }
+
+    if (!confirm(`Xóa vĩnh viễn ${trashCount} ghi chú trong Thùng rác?`)) {
+        return;
+    }
+
+    notes = notes.filter(n => !n.deleted);
+
+    saveNotesToDB(notes);
+
+    renderNotes();
+    updateStats();
+
+    alert(`🗑️ Đã xóa ${trashCount} ghi chú.`);
+}
+
         async function togglePin(id) {
             let notes = await getAllNotes();
             notes = notes.map(n => n.id === id ? {...n, pinned: !n.pinned} : n);
@@ -1063,20 +1187,7 @@ async function exportFile(id, type) {
     }
 
 }
-const grid = document.getElementById('iconGrid');
 
-
-// ICON SOLID
-iconSource.forEach(iconName => {
-
-    grid.appendChild(
-        createIconBtn(
-            'fa-solid fa-' + iconName,
-            colors[counter++ % colors.length]
-        )
-    );
-
-});
 // ===== SYMBOL =====
 const symbolGrid = document.getElementById("symbolGrid");
 
@@ -1101,60 +1212,329 @@ symbolSource.forEach(symbol => {
     symbolGrid.appendChild(btn);
 
 });
-// ICON BRAND
-brandIcons.forEach(iconName => {
 
-    grid.appendChild(
-        createIconBtn(
-            'fa-brands fa-' + iconName,
-            colors[counter++ % colors.length]
-        )
+async function renderNotes() {
+
+    const searchTerm =
+        (document.getElementById('searchInput')?.value || "")
+        .toLowerCase()
+        .trim();
+
+
+    const sortVal = window.sortValue || "newest";
+
+
+    let notes = await getAllNotes();
+
+
+
+    //==============================
+    // Filter
+    //==============================
+    notes = notes.filter(n => {
+
+        const matchTrash =
+            showTrash ? n.deleted : !n.deleted;
+
+
+        const searchText =
+            (
+                (n.title || "") +
+                " " +
+                (n.content || "").replace(/<[^>]*>/g,"") +
+                " " +
+                (n.date || "")
+            )
+            .toLowerCase();
+
+
+        return matchTrash &&
+               searchText.includes(searchTerm);
+
+    });
+
+
+
+    //==============================
+    // Sort
+    //==============================
+    switch(sortVal){
+
+        case "newest":
+            notes.sort((a,b)=>b.id-a.id);
+            break;
+
+
+        case "oldest":
+            notes.sort((a,b)=>a.id-b.id);
+            break;
+
+
+        case "title":
+            notes.sort((a,b)=>
+                (a.title||"")
+                .localeCompare(b.title||"")
+            );
+            break;
+
+
+        case "date":
+            notes.sort((a,b)=>
+                new Date(a.date || "9999") -
+                new Date(b.date || "9999")
+            );
+            break;
+
+
+        case "color":
+            notes.sort((a,b)=>
+                (a.bgColor||"")
+                .localeCompare(b.bgColor||"")
+            );
+            break;
+    }
+
+
+
+    // Pin lên đầu
+    notes.sort((a,b)=>
+        Number(b.pinned||0) -
+        Number(a.pinned||0)
     );
 
-});
-        async function renderNotes() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-           const sortVal = window.sortValue || "newest";
-            let notes = await getAllNotes();
-            
-            notes=notes.filter(n=>(showTrash?n.deleted:!n.deleted)&&(((n.title||"")+" "+(n.content||"").replace(/<[^>]*>/g,"")+" "+(n.date||"")).toLowerCase().includes(searchTerm)));
-            
-            if (sortVal === 'newest') notes.sort((a, b) => b.id - a.id);
-            if (sortVal === 'oldest') notes.sort((a, b) => a.id - b.id);
-            if (sortVal === 'title') notes.sort((a, b) => a.title.localeCompare(b.title));
-            if (sortVal === 'date') notes.sort((a, b) => new Date(a.date || '9999') - new Date(b.date || '9999'));
-            if (sortVal === 'color') notes.sort((a, b) => a.bgColor.localeCompare(b.bgColor));
-            
-            notes.sort((a, b) => b.pinned - a.pinned);
-            
-            const start = (currentPage - 1) * notesPerPage;
-            const paginated = notes.slice(start, start + notesPerPage);
-            
-            container.className = viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'grid grid-cols-1 gap-4';
-            container.innerHTML = paginated.map(n => `
-                <div data-id="${n.id}" class="p-5 border rounded-3xl ${n.fontSize} cursor-move" style="background-color: ${n.bgColor}">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-bold text-lg">${capitalize(n.title)}</h3>
-                        <div class="flex gap-2">
-                            ${!n.deleted ? `
-                                <button onclick="togglePin(${n.id})" class="${n.pinned ? 'text-yellow-500' : 'text-gray-400'}"><i class="fa-solid fa-thumbtack"></i></button>
-                                <button onclick="exportFile(${n.id}, 'pdf')" class="text-red-600"><i class="fa-solid fa-file-pdf"></i></button>
-                                <button onclick="exportFile(${n.id}, 'txt')" class="text-gray-600"><i class="fa-solid fa-file-lines"></i></button>
-                                <button onclick="editNote(${n.id})" class="text-blue-500"><i class="fa-solid fa-pen-to-square"></i></button>
-                            ` : `<button onclick="restoreNote(${n.id})" class="text-green-500"><i class="fa-solid fa-trash-arrow-up"></i></button>`}
-                            <button onclick="deleteNote(${n.id})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-400 mb-4 font-medium italic">
-                        ${n.date ? `<i class="fa-solid fa-calendar-days"></i> ${n.date} | ${getLunarDate(n.date)}` : 'Không có ngày hẹn'}
-                    </p>
-                    <div class="text-gray-700 ql-editor p-0">${n.content}</div>
+
+
+    //==============================
+    // Pagination
+    //==============================
+    const start =
+        (currentPage - 1) * notesPerPage;
+
+
+    const paginated =
+        notes.slice(
+            start,
+            start + notesPerPage
+        );
+
+
+
+    //==============================
+    // Container
+    //==============================
+    container.className =
+        viewMode === 'grid'
+        ?
+        'grid grid-cols-1 md:grid-cols-2 gap-4'
+        :
+        'grid grid-cols-1 gap-4';
+
+
+
+    //==============================
+    // Render Notes
+    //==============================
+    container.innerHTML = `
+
+    <div class="col-span-full flex justify-between items-center mb-2">
+
+        <div class="text-sm text-gray-500">
+            ${
+                showTrash
+                ?
+                `<i class="fa-solid fa-trash text-red-500"></i>
+                 Đang xem Thùng rác`
+                :
+                `<i class="fa-solid fa-note-sticky text-blue-500"></i>
+                 Ghi chú`
+            }
+        </div>
+
+
+        <div class="flex gap-2">
+
+            <button onclick="toggleTrash()"
+                class="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-200 hover:text-red-600 transition"
+                title="Xem Thùng rác">
+
+                <i class="fa-solid fa-trash"></i>
+
+            </button>
+
+
+
+            <button onclick="emptyTrash()"
+                class="
+                px-3 h-10 rounded-lg 
+                ${showTrash ? 
+                'bg-red-600 hover:bg-red-700 text-white' :
+                'bg-gray-200 text-gray-400 cursor-not-allowed'}
+                transition
+                "
+                title="Xóa toàn bộ Thùng rác"
+                ${showTrash ? "" : "disabled"}>
+
+                <i class="fa-solid fa-trash-can"></i>
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    ${
+    paginated.map(n=>`
+
+
+        <div 
+            data-id="${n.id}"
+            class="p-5 border rounded-3xl ${n.fontSize || ''} cursor-move"
+            style="background-color:${n.bgColor || '#ffffff'}"
+        >
+
+
+            <div class="flex justify-between items-start mb-2">
+
+
+                <h3 class="font-bold text-lg">
+
+                    ${capitalize(n.title || "Không có tiêu đề")}
+
+                </h3>
+
+
+
+                <div class="flex gap-2">
+
+
+                ${
+                !n.deleted
+                ?
+
+                `
+
+                <button onclick="togglePin(${n.id})"
+                    class="${n.pinned ? 
+                    'text-yellow-500' :
+                    'text-gray-400'}">
+
+                    <i class="fa-solid fa-thumbtack"></i>
+
+                </button>
+
+
+
+                <button onclick="exportFile(${n.id},'pdf')"
+                    class="text-red-600">
+
+                    <i class="fa-solid fa-file-pdf"></i>
+
+                </button>
+
+
+
+                <button onclick="exportFile(${n.id},'txt')"
+                    class="text-gray-600">
+
+                    <i class="fa-solid fa-file-lines"></i>
+
+                </button>
+
+
+
+                <button onclick="editNote(${n.id})"
+                    class="text-blue-500">
+
+                    <i class="fa-solid fa-pen-to-square"></i>
+
+                </button>
+
+
+                `
+
+                :
+
+                `
+
+                <button onclick="restoreNote(${n.id})"
+                    class="text-green-500">
+
+                    <i class="fa-solid fa-trash-arrow-up"></i>
+
+                </button>
+
+                `
+                }
+
+
+
+                <button onclick="deleteNote(${n.id})"
+                    class="text-red-500">
+
+                    <i class="fa-solid fa-trash"></i>
+
+                </button>
+
+
                 </div>
-            `).join('');
-            
-            renderPagination(notes.length);
-            updateStats();
-        }
+
+
+            </div>
+
+
+
+
+            <p class="text-xs text-gray-400 mb-4 font-medium italic">
+
+
+                ${
+                n.date
+                ?
+                `
+                <i class="fa-solid fa-calendar-days"></i>
+                ${n.date}
+                |
+                ${getLunarDate(n.date)}
+                `
+                :
+                "Không có ngày hẹn"
+                }
+
+
+            </p>
+
+
+
+
+            <div class="text-gray-700 ql-editor p-0">
+
+                ${n.content || ""}
+
+            </div>
+
+
+
+        </div>
+
+
+    `).join("")
+    }
+
+
+    `;
+
+
+
+    renderPagination(notes.length);
+
+    updateStats();
+
+}
+
 
 function renderPagination(total){
 
