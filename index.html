@@ -96,6 +96,440 @@
     white-space:nowrap;
     z-index:100;
 }
+/*==========================
+    OneNote File Attachment
+==========================*/
+
+.onenote-file-blot {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    margin: 4px;
+    max-width: 260px;
+}
+
+.onenote-file-blot:hover{
+    background:#e5e7eb;
+}
+
+.onenote-file-icon{
+    font-size:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.onenote-file-info{
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+}
+
+.onenote-file-name{
+    font-size:13px;
+    font-weight:600;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.onenote-file-size{
+    font-size:11px;
+    color:#6b7280;
+}
+
+/*================ GLASS LỊCH ÂM DƯƠNG ================*/
+
+/* Nền phủ modal */
+#calendarModal{
+    background:
+    linear-gradient(
+        135deg,
+        rgba(59,130,246,.18),
+        rgba(236,72,153,.18),
+        rgba(34,211,238,.18)
+    );
+
+    backdrop-filter:blur(15px);
+    -webkit-backdrop-filter:blur(15px);
+}
+
+
+/* Khung lịch chính */
+.calendar-glass{
+
+    background:
+    rgba(255,255,255,.25);
+
+    backdrop-filter:blur(25px);
+    -webkit-backdrop-filter:blur(25px);
+
+    border:
+    1px solid rgba(255,255,255,.45);
+
+    border-radius:26px;
+
+    box-shadow:
+    0 25px 60px rgba(0,0,0,.18),
+    inset 0 0 30px rgba(255,255,255,.25);
+
+    animation:
+    calendarShow .35s ease;
+
+}
+
+
+/* Tiêu đề tháng */
+.calendar-header{
+
+    background:
+    linear-gradient(
+        135deg,
+        rgba(239,68,68,.18),
+        rgba(59,130,246,.18)
+    );
+
+    backdrop-filter:blur(12px);
+
+    border-radius:18px;
+
+    padding:12px;
+
+}
+
+
+/* Lưới ngày */
+#calendarGrid{
+    gap:8px;
+}
+
+
+/* Ô ngày */
+.calendar-day{
+
+    background:
+    rgba(255,255,255,.22);
+
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+
+    border:
+    1px solid rgba(255,255,255,.45);
+
+    border-radius:16px;
+
+    padding:8px;
+
+    height:64px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+
+.calendar-day:hover{
+
+    background:
+    rgba(239,68,68,.18);
+
+    transform:
+    translateY(-3px);
+
+    box-shadow:
+    0 10px 25px rgba(0,0,0,.12);
+
+}
+
+
+
+/* Ngày hôm nay */
+.calendar-today{
+
+    background:
+    rgba(59,130,246,.22);
+
+    border:
+    2px solid #3b82f6;
+
+}
+
+
+
+/* Ngày chọn */
+.calendar-selected{
+
+    background:
+    linear-gradient(
+        135deg,
+        #ef4444,
+        #f97316
+    );
+
+    color:white;
+
+    transform:
+    scale(1.05);
+
+    box-shadow:
+    0 10px 25px rgba(239,68,68,.35);
+
+}
+
+
+
+/* Số ngày dương */
+.day-solar{
+
+    font-size:16px;
+
+    font-weight:800;
+
+}
+
+
+
+/* Ngày âm */
+.day-lunar{
+
+    font-size:11px;
+
+    color:#64748b;
+
+    text-align:right;
+
+}
+
+
+
+/* Khung thông tin ngày */
+#selectedDayInfo{
+
+    background:
+    rgba(255,255,255,.22);
+
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+
+    border:
+    1px solid rgba(255,255,255,.4);
+
+    border-radius:22px;
+
+    padding:14px;
+
+    box-shadow:
+    0 15px 35px rgba(0,0,0,.12);
+
+}
+
+
+
+/* Hai cột thông tin */
+.glass-box{
+
+    background:
+    linear-gradient(
+        135deg,
+        rgba(255,255,255,.35),
+        rgba(255,255,255,.15)
+    );
+
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+
+
+    border:
+    1px solid rgba(255,255,255,.45);
+
+
+    border-radius:18px;
+
+
+    padding:12px;
+
+
+    box-shadow:
+
+    inset 0 0 20px rgba(255,255,255,.25),
+    0 10px 25px rgba(0,0,0,.08);
+
+}
+
+
+
+/* Lễ dương */
+.glass-red{
+
+    background:
+    rgba(239,68,68,.18);
+
+    color:#dc2626;
+
+    border:
+    1px solid rgba(239,68,68,.3);
+
+    border-radius:12px;
+
+    padding:7px 10px;
+
+    font-weight:700;
+
+}
+
+
+
+/* Lễ âm */
+.glass-orange{
+
+    background:
+    rgba(249,115,22,.18);
+
+    color:#ea580c;
+
+    border:
+    1px solid rgba(249,115,22,.3);
+
+    border-radius:12px;
+
+    padding:7px 10px;
+
+    font-weight:700;
+
+}
+
+/*================ HOÀNG ĐẠO =================*/
+
+.glass-green{
+    background:rgba(34,197,94,.18);
+    color:#16a34a;
+    border:1px solid rgba(34,197,94,.3);
+    border-radius:12px;
+    padding:7px 10px;
+    font-weight:700;
+}
+
+.glass-gray{
+    background:rgba(107,114,128,.15);
+    color:#475569;
+    border-radius:12px;
+    padding:7px 10px;
+    font-weight:700;
+}
+
+.glass-gray{
+background:rgba(100,116,139,.18);
+color:#475569;
+border:1px solid rgba(100,116,139,.3);
+border-radius:12px;
+padding:7px 10px;
+font-weight:700;
+}
+
+/* Sao đánh dấu ngày */
+.day-star{
+    color:#f59e0b;
+    font-size:12px;
+}
+
+/* Tiết khí */
+.glass-blue{
+
+    background:
+    rgba(59,130,246,.18);
+
+    color:#2563eb;
+
+    border-radius:12px;
+
+    padding:7px 10px;
+
+}
+
+
+
+/* Dấu ngày lễ trên lịch */
+.calendar-holiday{
+
+    font-size:11px;
+
+    color:#dc2626;
+
+    text-align:center;
+
+}
+
+
+
+/* Nút chuyển tháng */
+.calendar-btn{
+
+    background:
+    rgba(255,255,255,.3);
+
+
+    backdrop-filter:blur(12px);
+
+
+    border:
+    1px solid rgba(255,255,255,.4);
+
+
+    border-radius:14px;
+
+
+    padding:8px 14px;
+
+
+    transition:.25s;
+
+}
+
+
+.calendar-btn:hover{
+
+    background:
+    rgba(255,255,255,.7);
+
+    transform:
+    scale(1.05);
+
+}
+
+
+
+/* Animation */
+@keyframes calendarShow{
+
+from{
+
+    opacity:0;
+
+    transform:
+    translateY(20px)
+    scale(.95);
+
+}
+
+to{
+
+    opacity:1;
+
+    transform:
+    translateY(0)
+    scale(1);
+
+}
+
+}
     </style>
 </head>
 <body class="bg-gray-100 p-4 md:p-10 font-sans">
@@ -165,26 +599,165 @@
                 <input type="hidden" id="fontSize" value="text-base">
             </div>
 
-            <div class="relative">
-               <button onclick="toggleEmojiPicker()" class="w-10 h-10 flex items-center justify-center rounded-lg text-amber-400 hover:bg-gray-200 hover:text-amber-500 active:bg-gray-300 transition-all" title="Emoji"><i class="fa-solid fa-face-smile text-lg"></i></button>
-                <emoji-picker id="emojiPicker" class="hidden absolute z-50 top-12"></emoji-picker>
-            </div>
-            <input type="file" id="imageInput" class="hidden" accept="image/*" onchange="insertImage(this)">
-          <button onclick="openIconModal()" class="w-10 h-10 flex items-center justify-center text-indigo-400 hover:text-indigo-500 active:text-indigo-600 transition-all" title="Icon"><i class="fa-brands fa-font-awesome"></i></button>
-          <button onclick="document.getElementById('imageInput').click()" class="w-10 h-10 flex items-center justify-center text-blue-400 hover:text-blue-500 active:text-blue-600 transition-all" title="Chèn ảnh"><i class="fa-solid fa-images text-lg"></i></button>
-          <button onclick="openQR()" class="w-10 h-10 flex items-center justify-center rounded-lg text-purple-600 hover:bg-purple-100 active:bg-purple-200 transition-all" title="Tạo mã QR"><i class="fa-solid fa-qrcode text-lg"></i></button>
-         <button onclick="openBarcode()" class="w-10 h-10 flex items-center justify-center rounded-lg text-blue-600 hover:bg-blue-100 active:bg-blue-200 transition-all" title="Mã vạch"><i class="fa-solid fa-barcode text-lg"></i></button>
-        <button onclick="openSymbolModal()" class="w-10 h-10 flex items-center justify-center rounded-lg text-indigo-600 hover:bg-indigo-100 active:bg-indigo-200 transition-all" title="Symbol"><i class="fa-solid fa-square-root-variable text-lg"></i></button>
-          <div class="relative">
-	<button onclick="toggleCaseMenu()" class="w-10 h-10 flex items-center justify-center rounded-lg text-sky-500 hover:bg-gray-200 hover:text-sky-600 active:bg-gray-300 transition-all" title="Đổi kiểu chữ"><i class="fa-solid fa-a"></i></button>
-	 <div id="caseMenu" class="hidden absolute z-50 mt-2 bg-white border rounded-xl shadow-xl p-2 w-56">
-		<button onclick="changeCase('upper')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100"><i class="fa-solid fa-arrow-up-a-z text-blue-500 mr-2"></i> VIẾT HOA</button>
-		<button onclick="changeCase('lower')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100"><i class="fa-solid fa-arrow-down-a-z text-green-500 mr-2"></i> viết thường</button>
-		 <button onclick="changeCase('title')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100"><i class="fa-solid fa-font text-orange-500 mr-2"></i> Viết Hoa Đầu Từ</button>
-		 <button onclick="changeCase('sentence')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100"><i class="fa-solid fa-paragraph text-purple-500 mr-2"></i> Viết hoa đầu câu</button>
-		<button onclick="changeCase('toggle')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100"><i class="fa-solid fa-repeat text-red-500 mr-2"></i> Đảo HOA / thường</button>
-	</div>
-         </div>
+<!-- Menu Emoji + Icon + Symbol -->
+<div class="relative">
+
+    <button
+        onclick="toggleToolsMenu()"
+        class="h-10 px-3 flex items-center justify-center gap-2 rounded-lg
+               bg-indigo-50 border border-indigo-200 text-indigo-600
+               hover:bg-indigo-100 transition-all"
+        title="Công cụ">
+
+        <i class="fa-solid fa-toolbox"></i>
+        <i class="fa-solid fa-chevron-down text-xs"></i>
+
+    </button>
+
+    <div id="toolsMenu"
+         class="hidden absolute z-50 mt-2 left-0 bg-white border border-gray-200
+                rounded-2xl shadow-xl p-2 w-56">
+
+        <button
+            onclick="toggleToolsMenu();toggleEmojiPicker();"
+            class="w-full flex items-center gap-3 p-2 rounded-xl
+                   hover:bg-amber-50 text-amber-600">
+
+            <i class="fa-solid fa-face-smile text-lg w-6 text-center"></i>
+            <span>Emoji</span>
+
+        </button>
+
+        <button
+            onclick="toggleToolsMenu();openIconModal();"
+            class="w-full flex items-center gap-3 p-2 rounded-xl
+                   hover:bg-indigo-50 text-indigo-600">
+
+            <i class="fa-brands fa-font-awesome text-lg w-6 text-center"></i>
+            <span>Font Awesome</span>
+
+        </button>
+
+        <button
+            onclick="toggleToolsMenu();openSymbolModal();"
+            class="w-full flex items-center gap-3 p-2 rounded-xl
+                   hover:bg-purple-50 text-purple-600">
+
+            <i class="fa-solid fa-square-root-variable text-lg w-6 text-center"></i>
+            <span>Unicode Symbol</span>
+
+        </button>
+
+    </div>
+
+    <emoji-picker
+        id="emojiPicker"
+        class="hidden absolute z-50 top-12 left-0 shadow-2xl rounded-2xl">
+    </emoji-picker>
+
+</div>
+
+<!-- Chèn ảnh -->
+<input
+    type="file"
+    id="imageInput"
+    class="hidden"
+    accept="image/*"
+    onchange="insertImage(this)">
+
+<button
+    onclick="document.getElementById('imageInput').click()"
+    class="w-10 h-10 flex items-center justify-center
+           text-blue-400 hover:text-blue-500 active:text-blue-600 transition-all"
+    title="Chèn ảnh">
+
+    <i class="fa-solid fa-images text-lg"></i>
+
+</button>
+<!-- Đính kèm mọi loại file -->
+<input
+    type="file"
+    id="fileAttachmentInput"
+    class="hidden"
+    accept="*/*"
+    onchange="insertFileAttachment(this)">
+
+<button
+    onclick="document.getElementById('fileAttachmentInput').click()"
+    class="w-10 h-10 flex items-center justify-center
+           text-teal-500 hover:text-teal-600 active:text-teal-700 transition-all"
+    title="Đính kèm file">
+
+    <i class="fa-solid fa-paperclip text-lg"></i>
+
+</button>
+<!-- QR -->
+<button
+    onclick="openQR()"
+    class="w-10 h-10 flex items-center justify-center rounded-lg
+           text-purple-600 hover:bg-purple-100 active:bg-purple-200 transition-all"
+    title="Tạo mã QR">
+
+    <i class="fa-solid fa-qrcode text-lg"></i>
+
+</button>
+
+<!-- Barcode -->
+<button
+    onclick="openBarcode()"
+    class="w-10 h-10 flex items-center justify-center rounded-lg
+           text-blue-600 hover:bg-blue-100 active:bg-blue-200 transition-all"
+    title="Mã vạch">
+
+    <i class="fa-solid fa-barcode text-lg"></i>
+
+</button>
+
+<!-- Đổi kiểu chữ -->
+<div class="relative">
+
+    <button
+        onclick="toggleCaseMenu()"
+        class="w-10 h-10 flex items-center justify-center rounded-lg
+               text-sky-500 hover:bg-gray-200 hover:text-sky-600
+               active:bg-gray-300 transition-all"
+        title="Đổi kiểu chữ">
+
+        <i class="fa-solid fa-a"></i>
+
+    </button>
+
+    <div id="caseMenu"
+         class="hidden absolute z-50 mt-2 bg-white border rounded-xl shadow-xl p-2 w-56">
+
+        <button onclick="changeCase('upper')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
+            <i class="fa-solid fa-arrow-up-a-z text-blue-500 mr-2"></i>
+            VIẾT HOA
+        </button>
+
+        <button onclick="changeCase('lower')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
+            <i class="fa-solid fa-arrow-down-a-z text-green-500 mr-2"></i>
+            viết thường
+        </button>
+
+        <button onclick="changeCase('title')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
+            <i class="fa-solid fa-font text-orange-500 mr-2"></i>
+            Viết Hoa Đầu Từ
+        </button>
+
+        <button onclick="changeCase('sentence')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
+            <i class="fa-solid fa-paragraph text-purple-500 mr-2"></i>
+            Viết hoa đầu câu
+        </button>
+
+        <button onclick="changeCase('toggle')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
+            <i class="fa-solid fa-repeat text-red-500 mr-2"></i>
+            Đảo HOA / thường
+        </button>
+
+    </div>
+
+</div>
           <button onclick="openAI()" class="w-10 h-10 flex items-center justify-center rounded-lg text-indigo-600 hover:bg-indigo-100 active:bg-indigo-200 transition-all" title="ChatGPT"><i class="fa-solid fa-microchip text-lg"></i></button>
          <button onclick="openCalendar()" class="w-10 h-10 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-100 transition" title="Calendar"><i class="fa-solid fa-calendar-days text-lg"></i></button>
         </div>
@@ -353,41 +926,143 @@ Unicode Symbol
     </div>
 
 </div>
-<!-- ================= Calender ================= -->
-<div id="calendarModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
 
-    <div class="bg-white rounded-3xl p-6 w-96 shadow-xl">
+<!-- ================= LỊCH ÂM DƯƠNG VIỆT NAM ================= -->
+<div id="calendarModal"
+class="hidden fixed inset-0 bg-black/30 backdrop-blur-md z-50 flex items-center justify-center p-4">
 
-        <h2 class="text-xl font-bold mb-4">
-            <i class="fa-solid fa-calendar-days text-green-600"></i>
-            Calendar
-        </h2>
 
-        <input id="calendarInput"
-               class="w-full border rounded-xl p-3 mb-4"
-               placeholder="Chọn ngày">
+<div class="calendar-glass rounded-3xl p-6 w-full max-w-xl">
 
-        <div class="flex gap-2">
 
-            <button onclick="insertCalendar()"
-                    class="flex-1 bg-green-600 text-white rounded-xl p-2">
-                <i class="fa-solid fa-check mr-1"></i>
-                Chèn
-            </button>
+<!-- Header -->
 
-            <button onclick="todayCalendar()"
-                    class="bg-blue-600 text-white rounded-xl px-4">
-                Hôm nay
-            </button>
+<div class="flex justify-between items-center mb-4">
 
-        </div>
+<h2 class="text-xl font-bold flex items-center gap-2">
 
-        <button onclick="closeCalendar()"
-                class="w-full mt-3 bg-gray-200 rounded-xl p-2">
-            Đóng
-        </button>
+<i class="fa-solid fa-calendar-days text-red-600"></i>
 
-    </div>
+Lịch Âm Dương Việt Nam
+
+</h2>
+
+
+<button onclick="closeCalendar()"
+class="text-2xl text-gray-400 hover:text-red-500">
+
+×
+
+</button>
+
+
+</div>
+
+
+
+
+<!-- Tháng -->
+
+<div class="flex justify-between items-center bg-gray-100 p-3 rounded-xl mb-4">
+
+
+<button onclick="changeMonth(-1)"
+class="w-10 h-10 rounded-xl hover:bg-white">
+
+<i class="fa-solid fa-chevron-left"></i>
+
+</button>
+
+
+
+<div>
+
+<div id="calMonthYear"
+class="font-bold text-center">
+</div>
+
+
+<div id="calLunarYear"
+class="text-xs text-red-600 text-center">
+</div>
+
+
+</div>
+
+
+
+<button onclick="changeMonth(1)"
+class="w-10 h-10 rounded-xl hover:bg-white">
+
+<i class="fa-solid fa-chevron-right"></i>
+
+</button>
+
+
+</div>
+
+
+
+
+
+<!-- Thứ -->
+
+<div class="grid grid-cols-7 text-center text-xs font-bold mb-2">
+
+
+<div class="text-red-500">CN</div>
+<div>T2</div>
+<div>T3</div>
+<div>T4</div>
+<div>T5</div>
+<div>T6</div>
+<div class="text-blue-500">T7</div>
+
+
+</div>
+
+
+
+
+
+<!-- Ngày -->
+
+<div id="calendarGrid"
+class="grid grid-cols-7 gap-1">
+
+</div>
+
+
+
+
+
+<!-- Thông tin ngày -->
+
+<div id="selectedDayInfo"
+class="mt-4 p-3 bg-red-50 rounded-xl text-sm">
+
+Chọn ngày để xem thông tin
+
+</div>
+
+
+
+
+
+<button onclick="insertCalendar()"
+class="mt-4 w-full bg-red-600 hover:bg-red-700 text-white rounded-xl p-3 transition">
+
+
+<i class="fa-solid fa-plus mr-1"></i>
+
+Chèn vào ghi chú
+
+
+</button>
+
+
+</div>
+
 
 </div>
 <!-- Modal -->
@@ -500,6 +1175,309 @@ Unicode Symbol
 
         const toolbarOptions=[[{'header':['1','2','3',false]}],[{'size':['small',false,'large','huge']}],['bold','italic','underline','strike'],[{'script':'sub'},{'script':'super'}],[{'color':[]},{'background':[]}],[{'align':[]}],[{'list':'ordered'},{'list':'bullet'}],['link','image']];
         const quill = new Quill('#editor', { theme: 'snow', modules: { toolbar: toolbarOptions } });
+
+
+// FILE ATTACHMENT BLOT (OneNote Style)
+//====================================================
+
+const Embed = Quill.import("blots/embed");
+
+
+class FileAttachmentBlot extends Embed {
+
+
+    static create(value){
+
+        const node = super.create();
+
+
+        node.className = "onenote-file-blot";
+
+        node.contentEditable = false;
+
+
+        node.dataset.name = value.name || "File";
+
+        node.dataset.size = value.size || "";
+
+        node.dataset.url  = value.url || "";
+
+
+
+        const ext = (value.name || "")
+            .split(".")
+            .pop()
+            .toLowerCase();
+
+
+
+        const icons = {
+
+            pdf:"fa-solid fa-file-pdf text-red-500",
+
+            doc:"fa-solid fa-file-word text-blue-600",
+            docx:"fa-solid fa-file-word text-blue-600",
+
+            xls:"fa-solid fa-file-excel text-green-600",
+            xlsx:"fa-solid fa-file-excel text-green-600",
+            csv:"fa-solid fa-file-excel text-green-600",
+
+            ppt:"fa-solid fa-file-powerpoint text-orange-500",
+            pptx:"fa-solid fa-file-powerpoint text-orange-500",
+
+            zip:"fa-solid fa-file-zipper text-yellow-500",
+            rar:"fa-solid fa-file-zipper text-yellow-500",
+            "7z":"fa-solid fa-file-zipper text-yellow-500",
+
+            mp3:"fa-solid fa-file-audio text-purple-500",
+            wav:"fa-solid fa-file-audio text-purple-500",
+
+            mp4:"fa-solid fa-file-video text-pink-500",
+            mov:"fa-solid fa-file-video text-pink-500",
+
+            jpg:"fa-solid fa-file-image text-cyan-500",
+            jpeg:"fa-solid fa-file-image text-cyan-500",
+            png:"fa-solid fa-file-image text-cyan-500",
+
+            html:"fa-brands fa-html5 text-orange-600",
+            css:"fa-brands fa-css3-alt text-blue-500",
+            js:"fa-brands fa-js text-yellow-500",
+
+            apk:"fa-brands fa-android text-green-600",
+
+            txt:"fa-solid fa-file-lines text-gray-500"
+
+        };
+
+
+        const iconClass =
+            icons[ext] || "fa-solid fa-file text-gray-500";
+
+
+
+        node.innerHTML = `
+
+            <div class="onenote-file-icon">
+
+                <i class="${iconClass}"></i>
+
+            </div>
+
+
+            <div class="onenote-file-info">
+
+                <div class="onenote-file-name">
+                    ${value.name}
+                </div>
+
+
+                <div class="onenote-file-size">
+                    ${value.size}
+                </div>
+
+            </div>
+
+        `;
+
+
+
+        // Click tải file
+
+        node.onclick = function(e){
+
+            e.preventDefault();
+
+            e.stopPropagation();
+
+
+            const url = node.dataset.url;
+
+            const name = node.dataset.name;
+
+
+            if(!url){
+
+                alert("Không tìm thấy file!");
+
+                return;
+
+            }
+
+
+            const a = document.createElement("a");
+
+
+            a.href = url;
+
+            a.download = name;
+
+
+            document.body.appendChild(a);
+
+
+            a.click();
+
+
+            document.body.removeChild(a);
+
+        };
+
+
+
+        return node;
+
+    }
+
+
+
+    static value(node){
+
+        return {
+
+            name:node.dataset.name,
+
+            size:node.dataset.size,
+
+            url:node.dataset.url
+
+        };
+
+    }
+
+
+}
+
+
+
+FileAttachmentBlot.blotName = "fileAttachment";
+
+FileAttachmentBlot.tagName = "div";
+
+
+Quill.register(FileAttachmentBlot);
+
+
+FileAttachmentBlot.blotName="fileAttachment";
+
+FileAttachmentBlot.tagName="div";
+
+Quill.register(FileAttachmentBlot);
+
+//====================================================
+//====================================================
+// INSERT FILE ATTACHMENT
+//====================================================
+
+function insertFileAttachment(input) {
+
+    if (!input.files || input.files.length === 0) {
+        return;
+    }
+
+
+    const file = input.files[0];
+
+
+    //==============================
+    // Format dung lượng file
+    //==============================
+
+    let sizeStr = "";
+
+    if (file.size < 1024) {
+
+        sizeStr = file.size + " B";
+
+    } 
+    else if (file.size < 1024 * 1024) {
+
+        sizeStr = (file.size / 1024).toFixed(1) + " KB";
+
+    } 
+    else if (file.size < 1024 * 1024 * 1024) {
+
+        sizeStr = (file.size / 1024 / 1024).toFixed(1) + " MB";
+
+    } 
+    else {
+
+        sizeStr = (file.size / 1024 / 1024 / 1024).toFixed(1) + " GB";
+
+    }
+
+
+
+    //==============================
+    // Tạo URL tạm cho file
+    // Không dùng FileReader Base64
+    //==============================
+
+    const fileURL = URL.createObjectURL(file);
+
+
+
+    //==============================
+    // Vị trí con trỏ Quill
+    //==============================
+
+    const range = quill.getSelection(true) || {
+
+        index: quill.getLength()
+
+    };
+
+
+
+    //==============================
+    // Chèn file vào Quill
+    //==============================
+
+    quill.insertEmbed(
+
+        range.index,
+
+        "fileAttachment",
+
+        {
+
+            name: file.name,
+
+            size: sizeStr,
+
+            url: fileURL
+
+        }
+
+    );
+
+
+
+    // Xuống dòng sau file
+
+    quill.insertText(
+
+        range.index + 1,
+
+        "\n"
+
+    );
+
+
+    // Đưa con trỏ xuống sau file
+
+    quill.setSelection(
+
+        range.index + 2
+
+    );
+
+
+
+    // Reset input
+
+    input.value = "";
+
+}
 // DÁN Ở ĐÂY
 function openIconModal(){
 
@@ -520,7 +1498,7 @@ const symbolSource=['✓','✔','✕','✖','✗','✘','☑','☒','☐','☑',
 
         const colors = ['text-red-500', 'text-blue-500', 'text-green-600', 'text-yellow-500', 'text-purple-600', 'text-pink-500', 'text-teal-600', 'text-indigo-500'];
 
-        const Embed = Quill.import('blots/embed');
+       const Embed2 = Quill.import('blots/embed');
         class ColorIconBlot extends Embed {
             static create(value) {
                 let node = super.create();
@@ -873,52 +1851,326 @@ function closeSymbolModal(){
     document.getElementById("symbolModal").classList.add("hidden");
 
 }
-// ================= CALENDAR =================
-let calendarPicker;
+
+
+//================================================
+// LỊCH ÂM DƯƠNG VIỆT NAM
+//================================================
+
+//================ TỪ ĐIỂN =================
+
+const CAN_VIET={
+"甲":"Giáp","乙":"Ất","丙":"Bính","丁":"Đinh","戊":"Mậu",
+"己":"Kỷ","庚":"Canh","辛":"Tân","壬":"Nhâm","癸":"Quý"
+};
+
+const CHI_VIET={
+"子":"Tý","丑":"Sửu","寅":"Dần","卯":"Mão","辰":"Thìn",
+"巳":"Tỵ","午":"Ngọ","未":"Mùi","申":"Thân","酉":"Dậu",
+"戌":"Tuất","亥":"Hợi"
+};
+
+const CON_GIAP_VIET={
+"鼠":"Tý","牛":"Sửu","虎":"Dần","兔":"Mão",
+"龙":"Thìn","蛇":"Tỵ","马":"Ngọ","羊":"Mùi",
+"猴":"Thân","鸡":"Dậu","狗":"Tuất","猪":"Hợi"
+};
+
+
+//================ 24 TIẾT KHÍ =================
+
+const TIET_KHI_VIET={
+"立春":"Lập Xuân","雨水":"Vũ Thủy","惊蛰":"Kinh Trập",
+"春分":"Xuân Phân","清明":"Thanh Minh","谷雨":"Cốc Vũ",
+"立夏":"Lập Hạ","小满":"Tiểu Mãn","芒种":"Mang Chủng",
+"夏至":"Hạ Chí","小暑":"Tiểu Thử","大暑":"Đại Thử",
+"立秋":"Lập Thu","处暑":"Xử Thử","白露":"Bạch Lộ",
+"秋分":"Thu Phân","寒露":"Hàn Lộ","霜降":"Sương Giáng",
+"立冬":"Lập Đông","小雪":"Tiểu Tuyết","大雪":"Đại Tuyết",
+"冬至":"Đông Chí","小寒":"Tiểu Hàn","大寒":"Đại Hàn"
+};
+
+//================ DỊCH 24 TIẾT KHÍ =================
+
+function getVietnameseTietKhi(jieQi){
+
+    if(!jieQi) return "Không có";
+
+    // Xóa ký tự L nếu thư viện trả về dạng Lập...
+    jieQi = jieQi.replace(/^L/,"");
+
+    return TIET_KHI_VIET[jieQi] || jieQi;
+
+}
+
+//================ NGÀY LỄ =================
+
+const VN_HOLIDAYS_SOLAR={
+"1-1":"Tết Dương Lịch",
+"30-4":"Giải Phóng Miền Nam",
+"1-5":"Quốc tế Lao Động",
+"2-9":"Quốc Khánh Việt Nam",
+"20-10":"Ngày Phụ Nữ Việt Nam",
+"20-11":"Ngày Nhà Giáo Việt Nam",
+"22-12":"Ngày Thành Lập QĐND Việt Nam",
+"25-12":"🎄 Giáng Sinh (Noel)"
+};
+
+
+const VN_HOLIDAYS_LUNAR={
+"1-1":"Tết Nguyên Đán",
+"2-1":"Tết Nguyên Đán Mùng 2",
+"3-1":"Tết Nguyên Đán Mùng 3",
+"15-1":"Tết Nguyên Tiêu",
+"10-3":"Giỗ Tổ Hùng Vương",
+"15-4":"Lễ Phật Đản",
+"5-5":"Tết Đoan Ngọ",
+"15-7":"Lễ Vu Lan",
+"15-8":"Tết Trung Thu",
+"23-12":"Ông Công Ông Táo"
+};
+
+//================ NGÀY HOÀNG ĐẠO =================
+
+const HOANG_DAO_CHI={
+"Tý":"Thanh Long",
+"Sửu":"Minh Đường",
+"Dần":"Thiên Hình",
+"Mão":"Chu Tước",
+"Thìn":"Kim Quỹ",
+"Tỵ":"Thiên Đức",
+"Ngọ":"Bạch Hổ",
+"Mùi":"Ngọc Đường",
+"Thân":"Thiên Lao",
+"Dậu":"Huyền Vũ",
+"Tuất":"Tư Mệnh",
+"Hợi":"Câu Trần"
+};
+
+const HAC_DAO_CHI={
+"Ngọ":"Thiên Hình",
+"Mùi":"Chu Tước",
+"Thân":"Bạch Hổ",
+"Dậu":"Thiên Lao",
+"Tuất":"Huyền Vũ",
+"Hợi":"Câu Trần",
+"Tý":"Thiên Hình",
+"Sửu":"Chu Tước",
+"Dần":"Bạch Hổ",
+"Mão":"Thiên Lao",
+"Thìn":"Huyền Vũ",
+"Tỵ":"Câu Trần"
+};
+
+function getNgayTotXau(lunar){
+
+try{
+
+let chi=translateGanZhi(
+lunar.getDayInGanZhi()
+).split(" ")[1];
+
+
+let tot=["Tý","Ngọ","Dần","Thân"].includes(chi);
+
+
+return {
+text:tot?"🌟 Ngày Hoàng Đạo":"⚫ Ngày Hắc Đạo",
+class:tot?"glass-green":"glass-gray"
+};
+
+
+}catch(e){
+
+return {
+text:"",
+class:""
+};
+
+}
+
+}
+//================ DỊCH CAN CHI =================
+
+function translateGanZhi(str){
+if(!str)return "";
+let r="";
+for(let c of str){
+r+=CAN_VIET[c]?CAN_VIET[c]+" ":CHI_VIET[c]?CHI_VIET[c]+" ":"";
+}
+return r.trim();
+}
+
+
+//================ BIẾN =================
+
+let calCurrentDate=new Date();
+let selectedCalendarDate=null;
+
+
+//================ OPEN/CLOSE =================
 
 function openCalendar(){
-
-    document.getElementById("calendarModal").classList.remove("hidden");
-
-    if(!calendarPicker){
-
-        calendarPicker = flatpickr("#calendarInput",{
-
-            dateFormat:"d/m/Y",
-
-            defaultDate:new Date(),
-
-            locale:"vn"
-
-        });
-
-    }
-
+document.getElementById("calendarModal").classList.remove("hidden");
+selectedCalendarDate=null;
+document.getElementById("selectedDayInfo").innerHTML="Chọn ngày để xem thông tin";
+renderCalendar();
 }
+
 
 function closeCalendar(){
+document.getElementById("calendarModal").classList.add("hidden");
+}
 
-    document.getElementById("calendarModal").classList.add("hidden");
+
+function changeMonth(step){
+calCurrentDate.setMonth(calCurrentDate.getMonth()+step);
+renderCalendar();
+}
+
+
+//================ RENDER =================
+
+function renderCalendar(){
+
+let y=calCurrentDate.getFullYear(),m=calCurrentDate.getMonth(),today=new Date();
+calMonthYear.innerHTML=`Tháng ${m+1}/${y}`;
+
+let grid=calendarGrid; grid.innerHTML="";
+
+for(let i=0;i<new Date(y,m,1).getDay();i++) grid.innerHTML+="<div></div>";
+
+for(let d=1;d<=new Date(y,m+1,0).getDate();d++){
+
+let date=new Date(y,m,d),lunar="",holiday="";
+
+try{
+let l=Solar.fromYmd(y,m+1,d).getLunar();
+lunar=`${l.getDay()}/${l.getMonth()}`;
+holiday=VN_HOLIDAYS_SOLAR[`${d}-${m+1}`]||VN_HOLIDAYS_LUNAR[`${l.getDay()}-${l.getMonth()}`]||"";
+}catch(e){}
+
+let div=document.createElement("div");
+div.className="calendar-day";
+if(date.toDateString()==today.toDateString()) div.classList.add("calendar-today");
+
+div.innerHTML=`
+<div class="day-solar">${holiday?"🌸 ":""}${d}</div>
+<div class="day-lunar">${lunar}</div>`;
+
+if(holiday) div.title=holiday;
+
+div.onclick=()=>{
+selectedCalendarDate=date;
+showCalendarInfo(date);
+document.querySelectorAll(".calendar-day").forEach(x=>x.classList.remove("calendar-selected"));
+div.classList.add("calendar-selected");
+};
+
+grid.appendChild(div);
+}
+}
+
+
+//================ THÔNG TIN NGÀY =================
+
+function showCalendarInfo(date){
+
+try{
+
+let l=Solar.fromYmd(date.getFullYear(),date.getMonth()+1,date.getDate()).getLunar();
+
+let solar=VN_HOLIDAYS_SOLAR[`${date.getDate()}-${date.getMonth()+1}`]||"";
+let lunar=VN_HOLIDAYS_LUNAR[`${l.getDay()}-${l.getMonth()}`]||"";
+let tot=getNgayTotXau(l);
+
+
+selectedDayInfo.innerHTML=`
+
+<div class="grid grid-cols-2 gap-3 mt-3">
+
+<div class="glass-box">
+☀ Dương: ${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}<br>
+🌙 Âm: ${l.getDay()}/${l.getMonth()}/${l.getYear()}<br>
+🐉 Năm: ${translateGanZhi(l.getYearInGanZhi())}<br>
+📅 Ngày: ${translateGanZhi(l.getDayInGanZhi())}
+</div>
+
+<div class="glass-box">
+🌤 Tiết khí: ${getVietnameseTietKhi(l.getJieQi())}<br>
+<div class="${tot.class}">${tot.text}</div>
+${solar?`🎉 ${solar}<br>`:""}
+${lunar?`🎊 ${lunar}`:""}
+</div>
+
+</div>`;
+
+}catch(e){
+selectedDayInfo.innerHTML=`☀ Dương: ${date.toLocaleDateString()}`;
+}
 
 }
 
-function todayCalendar(){
 
-    calendarPicker.setDate(new Date(),true);
+//================ HOÀNG / HẮC ĐẠO =================
+
+function getNgayTotXau(l){
+
+try{
+
+let chi=translateGanZhi(l.getDayInGanZhi()).split(" ")[1];
+let ok=["Tý","Ngọ","Dần","Thân"].includes(chi);
+
+return {
+text:ok?"🌟 Hoàng Đạo":"⚫ Hắc Đạo",
+class:ok?"glass-green":"glass-gray"
+};
+
+}catch(e){
+
+return {text:"",class:""};
 
 }
+
+}
+
+
+//================ QUILL =================
 
 function insertCalendar(){
 
-    const value=document.getElementById("calendarInput").value;
+if(!selectedCalendarDate) return alert("Vui lòng chọn ngày");
 
-    if(!value) return;
+let d=selectedCalendarDate,text="";
 
-    const range=quill.getSelection(true);
+try{
 
-    quill.insertText(range ? range.index : quill.getLength(),`📅 ${value}`);
+let l=Solar.fromYmd(d.getFullYear(),d.getMonth()+1,d.getDate()).getLunar();
 
-    closeCalendar();
+let solar=VN_HOLIDAYS_SOLAR[`${d.getDate()}-${d.getMonth()+1}`]||"";
+let lunar=VN_HOLIDAYS_LUNAR[`${l.getDay()}-${l.getMonth()}`]||"";
+
+text=
+`📅 Dương: ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}
+🌙 Âm: ${l.getDay()}/${l.getMonth()}/${l.getYear()}
+🐉 Năm: ${translateGanZhi(l.getYearInGanZhi())}
+📆 Ngày: ${translateGanZhi(l.getDayInGanZhi())}
+🌤 Tiết khí: ${getVietnameseTietKhi(l.getJieQi())}
+${getNgayTotXau(l).text}`;
+
+if(solar) text+=`\n🎉 ${solar}`;
+if(lunar) text+=`\n🎊 ${lunar}`;
+
+}catch(e){
+text=`📅 ${d.toLocaleDateString()}`;
+}
+
+if(typeof quill!="undefined"){
+let r=quill.getSelection(true);
+quill.insertText(r?r.index:quill.getLength(),text);
+}
+
+closeCalendar();
 
 }
 // ================= AI =================
@@ -948,6 +2200,11 @@ function askAI(){
 // ================= Change Case =================
 function toggleCaseMenu(){
     document.getElementById("caseMenu").classList.toggle("hidden");
+}
+
+// Thêm ngay dưới đây
+function toggleToolsMenu() {
+    document.getElementById("toolsMenu").classList.toggle("hidden");
 }
 
 function changeCase(type){
@@ -1350,7 +2607,6 @@ async function renderNotes() {
             }
         </div>
 
-
         <div class="flex gap-2">
 
             <button onclick="toggleTrash()"
@@ -1361,12 +2617,10 @@ async function renderNotes() {
 
             </button>
 
-
-
             <button onclick="emptyTrash()"
                 class="
-                px-3 h-10 rounded-lg 
-                ${showTrash ? 
+                px-3 h-10 rounded-lg
+                ${showTrash ?
                 'bg-red-600 hover:bg-red-700 text-white' :
                 'bg-gray-200 text-gray-400 cursor-not-allowed'}
                 transition
@@ -1378,38 +2632,25 @@ async function renderNotes() {
 
             </button>
 
-
         </div>
 
-
     </div>
-
-
 
     ${
     paginated.map(n=>`
 
-
-        <div 
+        <div
             data-id="${n.id}"
             class="p-5 border rounded-3xl ${n.fontSize || ''} cursor-move"
-            style="background-color:${n.bgColor || '#ffffff'}"
-        >
-
+            style="background-color:${n.bgColor || '#ffffff'}">
 
             <div class="flex justify-between items-start mb-2">
 
-
                 <h3 class="font-bold text-lg">
-
                     ${capitalize(n.title || "Không có tiêu đề")}
-
                 </h3>
 
-
-
                 <div class="flex gap-2">
-
 
                 ${
                 !n.deleted
@@ -1418,15 +2659,13 @@ async function renderNotes() {
                 `
 
                 <button onclick="togglePin(${n.id})"
-                    class="${n.pinned ? 
+                    class="${n.pinned ?
                     'text-yellow-500' :
                     'text-gray-400'}">
 
                     <i class="fa-solid fa-thumbtack"></i>
 
                 </button>
-
-
 
                 <button onclick="exportFile(${n.id},'pdf')"
                     class="text-red-600">
@@ -1435,8 +2674,6 @@ async function renderNotes() {
 
                 </button>
 
-
-
                 <button onclick="exportFile(${n.id},'txt')"
                     class="text-gray-600">
 
@@ -1444,15 +2681,12 @@ async function renderNotes() {
 
                 </button>
 
-
-
                 <button onclick="editNote(${n.id})"
                     class="text-blue-500">
 
                     <i class="fa-solid fa-pen-to-square"></i>
 
                 </button>
-
 
                 `
 
@@ -1470,8 +2704,6 @@ async function renderNotes() {
                 `
                 }
 
-
-
                 <button onclick="deleteNote(${n.id})"
                     class="text-red-500">
 
@@ -1479,17 +2711,11 @@ async function renderNotes() {
 
                 </button>
 
-
                 </div>
-
 
             </div>
 
-
-
-
             <p class="text-xs text-gray-400 mb-4 font-medium italic">
-
 
                 ${
                 n.date
@@ -1504,11 +2730,7 @@ async function renderNotes() {
                 "Không có ngày hẹn"
                 }
 
-
             </p>
-
-
-
 
             <div class="text-gray-700 ql-editor p-0">
 
@@ -1516,18 +2738,39 @@ async function renderNotes() {
 
             </div>
 
-
-
         </div>
-
 
     `).join("")
     }
 
-
     `;
 
+    //==================================================
+    // Gắn lại sự kiện click cho File Attachment
+    //==================================================
+    container.querySelectorAll(".onenote-file-blot").forEach(blot => {
 
+        blot.onclick = function (e) {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const url = blot.getAttribute("data-url");
+            const name = blot.getAttribute("data-name");
+
+            if (!url) return;
+
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = name || "file";
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+        };
+
+    });
 
     renderPagination(notes.length);
 
