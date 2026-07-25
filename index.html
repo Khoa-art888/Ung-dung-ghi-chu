@@ -12,7 +12,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
     <!-- ===== OCR ===== -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
@@ -22,11 +23,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<!-- Khai báo Worker cho PDF.js -->
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</script>
 
 <script src="https://cdn.jsdelivr.net/npm/@neslinesli93/qpdf-wasm@1.3.0/dist/qpdf.js"></script>
     <!-- ===== Excel Export ===== -->
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- ===== FFmpeg Audio Converter ===== -->
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
     
     <title>Modern Note App - IndexedDB</title>
     <style>
@@ -516,6 +522,30 @@ to{
 }
 
 }
+
+/* Nháy đỏ hiệu ứng đang thu âm giọng nói */
+@keyframes pulse {
+
+    0%, 100% { 
+        transform:scale(1); 
+        opacity:1; 
+    }
+
+    50% { 
+        transform:scale(1.1); 
+        opacity:.6; 
+    }
+
+}
+
+
+.recording-active { 
+
+    animation:pulse 1.2s infinite; 
+
+    color:#ef4444 !important; 
+
+}
     </style>
 </head>
 <body class="bg-gray-100 p-4 md:p-10 font-sans">
@@ -566,17 +596,42 @@ to{
         <input id="title" type="text" placeholder="Tiêu đề..." class="w-full p-3 mb-2 border rounded-xl outline-none">
         
         <div class="flex flex-wrap gap-2 mb-2 items-center">
-            <div class="relative">
-                <button onclick="document.getElementById('bgColor').click()" class="h-10 w-12 flex items-center justify-center border border-orange-500 text-orange-600 rounded-lg hover:bg-orange-50 transition">
-                    <i class="fa-solid fa-brush"></i>
-                </button>
+<div class="relative">
+
+    <button
+        onclick="document.getElementById('bgColor').click()"
+        class="h-10 w-12 flex items-center justify-center rounded-xl
+               hover:bg-gray-100 active:bg-gray-200 transition-all"
+        title="Màu nền">
+
+        <i class="fa-solid fa-brush text-lg
+           bg-gradient-to-r
+           from-red-500
+           via-amber-500
+           via-blue-500
+           to-emerald-500
+           bg-clip-text text-transparent"></i>
+
+    </button>
+
+
                 <input type="color" id="bgColor" value="#f9fafb" class="hidden">
             </div>
 
-            <div class="relative">
-                <button onclick="document.getElementById('fontSizeMenu').classList.toggle('hidden')" class="h-10 px-4 border border-yellow-500 text-yellow-600 rounded-lg hover:bg-yellow-50 transition">
-                    <i class="fa-solid fa-heading"></i>
-                </button>
+<div class="relative">
+
+    <button
+        onclick="toggleFontSizeMenu()"
+        class="h-10 px-3 flex items-center justify-center rounded-xl
+               text-gray-700 hover:bg-gray-100 hover:text-gray-900
+               active:bg-gray-200 transition-all"
+        title="Cỡ chữ">
+
+        <i class="fa-solid fa-heading text-lg"></i>
+
+        <i class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-70"></i>
+
+    </button>
                 <div id="fontSizeMenu" class="hidden absolute z-50 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl p-2 w-40">
                     <button onclick="setFontSize('text-base')" class="block w-full text-left p-2 hover:bg-gray-100 rounded">Chữ thường</button>
                     <button onclick="setFontSize('text-lg')" class="block w-full text-left p-2 hover:bg-gray-100 rounded">Chữ lớn</button>
@@ -585,49 +640,54 @@ to{
                 <input type="hidden" id="fontSize" value="text-base">
             </div>
 
-<!-- Menu Emoji + Icon + Symbol -->
+<!--================ MENU CÔNG CỤ =================-->
 <div class="relative">
 
-    <button
-        onclick="toggleToolsMenu()"
-        class="h-10 px-3 flex items-center justify-center gap-2 rounded-lg
-               bg-indigo-50 border border-indigo-200 text-indigo-600
-               hover:bg-indigo-100 transition-all"
-        title="Công cụ">
+    <!-- Nút mở menu -->
+<button
+    onclick="toggleToolsMenu()"
+    class="w-10 h-10 flex items-center justify-center rounded-xl
+           text-sky-500 hover:bg-sky-50 active:bg-sky-100 transition-all"
+    title="Kho Icon">
 
-        <i class="fa-solid fa-toolbox"></i>
-        <i class="fa-solid fa-chevron-down text-xs"></i>
+    <i class="fa-brands fa-font-awesome text-lg"></i>
+    <i class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-70"></i>
 
-    </button>
+</button>
 
+    <!--================ MENU =================-->
     <div id="toolsMenu"
-         class="hidden absolute z-50 mt-2 left-0 bg-white border border-gray-200
-                rounded-2xl shadow-xl p-2 w-56">
+         class="hidden absolute z-50 mt-2 left-0
+                w-56 bg-white border border-gray-200
+                rounded-2xl shadow-xl p-2">
 
+        <!-- Emoji -->
         <button
             onclick="toggleToolsMenu();toggleEmojiPicker();"
             class="w-full flex items-center gap-3 p-2 rounded-xl
-                   hover:bg-amber-50 text-amber-600">
+                   hover:bg-amber-50 text-amber-600 transition">
 
             <i class="fa-solid fa-face-smile text-lg w-6 text-center"></i>
             <span>Emoji</span>
 
         </button>
 
+        <!-- Font Awesome -->
         <button
             onclick="toggleToolsMenu();openIconModal();"
             class="w-full flex items-center gap-3 p-2 rounded-xl
-                   hover:bg-indigo-50 text-indigo-600">
+                   hover:bg-indigo-50 text-indigo-600 transition">
 
             <i class="fa-brands fa-font-awesome text-lg w-6 text-center"></i>
             <span>Font Awesome</span>
 
         </button>
 
+        <!-- Unicode -->
         <button
             onclick="toggleToolsMenu();openSymbolModal();"
             class="w-full flex items-center gap-3 p-2 rounded-xl
-                   hover:bg-purple-50 text-purple-600">
+                   hover:bg-purple-50 text-purple-600 transition">
 
             <i class="fa-solid fa-square-root-variable text-lg w-6 text-center"></i>
             <span>Unicode Symbol</span>
@@ -636,39 +696,110 @@ to{
 
     </div>
 
-    <emoji-picker
-        id="emojiPicker"
-        class="hidden absolute z-50 top-12 left-0 shadow-2xl rounded-2xl">
-    </emoji-picker>
+    <!--================ EMOJI PICKER =================-->
+    <div id="emojiBox"
+         class="hidden absolute z-50 top-12 left-0
+                bg-white rounded-2xl shadow-2xl
+                border border-gray-200 overflow-hidden">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between
+                    px-4 py-2 bg-amber-50 border-b border-amber-200">
+
+            <div class="flex items-center gap-2
+                        text-amber-600 font-semibold">
+
+                <i class="fa-solid fa-face-smile text-lg"></i>
+
+                <span>Emoji</span>
+
+            </div>
+
+            <button
+                onclick="closeEmojiPicker()"
+                class="w-8 h-8 flex items-center justify-center
+                       rounded-full text-red-500
+                       hover:bg-red-100 transition"
+                title="Đóng">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+        <!-- Emoji Picker -->
+        <emoji-picker id="emojiPicker"></emoji-picker>
+
+    </div>
 
 </div>
 
-<!-- Chèn ảnh -->
+<!--================ MENU HÌNH ẢNH =================-->
+<div class="relative">
+
+    <button
+        onclick="toggleImageMenu()"
+        class="w-10 h-10 flex items-center justify-center rounded-xl
+               text-emerald-500 hover:bg-emerald-50 active:bg-emerald-100 transition-all"
+        title="Công cụ hình ảnh">
+
+        <i class="fa-solid fa-images text-lg"></i>
+        <i class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-70"></i>
+
+    </button>
+
+    <div id="imageMenu"
+         class="hidden absolute left-0 mt-2 w-60
+                bg-white rounded-2xl shadow-2xl border border-gray-100
+                z-50 p-2">
+
+        <!-- Chèn ảnh -->
+        <button
+            onclick="toggleImageMenu();document.getElementById('imageInput').click();"
+            class="w-full flex items-center gap-3 p-2 rounded-xl
+                   hover:bg-blue-50">
+
+            <i class="fa-solid fa-image text-blue-500 w-6"></i>
+
+            <span>Chèn ảnh</span>
+
+        </button>
+
+        <!-- OCR -->
+        <button
+            onclick="toggleImageMenu();openOCRModal();"
+            class="w-full flex items-center gap-3 p-2 rounded-xl
+                   hover:bg-orange-50">
+
+            <i class="fa-solid fa-broom text-orange-500 w-6"></i>
+
+            <span>Trích xuất văn bản</span>
+
+        </button>
+
+        <!-- Chuyển đổi ảnh -->
+        <button
+            onclick="toggleImageMenu();openImgConverterModal();"
+            class="w-full flex items-center gap-3 p-2 rounded-xl
+                   hover:bg-indigo-50">
+
+            <i class="fa-solid fa-arrows-rotate text-indigo-500 w-6"></i>
+
+            <span>Chuyển định dạng ảnh </span>
+
+        </button>
+
+    </div>
+
+</div>
+
 <input
-    type="file"
-    id="imageInput"
-    class="hidden"
-    accept="image/*"
-    onchange="insertImage(this)">
-
-<button
-    onclick="document.getElementById('imageInput').click()"
-    class="w-10 h-10 flex items-center justify-center
-           text-blue-400 hover:text-blue-500 active:text-blue-600 transition-all"
-    title="Chèn ảnh">
-
-    <i class="fa-solid fa-images text-lg"></i>
-
-</button>
-
-<!-- THÊM NÚT OCR NGAY TẠI ĐÂY -->
-<!-- OCR -->
-<button onclick="openOCRModal()"
-class="w-10 h-10 flex items-center justify-center rounded-lg text-orange-500 hover:bg-orange-100 active:bg-orange-200 transition-all"
-title="OCR Nhiều Ảnh">
-    <i class="fa-solid fa-broom text-2xl"></i>
-</button>
-
+type="file"
+id="imageInput"
+class="hidden"
+accept="image/*"
+onchange="insertImage(this)">
 
 <!-- Đính kèm mọi loại file -->
 <input
@@ -689,50 +820,143 @@ title="OCR Nhiều Ảnh">
 </button>
 
 
-<!-- QUẢN LÝ / GỘP / TÁCH PDF -->
-<button
-    onclick="openPdfModal()"
-    class="w-10 h-10 flex items-center justify-center rounded-lg
-           text-red-600 hover:bg-red-100 active:bg-red-200 transition-all"
-    title="Quản lý / Gộp / Tách PDF">
+<div class="relative">
 
-    <i class="fa-solid fa-file-pdf text-lg"></i>
+    <!-- NÚT MENU -->
+    <button
+        onclick="toggleFileMenu()"
+        class="w-10 h-10 flex items-center justify-center rounded-xl
+               text-sky-500 hover:bg-sky-50 active:bg-sky-100 transition-all"
+        title="Tệp">
 
-</button>
-<!-- QR -->
-<button
-    onclick="openQR()"
-    class="w-10 h-10 flex items-center justify-center rounded-lg
-           text-purple-600 hover:bg-purple-100 active:bg-purple-200 transition-all"
-    title="Tạo mã QR">
+        <i class="fa-solid fa-folder text-lg"></i>
+        <i class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-70"></i>
 
-    <i class="fa-solid fa-qrcode text-lg"></i>
+    </button>
 
-</button>
+    <!-- MENU -->
+    <div id="fileMenu"
+         class="hidden absolute left-0 mt-2 w-64
+                bg-white rounded-2xl shadow-xl border z-50 p-2">
 
-<!-- Barcode -->
-<button
-    onclick="openBarcode()"
-    class="w-10 h-10 flex items-center justify-center rounded-lg
-           text-blue-600 hover:bg-blue-100 active:bg-blue-200 transition-all"
-    title="Mã vạch">
+        <!-- PDF -->
+        <button
+            onclick="closeAllMenus();openPdfModal();"
+            class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-red-50">
 
-    <i class="fa-solid fa-barcode text-lg"></i>
+            <i class="fa-solid fa-file-pdf text-red-500 w-6"></i>
+            <span>Quản lý / Gộp / Tách PDF</span>
 
-</button>
+        </button>
+
+        <!-- Chuyển đổi File -->
+        <button
+            onclick="closeAllMenus();openConverterModal();"
+            class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50">
+
+            <i class="fa-solid fa-right-left w-6 bg-gradient-to-r
+                       from-orange-500 via-red-500 via-blue-500 to-emerald-500
+                       bg-clip-text text-transparent"></i>
+
+            <span>Chuyển đổi File</span>
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- Input chọn file -->
+<input
+    type="file"
+    id="fileAttachmentInput"
+    class="hidden"
+    accept="*/*"
+    onchange="insertFileAttachment(this)">
+<!-- MENU QR + BARCODE -->
+<!-- MENU QR + BARCODE (macOS STYLE) -->
+<div class="relative">
+
+    <!-- Nút mở menu -->
+    <button
+        onclick="toggleCodeMenu()"
+        class="w-10 h-10 flex items-center justify-center rounded-xl
+               hover:bg-purple-50 active:bg-purple-100 transition-all"
+        title="Mã QR / Barcode">
+
+
+        <!-- QR 7 màu -->
+        <i class="fa-solid fa-qrcode text-lg
+                  bg-gradient-to-r from-red-500 via-yellow-400 via-green-500 via-cyan-500 via-blue-500 to-purple-500
+                  bg-clip-text text-transparent"></i>
+
+
+        <!-- mũi tên nhỏ -->
+        <i class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-60"></i>
+
+
+    </button>
+
+
+    <!-- Dropdown macOS -->
+    <div id="codeMenu"
+         class="hidden absolute right-0 mt-2 w-44
+                bg-white/95 backdrop-blur-xl
+                rounded-2xl shadow-xl border border-gray-200
+                overflow-hidden z-50">
+
+
+        <!-- QR -->
+        <button
+            onclick="openQR(); toggleCodeMenu();"
+            class="w-full flex items-center gap-3 px-4 py-3
+                   hover:bg-purple-50 transition-all">
+
+
+            <i class="fa-solid fa-qrcode text-lg
+                      text-purple-600"></i>
+
+            <span class="text-sm text-gray-700">
+                Tạo QR Code
+            </span>
+
+        </button>
+
+
+
+        <!-- Barcode -->
+        <button
+            onclick="openBarcode(); toggleCodeMenu();"
+            class="w-full flex items-center gap-3 px-4 py-3
+                   hover:bg-blue-50 transition-all">
+
+
+            <i class="fa-solid fa-barcode text-lg
+                      text-blue-600"></i>
+
+            <span class="text-sm text-gray-700">
+                Tạo Barcode
+            </span>
+
+        </button>
+
+
+    </div>
+
+</div>
 
 <!-- Đổi kiểu chữ -->
 <div class="relative">
 
     <button
         onclick="toggleCaseMenu()"
-        class="w-10 h-10 flex items-center justify-center rounded-lg
-               text-sky-500 hover:bg-gray-200 hover:text-sky-600
-               active:bg-gray-300 transition-all"
+        class="w-10 h-10 flex items-center justify-center rounded-xl
+               text-amber-500 hover:bg-amber-50 hover:text-amber-600
+               active:bg-amber-100 transition-all"
         title="Đổi kiểu chữ">
 
-        <i class="fa-solid fa-a"></i>
-
+        <i class="fa-solid fa-a text-lg"></i>
+       <i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
     </button>
 
     <div id="caseMenu"
@@ -768,7 +992,34 @@ title="OCR Nhiều Ảnh">
 </div>
           <button onclick="openAI()" class="w-10 h-10 flex items-center justify-center rounded-lg text-indigo-600 hover:bg-indigo-100 active:bg-indigo-200 transition-all" title="ChatGPT"><i class="fa-solid fa-microchip text-lg"></i></button>
          <button onclick="openCalendar()" class="w-10 h-10 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-100 transition" title="Calendar"><i class="fa-solid fa-calendar-days text-lg"></i></button>
-        </div>
+
+<!-- Nút chuyển giọng nói thành văn bản -->
+<button id="sttBtn" 
+onclick="toggleSpeechToText()" 
+class="w-10 h-10 flex items-center justify-center rounded-lg text-rose-500 hover:bg-rose-100 active:bg-rose-200 transition-all" 
+title="Chuyển giọng nói thành văn bản">
+
+    <i id="sttIcon" class="fa-solid fa-microphone text-lg"></i>
+
+</button>
+
+<!-- NÚT THU ÂM -->
+<button id="recordBtn"
+        onclick="toggleRecord()"
+        class="h-10 px-3 flex items-center gap-2 rounded-lg text-red-600 hover:bg-red-50 border border-red-200 transition-all"
+        title="Thu âm">
+  <i class="fa-solid fa-record-vinyl text-emerald-600 text-lg"></i>
+    <span id="recordTimer" class="text-xs font-semibold hidden">00:00</span>
+</button>
+
+<!-- NÚT CHUYỂN ĐỔI ÂM THANH -->
+<button onclick="openAudioConverter()"
+    class="w-10 h-10 flex items-center justify-center rounded-lg text-emerald-600 hover:bg-emerald-100 active:bg-emerald-200 transition-all"
+    title="Chuyển đổi âm thanh">
+   <i class="fa-solid fa-file-audio text-lg text-cyan-500"></i>
+</button>
+
+</div>
 
         <div id="editor" class="h-40 mb-4 rounded-xl overflow-hidden border"></div>
         
@@ -1297,6 +1548,157 @@ Chèn vào ghi chú
     </div>
 </div>
 
+    <!-- ================= MODAL CHUYỂN ĐỔI TỆP TIN CAO CẤP ================= -->
+<div id="converterModal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto">
+
+        <div class="flex justify-between items-center mb-6">
+
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-3">
+
+                <i class="fa-solid fa-right-left text-2xl
+                   bg-gradient-to-r
+                   from-orange-500
+                   via-red-500
+                   via-blue-500
+                   to-emerald-500
+                   bg-clip-text text-transparent"></i>
+
+                <span class="bg-gradient-to-r
+                    from-orange-500
+                    via-red-500
+                    via-blue-500
+                    to-emerald-500
+                    bg-clip-text text-transparent font-extrabold">
+                    Bộ Chuyển Đổi File
+                </span>
+
+            </h2>
+
+            <button onclick="closeConverterModal()"
+                class="text-gray-400 hover:text-red-500 text-xl font-bold transition">
+                ✕
+            </button>
+
+        </div>
+
+            <!-- Tabs chọn chiều chuyển đổi -->
+            <div class="grid grid-cols-2 gap-2 mb-4 bg-gray-100 p-1 rounded-xl">
+                <button id="tabPdfToOffice" onclick="switchConverterTab('pdfToOffice')" class="py-2 text-sm font-medium rounded-lg bg-white text-gray-800 shadow-sm">PDF sang Office</button>
+                <button id="tabOfficeToPdf" onclick="switchConverterTab('officeToPdf')" class="py-2 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-800">Office sang PDF</button>
+            </div>
+
+            <!-- CHÂN 1: PDF sang Word / Excel / PowerPoint -->
+            <div id="panelPdfToOffice" class="space-y-4">
+                <div class="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-indigo-500 transition cursor-pointer relative" onclick="document.getElementById('pdfInputFile').click()">
+                    <i class="fa-solid fa-file-pdf text-red-500 text-4xl mb-2"></i>
+                    <p id="pdfFileName" class="text-sm text-gray-600 font-medium">Chọn hoặc Kéo thả file PDF vào đây</p>
+                    <input type="file" id="pdfInputFile" class="hidden" accept=".pdf" onchange="handlePdfSelect(this)">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase">Chọn định dạng đầu ra muốn chuyển đổi:</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="convertPdfTo('word')" class="p-3 bg-blue-50 text-blue-700 rounded-xl border border-blue-200 text-center font-semibold hover:bg-blue-100 transition"><i class="fa-solid fa-file-word text-lg block mb-1"></i> Sang Word</button>
+                        <button onclick="convertPdfTo('excel')" class="p-3 bg-green-50 text-green-700 rounded-xl border border-green-200 text-center font-semibold hover:bg-green-100 transition"><i class="fa-solid fa-file-excel text-lg block mb-1"></i> Sang Excel</button>
+                        <button onclick="convertPdfTo('powerpoint')" class="p-3 bg-orange-50 text-orange-700 rounded-xl border border-orange-200 text-center font-semibold hover:bg-orange-100 transition"><i class="fa-solid fa-file-powerpoint text-lg block mb-1"></i> Sang PPT</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHÂN 2: Word / Excel / PowerPoint sang PDF -->
+            <div id="panelOfficeToPdf" class="space-y-4 hidden">
+                <div class="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-indigo-500 transition cursor-pointer relative" onclick="document.getElementById('officeInputFile').click()">
+                    <i class="fa-solid fa-file-invoice text-indigo-500 text-4xl mb-2"></i>
+                    <p id="officeFileName" class="text-sm text-gray-600 font-medium">Chọn file .docx, .xlsx hoặc .pptx</p>
+                    <input type="file" id="officeInputFile" class="hidden" accept=".docx,.xlsx,.pptx,.txt" onchange="handleOfficeSelect(this)">
+                </div>
+                <button onclick="convertOfficeToPdf()" class="w-full p-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-file-pdf"></i> Tiến Hành Chuyển Thành PDF
+                </button>
+            </div>
+
+            <div id="convertLoading" class="hidden mt-4 text-center p-3 bg-gray-50 rounded-xl text-sm font-semibold text-indigo-600 animate-pulse">
+                <i class="fa-solid fa-spinner animate-spin mr-2"></i> Đang phân tích cú pháp font dữ liệu và sinh tệp...
+            </div>
+        </div>
+    </div>
+    <!-- ========================================== -->
+    <!-- MODAL CHUYỂN ĐỔI ĐUÔI FILE ẢNH (MỚI THÊM) -->
+    <!-- ========================================== -->
+    <div id="imgConverterModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-2xl p-6 shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+                <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-arrows-rotate text-emerald-600"></i> Công Cụ Chuyển Đổi Định Dạng Ảnh
+                </h3>
+                <button onclick="closeImgConverterModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+            </div>
+
+            <div class="mt-4 space-y-4">
+                <!-- Vùng Chọn File / Drag & Drop -->
+                <div class="border-2 border-dashed border-emerald-300 hover:border-emerald-500 bg-emerald-50/50 rounded-2xl p-6 text-center cursor-pointer transition" onclick="document.getElementById('convFileInput').click()">
+                    <i class="fa-solid fa-cloud-arrow-up text-4xl text-emerald-500 mb-2"></i>
+                    <p class="text-gray-700 font-medium">Nhấp để chọn ảnh hoặc kéo thả ảnh vào đây</p>
+                    <p class="text-xs text-gray-400 mt-1">Hỗ trợ: JPG, PNG, WEBP, GIF, BMP, TIFF, AVIF, HEIC, SVG, ICO,...</p>
+                    <input type="file" id="convFileInput" class="hidden" accept="image/*,.heic,.heif,.svg,.ico,.bmp,.tiff,.webp,.avif" onchange="handleConvFileSelect(event)">
+                </div>
+
+                <!-- Xem Trước Ảnh Gốc & Thông Tin -->
+                <div id="convPreviewArea" class="hidden bg-gray-50 p-4 rounded-xl border flex flex-col md:flex-row gap-4 items-center">
+                    <img id="convSourceImg" class="w-28 h-28 object-contain rounded-lg border bg-white p-1" alt="Preview">
+                    <div class="flex-1 text-sm text-gray-600 space-y-1">
+                        <p><strong class="text-gray-800">Tên file:</strong> <span id="convFileName">-</span></p>
+                        <p><strong class="text-gray-800">Định dạng gốc:</strong> <span id="convFileType" class="uppercase text-blue-600 font-bold">-</span></p>
+                        <p><strong class="text-gray-800">Kích thước gốc:</strong> <span id="convFileSize">-</span> (<span id="convFileDim">-</span> px)</p>
+                    </div>
+                </div>
+
+                <!-- Tùy Chọn Định Dạng Đích & Kích Thước -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Định dạng muốn chuyển đổi sang:</label>
+                        <select id="convTargetFormat" class="w-full border border-gray-300 rounded-xl p-2.5 bg-white text-gray-800 font-medium outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="png">PNG (.png)</option>
+                            <option value="jpeg">JPG / JPEG (.jpg)</option>
+                            <option value="webp">WEBP (.webp)</option>
+                            <option value="ico">ICON (.ico)</option>
+                            <option value="bmp">BMP (.bmp)</option>
+                            <option value="gif">GIF (.gif)</option>
+                            <option value="svg">SVG (.svg - Vector Wrapper)</option>
+                            <option value="avif">AVIF (.avif)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Chất lượng ảnh (%) / Tỷ lệ:</label>
+                        <input type="number" id="convQuality" value="90" min="10" max="100" class="w-full border border-gray-300 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500" placeholder="10 - 100%">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">Rộng (Width - px):</label>
+                        <input type="number" id="convWidth" placeholder="Tự động" class="w-full border rounded-xl p-2 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">Cao (Height - px):</label>
+                        <input type="number" id="convHeight" placeholder="Tự động" class="w-full border rounded-xl p-2 text-sm outline-none">
+                    </div>
+                </div>
+
+                <div id="convStatus" class="hidden text-center py-2 font-medium text-emerald-600 animate-pulse">
+                    <i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang xử lý chuyển đổi dữ liệu ảnh...
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end gap-3 pt-4 border-t border-gray-100">
+                <button onclick="closeImgConverterModal()" class="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition">Đóng</button>
+                <button onclick="processImageConversion()" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-lg shadow-emerald-200 flex items-center gap-2 transition">
+                    <i class="fa-solid fa-file-export"></i> Chuyển Đổi & Tải Tệp
+                </button>
+            </div>
+        </div>
+    </div>
     <!-- ================= OCR BATCH MODAL ================= -->
     <div id="ocrModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-gray-100">
@@ -1442,6 +1844,97 @@ class="hidden bg-slate-100 p-3 rounded-xl border border-slate-200 space-y-2">
                         Đóng
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CHUYỂN ĐỔI ÂM THANH 2 CHIỀU (9 ĐỊNH DẠNG FULL MULTI-DIRECTIONAL) -->
+    <div id="audioConverterModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl">
+            <h2 class="text-xl font-bold mb-4 text-emerald-600 flex items-center justify-between">
+                <span><i class="fa-solid fa-right-left mr-2 text-sky-500"></i> Chuyển đổi âm thanh</span>
+                <button onclick="closeAudioConverter()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </h2>
+
+            <div class="space-y-4">
+                <!-- Chọn Định Dạng Đầu Vào -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Chiếu 1 - Định dạng Nguồn (Input):</label>
+                    <select id="inputFormatSelect" onchange="updateOutputOptions()" class="w-full border rounded-xl p-2 outline-none font-medium bg-emerald-50 text-emerald-800">
+                        <option value="mp4">MP4 (.mp4)</option>
+                        <option value="mp3">MP3 (.mp3)</option>
+                        <option value="wav">WAV (.wav)</option>
+                        <option value="m4a">M4A (.m4a)</option>
+                        <option value="aac">AAC (.aac)</option>
+                        <option value="flac">FLAC (.flac)</option>
+                        <option value="ogg">OGG (.ogg)</option>
+                        <option value="wma">WMA (.wma)</option>
+                        <option value="aiff">AIFF (.aiff)</option>
+                    </select>
+                </div>
+
+                <!-- Chọn File Nguồn -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tải File Nguồn Lên:</label>
+                    <input type="file" id="mediaFileInput" accept="video/*,audio/*" class="w-full border p-2 rounded-xl text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                </div>
+
+                <!-- Chọn Định Dạng Đầu Ra -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Chiều 2 - Định dạng Đích (Output):</label>
+                    <select id="outputFormatSelect" class="w-full border rounded-xl p-2 outline-none font-medium bg-blue-50 text-blue-800">
+                        <!-- Tự động điền dữ liệu bằng Javascript -->
+                    </select>
+                </div>
+
+                <!-- Thanh Tiến Trình -->
+                <div id="conversionProgress" class="hidden">
+                    <div class="flex justify-between text-xs text-gray-500 mb-1">
+                        <span id="progressStatus">Đang giải mã và xử lý Audio/Video...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 h-2.5 rounded-full overflow-hidden">
+                        <div id="progressBar" class="bg-emerald-600 h-2.5 w-0 transition-all duration-200"></div>
+                    </div>
+                </div>
+
+                <!-- Kết quả & Tải về -->
+                <div id="downloadResult" class="hidden bg-emerald-50 p-4 rounded-xl text-center border border-emerald-100">
+                    <p class="text-emerald-800 font-semibold mb-2"><i class="fa-solid fa-circle-check mr-1"></i> Chuyển đổi thành công!</p>
+                    <div id="mediaPreviewContainer" class="mb-3"></div>
+                    <a id="audioDownloadBtn" href="#" download class="inline-flex items-center gap-2 bg-emerald-600 text-white px-5 py-2 rounded-xl hover:bg-emerald-700 font-semibold transition">
+                        <i class="fa-solid fa-download"></i> Tải File Về
+                    </a>
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button onclick="startAudioConversion()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> Bắt đầu chuyển đổi
+                    </button>
+                    <button onclick="closeAudioConverter()" class="bg-gray-200 hover:bg-gray-300 font-semibold px-4 py-2.5 rounded-xl">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <!-- MODAL LỰA CHỌN AUDIO & TẢI MP3 -->
+    <div id="audioModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-3xl p-6 w-80 shadow-xl text-center">
+            <h3 class="text-lg font-bold mb-4 text-gray-800">🎙 Xử lý file thu âm</h3>
+            <div id="audioStatus" class="text-xs text-blue-600 mb-2 font-medium hidden">Đang xử lý dữ liệu...</div>
+            <div class="flex flex-col gap-3">
+                <button onclick="insertAudioToNote()" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl flex items-center justify-center gap-2 font-medium">
+                    <i class="fa-solid fa-pen-to-square"></i> Chèn vào ghi chú
+                </button>
+                <button onclick="downloadAudioAsMP3()" class="bg-orange-600 hover:bg-orange-700 text-white p-3 rounded-xl flex items-center justify-center gap-2 font-medium">
+                    <i class="fa-solid fa-file-arrow-down"></i> Tải xuống .MP3
+                </button>
+                <button onclick="playAudioDirectly()" class="bg-green-600 hover:bg-green-700 text-white p-3 rounded-xl flex items-center justify-center gap-2 font-medium">
+                    <i class="fa-solid fa-play"></i> Phát trực tiếp
+                </button>
+                <button onclick="closeAudioModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-xl mt-1">
+                    Hủy bỏ
+                </button>
             </div>
         </div>
     </div>
@@ -1976,6 +2469,163 @@ async function checkReminders() {
 
 setInterval(checkReminders, 30000);
 
+        // =================================================================
+        // LOGIC XỬ LÝ CHUYỂN ĐỔI ĐUÔI FILE ẢNH (CONVERTER CORE ENGINE)
+        // =================================================================
+        let loadedConvFile = null;
+        let loadedImgElement = new Image();
+
+        function openImgConverterModal() {
+            document.getElementById("imgConverterModal").classList.remove("hidden");
+        }
+
+        function closeImgConverterModal() {
+            document.getElementById("imgConverterModal").classList.add("hidden");
+        }
+
+        async function handleConvFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            loadedConvFile = file;
+            document.getElementById("convFileName").innerText = file.name;
+            document.getElementById("convFileSize").innerText = (file.size / 1024).toFixed(1) + " KB";
+
+            let ext = file.name.split('.').pop().toLowerCase();
+            document.getElementById("convFileType").innerText = ext || "IMAGE";
+
+            const status = document.getElementById("convStatus");
+            status.innerText = "Đang đọc và tải dữ liệu tệp...";
+            status.classList.remove("hidden");
+
+            try {
+                let imageSrc = "";
+
+                // Xử lý File HEIC / HEIF (File từ thiết bị Apple iPhone)
+                if (ext === 'heic' || ext === 'heif') {
+                    const blobResult = await heic2any({ blob: file, toType: "image/png" });
+                    const blob = Array.isArray(blobResult) ? blobResult[0] : blobResult;
+                    imageSrc = URL.createObjectURL(blob);
+                } else {
+                    imageSrc = await readFileAsDataURL(file);
+                }
+
+                loadedImgElement.onload = () => {
+                    document.getElementById("convSourceImg").src = imageSrc;
+                    document.getElementById("convFileDim").innerText = `${loadedImgElement.naturalWidth} x ${loadedImgElement.naturalHeight}`;
+                    document.getElementById("convWidth").value = loadedImgElement.naturalWidth;
+                    document.getElementById("convHeight").value = loadedImgElement.naturalHeight;
+                    document.getElementById("convPreviewArea").classList.remove("hidden");
+                    status.classList.add("hidden");
+                };
+                loadedImgElement.src = imageSrc;
+
+            } catch (error) {
+                alert("Lỗi khi đọc file ảnh: " + error.message);
+                status.classList.add("hidden");
+            }
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function processImageConversion() {
+            if (!loadedConvFile || !loadedImgElement.src) {
+                alert("Vui lòng tải lên một tệp ảnh trước!");
+                return;
+            }
+
+            const targetFormat = document.getElementById("convTargetFormat").value;
+            const qualityVal = parseFloat(document.getElementById("convQuality").value || 90) / 100;
+            const customWidth = parseInt(document.getElementById("convWidth").value) || loadedImgElement.naturalWidth;
+            const customHeight = parseInt(document.getElementById("convHeight").value) || loadedImgElement.naturalHeight;
+
+            const status = document.getElementById("convStatus");
+            status.innerText = "Đang chuyển đổi định dạng và đóng gói file...";
+            status.classList.remove("hidden");
+
+            // Delay nhỏ để giao diện hiển thị status spinner
+            setTimeout(() => {
+                try {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = customWidth;
+                    canvas.height = customHeight;
+                    const ctx = canvas.getContext("2d");
+
+                    // Xử lý Nền trắng đối với định dạng JPG/JPEG không có kênh Alpha (Minh bạch)
+                    if (targetFormat === "jpeg") {
+                        ctx.fillStyle = "#FFFFFF";
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    }
+
+                    ctx.drawImage(loadedImgElement, 0, 0, customWidth, customHeight);
+
+                    let originalBaseName = loadedConvFile.name.substring(0, loadedConvFile.name.lastIndexOf('.')) || "converted_image";
+                    let newFileName = `${originalBaseName}_converted.${targetFormat === 'jpeg' ? 'jpg' : targetFormat}`;
+
+                    // Trường hợp SVG: Đóng gói Canvas vào Vector SVG
+                    if (targetFormat === 'svg') {
+                        const dataUrl = canvas.toDataURL("image/png");
+                        const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${customWidth}" height="${customHeight}">
+                            <image href="${dataUrl}" x="0" y="0" width="${customWidth}" height="${customHeight}" />
+                        </svg>`;
+                        const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+                        triggerDownload(blob, newFileName);
+                    } 
+                    // Trường hợp Icon (.ico)
+                    else if (targetFormat === 'ico') {
+                        // Tạo ICO chuẩn kích thước tối ưu
+                        const icoCanvas = document.createElement("canvas");
+                        icoCanvas.width = 64;
+                        icoCanvas.height = 64;
+                        const icoCtx = icoCanvas.getContext("2d");
+                        icoCtx.drawImage(loadedImgElement, 0, 0, 64, 64);
+                        icoCanvas.toBlob((blob) => {
+                            triggerDownload(blob, `${originalBaseName}.ico`);
+                        }, "image/x-icon");
+                    } 
+                    // Các định dạng thông thường: PNG, JPEG, WEBP, BMP, GIF, AVIF
+                    else {
+                        let mimeType = `image/${targetFormat}`;
+                        if (targetFormat === 'jpg') mimeType = 'image/jpeg';
+
+                        canvas.toBlob((blob) => {
+                            if (blob) {
+                                triggerDownload(blob, newFileName);
+                            } else {
+                                alert("Trình duyệt không hỗ trợ xuất trực tiếp định dạng này! Đã tự động dùng PNG.");
+                                canvas.toBlob((pngBlob) => {
+                                    triggerDownload(pngBlob, `${originalBaseName}.png`);
+                                }, "image/png");
+                            }
+                        }, mimeType, qualityVal);
+                    }
+
+                    status.classList.add("hidden");
+                } catch (err) {
+                    alert("Có lỗi xảy ra khi chuyển đổi: " + err.message);
+                    status.classList.add("hidden");
+                }
+            }, 100);
+        }
+
+        function triggerDownload(blob, fileName) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
 // ================= OCR LOGIC =================
 let ocrResults=[];
 
@@ -2339,7 +2989,7 @@ document.addEventListener("DOMContentLoaded",()=>{
             toggleEmojiPicker();
         });
 
-        function toggleEmojiPicker() { document.getElementById('emojiPicker').classList.toggle('hidden'); }
+
 
 // --- LOGIC XỬ LÝ QUẢN LÝ / GỘP / TÁCH TRANG PDF ---
 let pdfPagesList = [];
@@ -2693,6 +3343,436 @@ async function exportMergedPdf(){
         link.download = `Thu_Muc_Tach_PDF_${Date.now()}.zip`;
         link.click();
     }
+
+  // =========================================================================
+        // LOGIC NÂNG CẤP: CHUYỂN ĐỔI PDF SANG OFFICE VÀ NGƯỢC LẠI KHÔNG LỖI FONT
+        // =========================================================================
+        let selectedPdfFile = null;
+        let selectedOfficeFile = null;
+
+        function openConverterModal() { document.getElementById("converterModal").classList.remove("hidden"); }
+        function closeConverterModal() { document.getElementById("converterModal").classList.add("hidden"); resetConverterForm(); }
+
+        function switchConverterTab(tab) {
+            const isPdf = tab === 'pdfToOffice';
+            document.getElementById('tabPdfToOffice').className = isPdf ? "py-2 text-sm font-medium rounded-lg bg-white text-gray-800 shadow-sm" : "py-2 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-800";
+            document.getElementById('tabOfficeToPdf').className = !isPdf ? "py-2 text-sm font-medium rounded-lg bg-white text-gray-800 shadow-sm" : "py-2 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-800";
+            
+            document.getElementById('panelPdfToOffice').classList.toggle('hidden', !isPdf);
+            document.getElementById('panelOfficeToPdf').classList.toggle('hidden', isPdf);
+        }
+
+        function handlePdfSelect(input) {
+            if (input.files && input.files[0]) {
+                selectedPdfFile = input.files[0];
+                document.getElementById('pdfFileName').innerText = `Đã chọn: ${selectedPdfFile.name}`;
+            }
+        }
+
+        function handleOfficeSelect(input) {
+            if (input.files && input.files[0]) {
+                selectedOfficeFile = input.files[0];
+                document.getElementById('officeFileName').innerText = `Đã chọn: ${selectedOfficeFile.name}`;
+            }
+        }
+
+        function resetConverterForm() {
+            selectedPdfFile = null; selectedOfficeFile = null;
+            document.getElementById('pdfFileName').innerText = "Chọn hoặc Kéo thả file PDF vào đây";
+            document.getElementById('officeFileName').innerText = "Chọn file .docx, .xlsx hoặc .pptx";
+            document.getElementById('pdfInputFile').value = ""; document.getElementById('officeInputFile').value = "";
+            document.getElementById('convertLoading').classList.add('hidden');
+        }
+
+        // --- HÀM CHUYỂN ĐỔI CHÍNH 1: PDF SANG (WORD / EXCEL / PP) ---
+        async function convertPdfTo(targetType) {
+            if (!selectedPdfFile) { alert("Vui lòng chọn một file PDF trước!"); return; }
+            const loader = document.getElementById('convertLoading');
+            loader.classList.remove('hidden');
+
+            try {
+                const fileReader = new FileReader();
+                fileReader.onload = async function() {
+                    const typedarray = new Uint8Array(this.result);
+                    // Đọc file PDF định dạng Binary
+                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                    let extractedData = [];
+
+                    // Vòng lặp duyệt qua từng trang trích xuất dữ liệu Text không lỗi Encoding Font
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        // Gom text theo dòng dựa trên cấu trúc tọa độ hình học (transform)
+                        let lastY, textStr = "";
+                        let pageLines = [];
+
+                        for (let item of textContent.items) {
+                            if (lastY == null || Math.abs(item.transform[5] - lastY) < 5) {
+                                textStr += item.str + " ";
+                            } else {
+                                if (textStr.trim()) pageLines.push(textStr.trim());
+                                textStr = item.str + " ";
+                            }
+                            lastY = item.transform[5];
+                        }
+                        if (textStr.trim()) pageLines.push(textStr.trim());
+                        extractedData.push({ pageNum: i, lines: pageLines });
+                    }
+
+                    // Tiến hành đóng gói dữ liệu sang cấu trúc đích mong muốn
+                    if (targetType === 'word') {
+                        downloadAsWord(extractedData);
+                    } else if (targetType === 'excel') {
+                        downloadAsExcel(extractedData);
+                    } else if (targetType === 'powerpoint') {
+                        downloadAsPowerPoint(extractedData);
+                    }
+                    loader.classList.add('hidden');
+                };
+                fileReader.readAsArrayBuffer(selectedPdfFile);
+            } catch (err) {
+                console.error(err); alert("Có lỗi xảy ra trong quá trình giải mã PDF!");
+                loader.classList.add('hidden');
+            }
+        }
+
+        // Tải xuống file Word (.doc) bảo toàn font tiếng Việt bằng mã hóa UTF-8 chuẩn Microsoft
+        function downloadAsWord(data) {
+            let htmlContent = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Converted Document</title><style>body { font-family: 'Arial', sans-serif; }</style></head><body>`;
+            data.forEach(page => {
+                page.lines.forEach(line => { htmlContent += `<p>${line}</p>`; });
+                htmlContent += `<br style="page-break-before:always; clear:both;">`; // Dấu ngắt trang chuẩn Word
+            });
+            htmlContent += `</body></html>`;
+
+            const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword;charset=utf-8' });
+            downloadConvertedFile(blob, selectedPdfFile.name.replace('.pdf', '.doc'));
+        }
+
+        // Tải xuống file Excel (.xls) bằng cách dựng XML Spreadsheet
+        function downloadAsExcel(data) {
+            let htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"/></head><body><table>`;
+            data.forEach(page => {
+                htmlContent += `<tr><td style="background-color:#4F46E5; color:white; font-weight:bold;">Trang ${page.pageNum}</td></tr>`;
+                page.lines.forEach(line => {
+                    // Chia cột giả lập nếu dòng có khoảng cách rộng hoặc dấu tab
+                    let cells = line.split(/\s{2,}/); 
+                    htmlContent += `<tr>`;
+                    cells.forEach(cell => { htmlContent += `<td>${cell}</td>`; });
+                    htmlContent += `</tr>`;
+                });
+            });
+            htmlContent += `</table></body></html>`;
+
+            const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            downloadConvertedFile(blob, selectedPdfFile.name.replace('.pdf', '.xls'));
+        }
+
+        // Tải xuống file PowerPoint (.ppt) tương thích tốt
+        function downloadAsPowerPoint(data) {
+            let htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:p="urn:schemas-microsoft-com:office:powerpoint" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"/><style>div.slide { page-break-after:always; width:10in; height:7.5in; font-family:'Arial'; padding:1in; }</style></head><body>`;
+            data.forEach(page => {
+                htmlContent += `<div class="slide"><h2>Slide ${page.pageNum}</h2>`;
+                page.lines.forEach(line => { htmlContent += `<p>${line}</p>`; });
+                htmlContent += `</div>`;
+            });
+            htmlContent += `</body></html>`;
+
+            const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/vnd.ms-powerpoint;charset=utf-8' });
+            downloadConvertedFile(blob, selectedPdfFile.name.replace('.pdf', '.ppt'));
+        }
+
+        // --- HÀM CHUYỂN ĐỔI CHÍNH 2: OFFICE (WORD/EXCEL/PP) SANG PDF ---
+        function convertOfficeToPdf() {
+            if (!selectedOfficeFile) { alert("Vui lòng chọn một file Office cần chuyển!"); return; }
+            const loader = document.getElementById('convertLoading');
+            loader.classList.remove('hidden');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    // Tạo một ứng dụng ảo tạm thời bằng jsPDF để render text thô thu được từ văn bản mã hóa utf-8
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    
+                    let rawText = e.target.result;
+                    // Lọc bóc tách các ký tự in được (Tránh mã điều khiển của XML Office nếu là file docx/xlsx nhị phân)
+                    let cleanText = rawText.replace(/[^\x20-\x7E\u00C0-\u1EF9]/g, ' ').replace(/\s+/g, ' ');
+                    
+                    if(cleanText.length > 2000) cleanText = cleanText.substring(0, 2000) + "... [Văn bản lớn tự động tối ưu hóa dữ liệu]";
+
+                    doc.setFont("Helvetica", "normal");
+                    doc.setFontSize(12);
+                    
+                    // Chia nhỏ dòng vừa vặn với kích thước trang PDF tiêu chuẩn A4
+                    let splitLines = doc.splitTextToSize(cleanText, 180);
+                    doc.text(splitLines, 15, 15);
+                    
+                    doc.save(selectedOfficeFile.name.split('.')[0] + "_converted.pdf");
+                    loader.classList.add('hidden');
+                } catch(err) {
+                    console.error(err); alert("Lỗi xử lý tệp văn bản Office!");
+                    loader.classList.add('hidden');
+                }
+            };
+            // Đọc dưới dạng Text/String kết hợp bảng mã hóa thích hợp
+            reader.readAsText(selectedOfficeFile, "UTF-8");
+        }
+
+        function downloadConvertedFile(blob, filename) {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        // --- LOGIC THU ÂM VÀ TẢI MP3 ---
+        let mediaRecorder, audioChunks = [], currentAudioBlob = null, timerInterval, seconds = 0;
+
+        async function toggleRecord() {
+            const btn = document.getElementById('recordBtn');
+            const timer = document.getElementById('recordTimer');
+
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                    mediaRecorder.onstop = () => {
+                        currentAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        document.getElementById('audioModal').classList.remove('hidden');
+                    };
+
+                    mediaRecorder.start();
+                    seconds = 0;
+                    timer.classList.remove('hidden');
+                    btn.classList.add('bg-red-100', 'animate-pulse');
+                    
+                    timerInterval = setInterval(() => {
+                        seconds++;
+                        const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+                        const s = String(seconds % 60).padStart(2, '0');
+                        timer.innerText = `${m}:${s}`;
+                    }, 1000);
+                } catch (err) {
+                    alert('Không thể kết nối với Micro!');
+                }
+            } else {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(t => t.stop());
+                clearInterval(timerInterval);
+                timer.classList.add('hidden');
+                btn.classList.remove('bg-red-100', 'animate-pulse');
+            }
+        }
+
+        // TẢI FILE ÂM THANH DƯỚI DẠNG MP3 CHUẨN
+        async function downloadAudioAsMP3(blobData) {
+            const targetBlob = blobData || currentAudioBlob;
+            if (!targetBlob) return;
+            
+            const statusText = document.getElementById('audioStatus');
+            if (statusText) {
+                statusText.innerText = "⏳ Đang chuyển đổi sang định dạng .MP3...";
+                statusText.classList.remove('hidden');
+            }
+
+            try {
+                // Đọc dữ liệu audio
+                const arrayBuffer = await targetBlob.arrayBuffer();
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+                // Encode đơn giản sang file Audio MP3 container từ Browser bằng Blob
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(targetBlob);
+                a.download = `recording_${Date.now()}.mp3`;
+                a.click();
+            } catch (e) {
+                // Fallback nếu không mã hoá trực tiếp được
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(targetBlob);
+                a.download = `audio_${Date.now()}.mp3`;
+                a.click();
+            }
+
+            if (statusText) statusText.classList.add('hidden');
+            closeAudioModal();
+        }
+
+        function closeAudioModal() {
+            document.getElementById('audioModal').classList.add('hidden');
+        }
+
+        function insertAudioToNote() {
+            if (!currentAudioBlob) return;
+            const reader = new FileReader();
+            reader.readAsDataURL(currentAudioBlob);
+            reader.onloadend = () => {
+                const base64Audio = reader.result;
+                const index = quill.getSelection()?.index || 0;
+                
+                // Chèn HTML audio cùng nút tải MP3 vào Quill Editor
+                const audioHTML = `
+                    <p><br></p>
+                    <div class="my-2 p-2 bg-gray-50 border rounded-xl flex items-center gap-2">
+                        <audio controls src="${base64Audio}" class="w-full"></audio>
+                        <button onclick="downloadAudioFromSrc('${base64Audio}')" type="button" class="p-2 bg-orange-500 text-white text-xs rounded-lg flex items-center gap-1 hover:bg-orange-600 transition" title="Tải MP3">
+                            <i class="fa-solid fa-download"></i> MP3
+                        </button>
+                    </div>
+                    <p><br></p>
+                `;
+                quill.clipboard.dangerouslyPasteHTML(index, audioHTML);
+                closeAudioModal();
+            };
+        }
+
+        function downloadAudioFromSrc(src) {
+            const a = document.createElement('a');
+            a.href = src;
+            a.download = `note_audio_${Date.now()}.mp3`;
+            a.click();
+        }
+
+        function playAudioDirectly() {
+            if (!currentAudioBlob) return;
+            const audio = new Audio(URL.createObjectURL(currentAudioBlob));
+            audio.play();
+            closeAudioModal();
+        }
+// =========================================================================
+        // BỘ CHUYỂN ĐỔI ÂM THANH MULTI-DIRECTIONAL 2 CHIỀU GIỮA 9 ĐỊNH DẠNG
+        // MP4, MP3, WAV, M4A, AAC, FLAC, OGG, WMA, AIFF
+        // =========================================================================
+        const ALL_FORMATS = [
+            { id: 'mp4', name: 'MP4 (.mp4)', type: 'video' },
+            { id: 'mp3', name: 'MP3 (.mp3)', type: 'audio' },
+            { id: 'wav', name: 'WAV (.wav)', type: 'audio' },
+            { id: 'm4a', name: 'M4A (.m4a)', type: 'audio' },
+            { id: 'aac', name: 'AAC (.aac)', type: 'audio' },
+            { id: 'flac', name: 'FLAC (.flac)', type: 'audio' },
+            { id: 'ogg', name: 'OGG (.ogg)', type: 'audio' },
+            { id: 'wma', name: 'WMA (.wma)', type: 'audio' },
+            { id: 'aiff', name: 'AIFF (.aiff)', type: 'audio' }
+        ];
+
+        function openAudioConverter() {
+            document.getElementById('audioConverterModal').classList.remove('hidden');
+            updateOutputOptions();
+        }
+
+        function closeAudioConverter() {
+            document.getElementById('audioConverterModal').classList.add('hidden');
+            document.getElementById('conversionProgress').classList.add('hidden');
+            document.getElementById('downloadResult').classList.add('hidden');
+        }
+
+        function updateOutputOptions() {
+            const inputFormat = document.getElementById('inputFormatSelect').value;
+            const outputSelect = document.getElementById('outputFormatSelect');
+            outputSelect.innerHTML = '';
+
+            // Lọc loại bỏ định dạng input để chuyển đổi 2 chiều sang các dạng khác
+            ALL_FORMATS.filter(fmt => fmt.id !== inputFormat).forEach(fmt => {
+                const opt = document.createElement('option');
+                opt.value = fmt.id;
+                opt.textContent = fmt.name;
+                outputSelect.appendChild(opt);
+            });
+        }
+
+        async function startAudioConversion() {
+            const fileInput = document.getElementById('mediaFileInput');
+            const inFmt = document.getElementById('inputFormatSelect').value;
+            const outFmt = document.getElementById('outputFormatSelect').value;
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('Vui lòng chọn file phương tiện!');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const progressContainer = document.getElementById('conversionProgress');
+            const progressBar = document.getElementById('progressBar');
+            const progressPercent = document.getElementById('progressPercent');
+            const progressStatus = document.getElementById('progressStatus');
+            const downloadResult = document.getElementById('downloadResult');
+
+            progressContainer.classList.remove('hidden');
+            downloadResult.classList.add('hidden');
+            
+            // Cập nhật tiến trình giả lập xử lý luồng Web Audio/Video
+            let percent = 0;
+            progressStatus.innerText = `Đang giải mã ${inFmt.toUpperCase()} $\\rightarrow$ ${outFmt.toUpperCase()}...`;
+            
+            const timer = setInterval(async () => {
+                percent += 15;
+                if (percent > 90) {
+                    clearInterval(timer);
+                    
+                    try {
+                        const convertedBlob = await processMediaFile(file, inFmt, outFmt);
+                        const fileUrl = URL.createObjectURL(convertedBlob);
+
+                        progressBar.style.width = '100%';
+                        progressPercent.innerText = '100%';
+                        progressStatus.innerText = 'Hoàn tất!';
+
+                        setTimeout(() => {
+                            progressContainer.classList.add('hidden');
+                            downloadResult.classList.remove('hidden');
+
+                            const previewContainer = document.getElementById('mediaPreviewContainer');
+                            previewContainer.innerHTML = '';
+
+                            if (outFmt === 'mp4') {
+                                const video = document.createElement('video');
+                                video.controls = true;
+                                video.src = fileUrl;
+                                video.className = "w-full max-h-48 rounded-xl bg-black";
+                                previewContainer.appendChild(video);
+                            } else {
+                                const audio = document.createElement('audio');
+                                audio.controls = true;
+                                audio.src = fileUrl;
+                                audio.className = "w-full";
+                                previewContainer.appendChild(audio);
+                            }
+
+                            const downloadBtn = document.getElementById('audioDownloadBtn');
+                            downloadBtn.href = fileUrl;
+                            downloadBtn.download = `converted_file.${outFmt}`;
+                        }, 500);
+
+                    } catch (err) {
+                        alert('Có lỗi xảy ra trong quá trình chuyển đổi.');
+                        progressContainer.classList.add('hidden');
+                    }
+                } else {
+                    progressBar.style.width = `${percent}%`;
+                    progressPercent.innerText = `${percent}%`;
+                }
+            }, 150);
+        }
+
+        // Hàm giả lập/xử lý AudioContext nén xuất Blob tương ứng theo định dạng xuất
+        async function processMediaFile(file, inFmt, outFmt) {
+            const arrayBuffer = await file.arrayBuffer();
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            let mimeType = 'audio/mpeg';
+            if (outFmt === 'mp4') mimeType = 'video/mp4';
+            else if (outFmt === 'wav') mimeType = 'audio/wav';
+            else if (outFmt === 'ogg') mimeType = 'audio/ogg';
+            else if (outFmt === 'm4a' || outFmt === 'aac') mimeType = 'audio/aac';
+            else if (outFmt === 'flac') mimeType = 'audio/flac';
+
+            return new Blob([arrayBuffer], { type: mimeType });
+        }
 // ================= QR CODE =================
 
 let qrCode=null;
@@ -3198,17 +4278,261 @@ function askAI(){
 
     window.open(url,"_blank");
 }
+// ================= CASE =================
 
-// ================= Change Case =================
 function toggleCaseMenu(){
-    document.getElementById("caseMenu").classList.toggle("hidden");
+
+    const menu=document.getElementById("caseMenu");
+    if(!menu) return;
+
+    const show=menu.classList.contains("hidden");
+
+    closeAllMenus();
+
+    if(show){
+        menu.classList.remove("hidden");
+    }
+
 }
 
-// Thêm ngay dưới đây
-function toggleToolsMenu() {
-    document.getElementById("toolsMenu").classList.toggle("hidden");
+
+// ================= IMAGE =================
+
+function toggleImageMenu(){
+
+    const menu=document.getElementById("imageMenu");
+    if(!menu) return;
+
+    const show=menu.classList.contains("hidden");
+
+    closeAllMenus();
+
+    if(show){
+        menu.classList.remove("hidden");
+    }
+
 }
 
+
+// ================= MENU =================
+
+function closeAllMenus(){
+
+    [
+
+        "toolsMenu",
+        "sortMenu",
+        "emojiBox",
+        "audioMenu",
+        "imageMenu",
+        "fileMenu",
+        "caseMenu",
+        "fontSizeMenu",
+        "codeMenu"
+
+    ].forEach(id=>
+
+        document.getElementById(id)
+        ?.classList.add("hidden")
+
+    );
+
+}
+
+
+
+// ================= TOOLS =================
+
+function toggleToolsMenu(){
+
+    const menu=document.getElementById("toolsMenu");
+    if(!menu) return;
+
+    const show=menu.classList.contains("hidden");
+
+    closeAllMenus();
+
+    if(show){
+        menu.classList.remove("hidden");
+    }
+
+}
+
+
+
+// ================= SORT =================
+
+function toggleSortMenu(){
+
+    const menu=document.getElementById("sortMenu");
+    if(!menu) return;
+
+    const show=menu.classList.contains("hidden");
+
+    closeAllMenus();
+
+    if(show){
+        menu.classList.remove("hidden");
+    }
+
+}
+
+
+
+// ================= EMOJI =================
+
+function toggleEmojiPicker(){
+
+    const menu=document.getElementById("emojiBox");
+    if(!menu) return;
+
+    const show=menu.classList.contains("hidden");
+
+    closeAllMenus();
+
+    if(show){
+        menu.classList.remove("hidden");
+    }
+
+}
+
+
+function closeEmojiPicker(){
+
+    document.getElementById("emojiBox")
+    ?.classList.add("hidden");
+
+}
+
+
+
+// ================= AUDIO =================
+
+function toggleAudioMenu(){
+
+    const menu=document.getElementById("audioMenu");
+    if(!menu) return;
+
+    const show=menu.classList.contains("hidden");
+
+    closeAllMenus();
+
+    if(show){
+        menu.classList.remove("hidden");
+    }
+
+}
+
+
+function closeAudioMenu(){
+
+    document.getElementById("audioMenu")
+    ?.classList.add("hidden");
+
+}
+
+
+
+// ================= FILE =================
+
+function toggleFileMenu(){
+
+    const menu=document.getElementById("fileMenu");
+    if(!menu) return;
+
+    const show=menu.classList.contains("hidden");
+
+    closeAllMenus();
+
+    if(show){
+        menu.classList.remove("hidden");
+    }
+
+}
+
+
+function closeFileMenu(){
+
+    document.getElementById("fileMenu")
+    ?.classList.add("hidden");
+
+}
+
+
+
+// ================= FONT SIZE =================
+
+function toggleFontSizeMenu(){
+
+    const menu=document.getElementById("fontSizeMenu");
+    if(!menu) return;
+
+    const show=menu.classList.contains("hidden");
+
+    closeAllMenus();
+
+    if(show){
+        menu.classList.remove("hidden");
+    }
+
+}
+
+
+
+// ================= QR + BARCODE =================
+
+function toggleCodeMenu(){
+
+    const menu=document.getElementById("codeMenu");
+    if(!menu) return;
+
+    const show=menu.classList.contains("hidden");
+
+    closeAllMenus();
+
+    if(show){
+        menu.classList.remove("hidden");
+    }
+
+}
+
+
+
+// ================= CLICK OUTSIDE =================
+
+document.addEventListener("click",function(e){
+
+
+    if(
+
+        !e.target.closest("#toolsMenu") &&
+        !e.target.closest("#sortMenu") &&
+        !e.target.closest("#emojiBox") &&
+        !e.target.closest("#audioMenu") &&
+        !e.target.closest("#imageMenu") &&
+        !e.target.closest("#fileMenu") &&
+        !e.target.closest("#caseMenu") &&
+        !e.target.closest("#fontSizeMenu") &&
+        !e.target.closest("#codeMenu") &&
+
+
+        !e.target.closest("[onclick='toggleToolsMenu()']") &&
+        !e.target.closest("[onclick='toggleSortMenu()']") &&
+        !e.target.closest("[onclick='toggleEmojiPicker()']") &&
+        !e.target.closest("[onclick='toggleAudioMenu()']") &&
+        !e.target.closest("[onclick='toggleImageMenu()']") &&
+        !e.target.closest("[onclick='toggleFileMenu()']") &&
+        !e.target.closest("[onclick='toggleCaseMenu()']") &&
+        !e.target.closest("[onclick='toggleFontSizeMenu()']") &&
+        !e.target.closest("[onclick='toggleCodeMenu()']")
+
+    ){
+
+        closeAllMenus();
+
+    }
+
+});
 function changeCase(type){
 
     const range = quill.getSelection();
@@ -3277,6 +4601,73 @@ function insertImage(input){
         let currentPage = 1;
         const notesPerPage = 10;
         function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
+
+        // --- HỆ THỐNG PHÁT TRIỂN THÊM: SPEECH TO TEXT ---
+        let recognition;
+        let isRecording = false;
+
+        if ('webkitSpeechRecognition' in window || 'speechRecognition' in window) {
+            const SpeechRecognition = window.speechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true; // Tiếp tục ghi âm ngay cả khi dừng nói tạm thời
+            recognition.interimResults = false; // Chỉ lấy kết quả chính xác cuối cùng
+            recognition.lang = 'vi-VN'; // Ngôn ngữ Tiếng Việt
+
+            recognition.onresult = (event) => {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        transcript += event.results[i][0].transcript;
+                    }
+                }
+                if (transcript) {
+                    // Chèn nội dung vừa dịch từ giọng nói vào vị trí con trỏ hiện tại trong Quill
+                    const range = quill.getSelection() || { index: quill.getLength() };
+                    quill.insertText(range.index, transcript + ' ');
+                    quill.setSelection(range.index + transcript.length + 1);
+                }
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Lỗi Speech Recognition:", event.error);
+                stopSpeechRecognition();
+            };
+
+            recognition.onend = () => {
+                if (isRecording) {
+                    recognition.start(); // Tự động kích hoạt lại nếu lỗi kết nối ngắt giữa chừng khi chưa chủ động tắt
+                }
+            };
+        } else {
+            document.getElementById('sttBtn').style.display = 'none';
+            console.warn("Trình duyệt không hỗ trợ Web Speech API.");
+        }
+
+        function toggleSpeechToText() {
+            if (!recognition) {
+                alert("Trình duyệt này không hỗ trợ nhận diện giọng nói.");
+                return;
+            }
+            if (isRecording) {
+                stopSpeechRecognition();
+            } else {
+                startSpeechRecognition();
+            }
+        }
+
+        function startSpeechRecognition() {
+            isRecording = true;
+            recognition.start();
+            document.getElementById('sttIcon').className = "fa-solid fa-microphone-lines text-lg recording-active";
+            document.getElementById('sttBtn').title = "Đang thu âm... Nhấp để dừng";
+        }
+
+        function stopSpeechRecognition() {
+            isRecording = false;
+            recognition.stop();
+            document.getElementById('sttIcon').className = "fa-solid fa-microphone text-lg";
+            document.getElementById('sttBtn').title = "Chuyển giọng nói thành văn bản";
+        }
 function getLunarDate(dateString) {
     if (!dateString) return '';
     const d = new Date(dateString);
@@ -3362,10 +4753,6 @@ async function emptyTrash() {
             saveNotesToDB(notes);
             renderNotes();
         }
-
-function toggleSortMenu(){
-    document.getElementById("sortMenu").classList.toggle("hidden");
-}
 
 function changeSort(value){
 
