@@ -1,11 +1,10 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>  
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.12/lunar.min.js"></script>
@@ -14,6 +13,20 @@
    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <!-- ===== OCR ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<!-- ===== PDF MANAGER ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@neslinesli93/qpdf-wasm@1.3.0/dist/qpdf.js"></script>
+    <!-- ===== Excel Export ===== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
     <title>Modern Note App - IndexedDB</title>
     <style>
@@ -236,16 +249,10 @@
 
 
 .calendar-day:hover{
-
-    background:
-    rgba(239,68,68,.18);
-
-    transform:
-    translateY(-3px);
-
-    box-shadow:
-    0 10px 25px rgba(0,0,0,.12);
-
+    background:rgba(253,230,138,.35);
+    border:1px solid rgba(250,204,21,.45);
+    transform:translateY(-3px);
+    box-shadow:0 10px 25px rgba(250,204,21,.18);
 }
 
 
@@ -265,22 +272,13 @@
 
 /* Ngày chọn */
 .calendar-selected{
-
-    background:
-    linear-gradient(
-        135deg,
-        #ef4444,
-        #f97316
-    );
-
-    color:white;
-
-    transform:
-    scale(1.05);
-
-    box-shadow:
-    0 10px 25px rgba(239,68,68,.35);
-
+    background:rgba(254,243,199,.55);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    border:2px solid #fcd34d;
+    color:#92400e;
+    transform:scale(1.05);
+    box-shadow:0 8px 20px rgba(250,204,21,.25);
 }
 
 
@@ -388,22 +386,14 @@
 
 
 /* Lễ âm */
-.glass-orange{
-
-    background:
-    rgba(249,115,22,.18);
-
-    color:#ea580c;
-
-    border:
-    1px solid rgba(249,115,22,.3);
-
+/* Lễ âm */
+.glass-blue{
+    background:rgba(186,230,253,.28);
+    color:#0369a1;
+    border:1px solid rgba(125,211,252,.5);
     border-radius:12px;
-
     padding:7px 10px;
-
     font-weight:700;
-
 }
 
 /*================ HOÀNG ĐẠO =================*/
@@ -425,13 +415,13 @@
     font-weight:700;
 }
 
-.glass-gray{
-background:rgba(100,116,139,.18);
-color:#475569;
-border:1px solid rgba(100,116,139,.3);
-border-radius:12px;
-padding:7px 10px;
-font-weight:700;
+.glass-gray-dark{
+    background:rgba(100,116,139,.18);
+    color:#475569;
+    border:1px solid rgba(100,116,139,.3);
+    border-radius:12px;
+    padding:7px 10px;
+    font-weight:700;
 }
 
 /* Sao đánh dấu ngày */
@@ -441,17 +431,13 @@ font-weight:700;
 }
 
 /* Tiết khí */
-.glass-blue{
-
-    background:
-    rgba(59,130,246,.18);
-
+.glass-sky{
+    background:rgba(59,130,246,.18);
     color:#2563eb;
-
+    border:1px solid rgba(59,130,246,.3);
     border-radius:12px;
-
     padding:7px 10px;
-
+    font-weight:700;
 }
 
 
@@ -674,6 +660,16 @@ to{
     <i class="fa-solid fa-images text-lg"></i>
 
 </button>
+
+<!-- THÊM NÚT OCR NGAY TẠI ĐÂY -->
+<!-- OCR -->
+<button onclick="openOCRModal()"
+class="w-10 h-10 flex items-center justify-center rounded-lg text-orange-500 hover:bg-orange-100 active:bg-orange-200 transition-all"
+title="OCR Nhiều Ảnh">
+    <i class="fa-solid fa-broom text-2xl"></i>
+</button>
+
+
 <!-- Đính kèm mọi loại file -->
 <input
     type="file"
@@ -685,10 +681,22 @@ to{
 <button
     onclick="document.getElementById('fileAttachmentInput').click()"
     class="w-10 h-10 flex items-center justify-center
-           text-teal-500 hover:text-teal-600 active:text-teal-700 transition-all"
+           text-gray-400 hover:text-gray-500 active:text-gray-600 transition-all"
     title="Đính kèm file">
 
-    <i class="fa-solid fa-paperclip text-lg"></i>
+    <i class="fa-solid fa-paperclip text-lg text-slate-300"></i>
+
+</button>
+
+
+<!-- QUẢN LÝ / GỘP / TÁCH PDF -->
+<button
+    onclick="openPdfModal()"
+    class="w-10 h-10 flex items-center justify-center rounded-lg
+           text-red-600 hover:bg-red-100 active:bg-red-200 transition-all"
+    title="Quản lý / Gộp / Tách PDF">
+
+    <i class="fa-solid fa-file-pdf text-lg"></i>
 
 </button>
 <!-- QR -->
@@ -1010,13 +1018,13 @@ class="w-10 h-10 rounded-xl hover:bg-white">
 <div class="grid grid-cols-7 text-center text-xs font-bold mb-2">
 
 
-<div class="text-red-500">CN</div>
-<div>T2</div>
-<div>T3</div>
-<div>T4</div>
-<div>T5</div>
-<div>T6</div>
-<div class="text-blue-500">T7</div>
+<div>Thứ 2</div>
+<div>Thứ 3</div>
+<div>Thứ 4</div>
+<div>Thứ 5</div>
+<div>Thứ 6</div>
+<div class="text-blue-500">Thứ 7</div>
+<div class="text-red-500">Chủ Nhật</div>
 
 
 </div>
@@ -1145,14 +1153,334 @@ Chèn vào ghi chú
     </div>
 </div>
 
+  <!-- Nút mở Modal PDF Nâng Cấp -->
+          
+        </div>
+
+        <div id="editor" class="h-40 mb-4 rounded-xl overflow-hidden border"></div>
+        
+        <div class="flex flex-wrap gap-3 mb-8">
+            <div class="relative flex items-center">
+                <i class="fa-solid fa-calendar-days absolute left-3 text-red-500"></i>
+                <input type="text" id="datePicker" placeholder="Thêm ngày hẹn" class="p-2 border border-red-500 rounded-full w-48 pl-10 pr-4 outline-none">
+            </div>
+            <button id="saveBtn" onclick="saveNote()" class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition"><i class="fa-solid fa-floppy-disk"></i> Lưu</button>
+            <button id="cancelBtn" onclick="resetForm()" class="hidden bg-gray-500 text-white px-6 py-2 rounded-full hover:bg-gray-600 transition">Hủy</button>
+        </div>
+
+        <div id="notesContainer" class="grid grid-cols-1 gap-4"></div>
+        <div id="pagination" class="flex justify-center gap-2 mt-6"></div>
+    </div>
+
+<!-- ================= MODAL QUẢN LÝ / TÁCH / GỘP PDF TRỰC QUAN ================= -->
+<div id="pdfModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-5xl shadow-2xl max-h-[92vh] flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold flex items-center gap-2 text-emerald-600">
+                <i class="fa-solid fa-file-pdf text-2xl text-red-600"></i> Quản Lý, Tách & Gộp PDF 
+            </h2>
+            <button onclick="closePdfModal()" class="text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+<!-- PDF TOOL -->
+<div class="bg-slate-50 border p-4 rounded-2xl mb-4 space-y-3">
+
+    <!-- DROP ZONE -->
+    <div id="pdfDropZone"
+        class="border-2 border-dashed border-emerald-300 bg-emerald-50
+        rounded-xl p-5 text-center cursor-pointer hover:bg-emerald-100">
+
+        <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-600"></i>
+
+        <p class="text-sm text-emerald-700 font-semibold">
+            Kéo thả PDF hoặc
+        </p>
+
+        <label class="inline-flex items-center gap-2 mt-2
+            bg-emerald-600 text-white px-4 py-2 rounded-xl cursor-pointer">
+
+            <i class="fa-solid fa-file-pdf"></i> Chọn PDF
+
+            <input id="pdfFileInput"
+                type="file"
+                multiple
+                accept="application/pdf"
+                onchange="handlePdfFilesUpload(this)"
+                class="hidden">
+
+        </label>
+
+    </div>
+
+
+    <!-- TOOL BAR -->
+    <div class="flex flex-wrap gap-2 items-center">
+
+
+        <button onclick="clearAllPdfPages()"
+            class="px-3 py-2 rounded-xl bg-gray-200 hover:text-red-600">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+
+
+        <button onclick="openPdfFullscreen()"
+            class="px-3 py-2 rounded-xl bg-blue-100 text-blue-700">
+            <i class="fa-solid fa-expand"></i>
+        </button>
+
+
+        <input id="pdfExportName"
+            value="Tai_Lieu_Gop"
+            class="border rounded-xl px-3 py-2 w-36 text-sm"
+            placeholder="Tên file">
+
+
+        <span id="pdfTotalPagesBadge"
+            class="bg-emerald-100 text-emerald-700
+            px-3 py-2 rounded-full text-xs font-semibold">
+            0 trang
+        </span>
+
+
+    </div>
+
+</div>
+
+        <!-- Khung Kéo - Thả Danh Sách Trang Trực Quan -->
+        <div class="flex-1 border-2 border-dashed border-slate-200 rounded-2xl p-4 bg-slate-50/50 overflow-y-auto">
+            <div id="pdfPageGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <div id="pdfEmptyState" class="col-span-full flex flex-col items-center justify-center py-16 text-slate-400">
+                    <i class="fa-solid fa-file-pdf text-5xl mb-3 text-slate-300"></i>
+                    <p class="text-sm font-medium">Chưa có trang PDF nào.</p>
+                    <p class="text-xs text-slate-400 mt-1">Hãy nhấn "Chọn File PDF" để tải các trang lên và sắp xếp kéo thả.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Các Nút Chức Năng Hoàn Tất -->
+        <div class="mt-4 pt-3 border-t flex flex-wrap gap-3 justify-end items-center">
+            <button onclick="exportMergedPdf()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-semibold transition shadow flex items-center gap-2">
+                <i class="fa-solid fa-object-group"></i> Gộp Các Trang Thành 1 File PDF
+            </button>
+            <button onclick="exportSplitZip()" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl font-semibold transition shadow flex items-center gap-2">
+                <i class="fa-solid fa-file-zipper"></i> Tách Thành Thư Mục Nén (.ZIP)
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem Thử Trang PDF Phóng To -->
+<div id="pdfPreviewModal" class="hidden fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl p-4 w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl">
+
+        <div class="flex justify-between items-center mb-2 pb-2 border-b">
+            <h3 id="pdfPreviewTitle" class="text-sm font-bold text-gray-700 truncate">
+                Xem Trước Trang PDF
+            </h3>
+
+            <button onclick="closePdfPreview()" class="text-gray-500 hover:text-black text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+
+        <div class="flex-1 overflow-auto flex justify-center bg-gray-100 p-2 rounded-xl">
+           <canvas id="pdfPreviewCanvas" class="shadow-md rounded bg-white mx-auto block"></canvas>
+        </div>
+
+
+        <!-- Điều hướng trang -->
+        <div class="flex justify-between items-center mt-3">
+
+            <button onclick="prevPdfPage()"
+            class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300">
+                <i class="fa-solid fa-chevron-left"></i>
+                Trang trước
+            </button>
+
+
+            <span id="pdfPreviewCount"
+            class="text-sm font-semibold text-gray-600">
+                1 / 1
+            </span>
+
+
+            <button onclick="nextPdfPage()"
+            class="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700">
+                Trang sau
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+    // Worker cấu hình PDF.js
+    if (window.pdfjsLib) {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    }
+</script>
+    <!-- ================= OCR BATCH MODAL ================= -->
+    <div id="ocrModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-gray-100">
+            <!-- Header -->
+            <div class="p-5 bg-gradient-to-r from-teal-600 to-emerald-600 text-white flex justify-between items-center">
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                   <i class="fa-solid fa-broom text-2xl"></i>
+                    OCR Quét & Nhận Dạng Văn Bản
+                </h2>
+                <button onclick="closeOCRModal()" class="text-white hover:text-gray-200 text-2xl font-bold">&times;</button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="p-6 overflow-y-auto flex-1 space-y-4">
+                <!-- Controls bar -->
+                <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                    <div class="flex items-center gap-2">
+                        <label class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-xl cursor-pointer text-sm font-semibold transition shadow-md flex items-center gap-2">
+                            <i class="fa-solid fa-images"></i> Chọn Ảnh (Nhiều)
+                            <input type="file" id="ocrFilesInput" multiple accept="image/*" class="hidden" onchange="handleOCRFiles(this.files)">
+                        </label>
+                        <span id="ocrStatusText" class="text-sm text-gray-600 font-medium ml-2">Chưa chọn ảnh nào.</span>
+                    </div>
+
+                    <!-- Filter / Search OCR Results -->
+                    <div class="relative w-full sm:w-64">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="text" id="ocrSearchInput" oninput="filterOCRResults()" placeholder="Tìm từ khóa trong chữ OCR..." class="w-full p-2 pl-9 text-sm border border-gray-300 rounded-xl outline-none focus:border-teal-500">
+                    </div>
+                </div>
+
+<!-- ================= DROP ZONE ================= -->
+<div id="ocrDropZone"
+class="border-2 border-dashed border-teal-400 rounded-xl p-3 text-center bg-gradient-to-br from-teal-50 to-emerald-50 hover:bg-teal-100 transition cursor-pointer">
+
+    <i class="fa-solid fa-cloud-arrow-up text-3xl text-teal-500"></i>
+
+    <div class="font-bold text-sm text-gray-700">
+        Kéo & Thả Ảnh
+    </div>
+
+    <div class="text-xs text-gray-500">
+        hoặc Chọn Ảnh nhiều file
+    </div>
+
+</div>
+
+
+
+<!-- ================= OCR PROGRESS ================= -->
+<div id="ocrProgressContainer"
+class="hidden bg-slate-100 p-3 rounded-xl border border-slate-200 space-y-2">
+
+
+    <!-- Tiêu đề -->
+    <div class="flex justify-between items-center">
+
+        <span id="ocrProgressLabel"
+        class="font-bold text-sm text-teal-700">
+            Đang xử lý OCR...
+        </span>
+
+        <span id="ocrProgressCount"
+        class="text-xs text-gray-600">
+            0 / 0 ảnh
+        </span>
+
+    </div>
+
+
+
+    <!-- Ảnh hiện tại -->
+    <div>
+
+        <div class="flex justify-between text-[11px] text-gray-600">
+            <span>Ảnh hiện tại</span>
+            <span id="ocrImagePercent">0%</span>
+        </div>
+
+
+        <div class="bg-gray-200 rounded-full h-1.5 overflow-hidden">
+
+            <div id="ocrImageProgressBar"
+            class="bg-emerald-500 h-1.5 rounded-full transition-all"
+            style="width:0%">
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Tổng tiến trình -->
+    <div>
+
+        <div class="flex justify-between text-[11px] text-gray-600">
+            <span>Tổng</span>
+            <span id="ocrProgressPercent">0%</span>
+        </div>
+
+
+        <div class="bg-gray-200 rounded-full h-2 overflow-hidden">
+
+            <div id="ocrProgressBar"
+            class="bg-teal-600 h-2 rounded-full transition-all"
+            style="width:0%">
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+                <!-- OCR Items Container -->
+                <div id="ocrResultsList" class="space-y-4">
+                    <div class="text-center py-10 text-gray-400">
+                        <i class="fa-regular fa-image text-5xl mb-3"></i>
+                        <p class="text-sm">Hãy tải lên một hoặc nhiều hình ảnh chứa chữ viết để đọc văn bản.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer / Export Buttons -->
+            <div class="p-4 bg-gray-50 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2">
+                <button onclick="insertOCRToEditor()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2">
+                    <i class="fa-solid fa-file-import"></i> Chèn Tất Cả Vào Editor
+                </button>
+
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="exportOCRExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-excel"></i> Xuất Excel (.xlsx)
+                    </button>
+                    <button onclick="exportOCRCSV()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-csv"></i> Xuất CSV
+                    </button>
+                    <button onclick="exportOCRWord()" class="bg-blue-800 hover:bg-blue-900 text-white px-3 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-word"></i> Xuất Word
+                    </button>
+                    <button onclick="closeOCRModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-semibold transition">
+                        Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
+
         // --- IndexedDB Logic ---
         let db;
         const request = indexedDB.open("NotesDB", 1);
         request.onupgradeneeded = e => { db = e.target.result; db.createObjectStore("notes", { keyPath: "id" }); };
-        request.onsuccess=async e=>{db=e.target.result;if("Notification"in window&&Notification.permission==="default")await Notification.requestPermission();renderNotes();checkReminders();};
+       request.onsuccess=e=>{db=e.target.result;renderNotes();checkReminders();if("Notification"in window&&Notification.permission==="default")setTimeout(()=>Notification.requestPermission().catch(console.error),500);};
 
         const dbAction = (mode, callback) => {
             const tx = db.transaction("notes", mode);
@@ -1677,6 +2005,349 @@ async function checkReminders() {
 
 setInterval(checkReminders, 30000);
 
+// ================= OCR LOGIC =================
+let ocrResults=[];
+
+function openOCRModal(){
+    ocrModal.classList.remove('hidden');
+}
+
+function closeOCRModal(){
+    ocrModal.classList.add('hidden');
+}
+
+
+async function handleOCRFiles(files){
+
+    if(!files?.length) return;
+
+
+    // Sắp xếp ảnh từ nhỏ đến lớn theo tên
+    files = Array.from(files).sort((a,b)=>
+        a.name.localeCompare(
+            b.name,
+            undefined,
+            {
+                numeric:true,
+                sensitivity:"base"
+            }
+        )
+    );
+
+
+    const statusText=document.getElementById('ocrStatusText'),
+          box=document.getElementById('ocrProgressContainer'),
+          bar=document.getElementById('ocrProgressBar'),
+          label=document.getElementById('ocrProgressLabel'),
+          percent=document.getElementById('ocrProgressPercent'),
+          count=document.getElementById('ocrProgressCount'),
+          imgBar=document.getElementById('ocrImageProgressBar'),
+          imgPercent=document.getElementById('ocrImagePercent'),
+          list=document.getElementById('ocrResultsList');
+
+
+    statusText.innerText=`Đã chọn ${files.length} ảnh. Đang xử lý...`;
+
+    box.classList.remove('hidden');
+    list.innerHTML='';
+    ocrResults=[];
+
+
+    const total=files.length;
+
+
+    for(let i=0;i<total;i++){
+
+        const file=files[i];
+
+
+        label.innerText=
+            `Đang đọc ${i+1}/${total}: ${file.name}`;
+
+        count.innerText=
+            `${i}/${total} ảnh`;
+
+
+        imgBar.style.width="0%";
+        imgPercent.innerText="0%";
+
+
+        try{
+
+
+            const result=await Tesseract.recognize(
+
+                file,
+
+                'vie+eng',
+
+                {
+
+                    logger:m=>{
+
+                        if(m.status==="recognizing text"){
+
+                            const img=
+                                Math.round((m.progress||0)*100);
+
+                            const all=
+                                Math.round(
+                                    ((i+m.progress)/total)*100
+                                );
+
+
+                            imgBar.style.width=
+                                img+"%";
+
+                            imgPercent.innerText=
+                                img+"%";
+
+
+                            bar.style.width=
+                                all+"%";
+
+                            percent.innerText=
+                                all+"%";
+
+                        }
+
+                    }
+
+                }
+
+            );
+
+
+
+            ocrResults.push({
+
+                id:i,
+
+                fileName:file.name,
+
+                text:result.data.text.trim(),
+
+                imageSrc:
+                    URL.createObjectURL(file)
+
+            });
+
+
+
+        }catch(e){
+
+
+            console.error("Lỗi OCR:",e);
+
+
+            ocrResults.push({
+
+                id:i,
+
+                fileName:file.name,
+
+                text:"[Lỗi khi đọc chữ]",
+
+                imageSrc:
+                    URL.createObjectURL(file)
+
+            });
+
+        }
+
+
+
+        count.innerText=
+            `${i+1}/${total} ảnh`;
+
+    }
+
+
+
+    // Hoàn tất
+
+    bar.style.width="100%";
+    percent.innerText="100%";
+
+    imgBar.style.width="100%";
+    imgPercent.innerText="100%";
+
+    label.innerText="Hoàn tất OCR ✓";
+
+    statusText.innerText=
+        `Hoàn thành OCR ${total} ảnh.`;
+
+
+    renderOCRResults(ocrResults);
+
+}
+        function renderOCRResults(items) {
+            const resultsList = document.getElementById('ocrResultsList');
+            if (items.length === 0) {
+                resultsList.innerHTML = `<div class="text-center py-8 text-gray-400">Không tìm thấy kết quả phù hợp.</div>`;
+                return;
+            }
+
+            resultsList.innerHTML = items.map(item => `
+                <div class="p-4 border rounded-2xl bg-white shadow-sm flex flex-col md:flex-row gap-4 items-start">
+                    <img src="${item.imageSrc}" class="w-full md:w-32 h-32 object-cover rounded-xl border">
+                    <div class="flex-1 w-full">
+                        <div class="font-bold text-sm text-gray-700 mb-1 flex justify-between">
+                            <span><i class="fa-regular fa-image text-teal-600 mr-1"></i> ${item.fileName}</span>
+                            <button onclick="copyOCRText(${item.id})" class="text-xs text-blue-600 hover:underline"><i class="fa-regular fa-copy"></i> Sao chép</button>
+                        </div>
+                        <textarea id="ocr-text-${item.id}" oninput="updateOCRText(${item.id}, this.value)" class="w-full h-24 p-2 text-sm border rounded-xl outline-none focus:border-teal-500">${item.text}</textarea>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateOCRText(id, val) {
+            const item = ocrResults.find(x => x.id === id);
+            if (item) item.text = val;
+        }
+
+        function copyOCRText(id) {
+            const item = ocrResults.find(x => x.id === id);
+            if (item) {
+                navigator.clipboard.writeText(item.text);
+                alert("Đã sao chép văn bản!");
+            }
+        }
+
+        function filterOCRResults() {
+            const search = document.getElementById('ocrSearchInput').value.toLowerCase();
+            const filtered = ocrResults.filter(item => item.text.toLowerCase().includes(search) || item.fileName.toLowerCase().includes(search));
+            renderOCRResults(filtered);
+        }
+
+        function insertOCRToEditor() {
+            if (ocrResults.length === 0) return alert("Không có dữ liệu OCR để chèn!");
+            const combinedText = ocrResults.map(r => `--- ${r.fileName} ---\n${r.text}`).join('\n\n');
+            const range = quill.getSelection(true);
+            quill.insertText(range.index, `\n${combinedText}\n`);
+            closeOCRModal();
+        }
+
+        function exportOCRExcel() {
+            if (ocrResults.length === 0) return alert("Không có dữ liệu để xuất!");
+            const data = ocrResults.map((r, idx) => ({ "STT": idx + 1, "Tên File": r.fileName, "Nội Dung OCR": r.text }));
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "OCR_Result");
+            XLSX.writeFile(wb, "OCR_Results.xlsx");
+        }
+
+        function exportOCRCSV() {
+            if (ocrResults.length === 0) return alert("Không có dữ liệu để xuất!");
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFFSTT,Tên File,Nội Dung OCR\n";
+            ocrResults.forEach((r, idx) => {
+                const cleanText = `"${r.text.replace(/"/g, '""')}"`;
+                csvContent += `${idx + 1},"${r.fileName}",${cleanText}\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "OCR_Results.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ================= XUẤT WORD CHUẨN VĂN BẢN (KHÔNG BỊ THÀNH HÌNH ẢNH) =================
+        function exportOCRWord() {
+            if (ocrResults.length === 0) return alert("Không có dữ liệu để xuất!");
+            
+            // Xây dựng nội dung HTML chuẩn văn bản để Microsoft Word đọc trực tiếp
+            let contentHtml = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                    <meta charset='utf-8'>
+                    <title>OCR Text Output</title>
+                    <style>
+                        body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.5; }
+                        h2 { color: #0d9488; border-bottom: 1px solid #0d9488; padding-bottom: 4px; }
+                        .file-block { margin-bottom: 20px; }
+                        .file-name { font-weight: bold; color: #1e293b; margin-bottom: 5px; }
+                        .file-content { white-space: pre-wrap; background-color: #f8fafc; padding: 10px; border: 1px solid #e2e8f0; }
+                    </style>
+                </head>
+                <body>
+                    <h2>KẾT QUẢ PHÂN TÍCH OCR VĂN BẢN</h2>
+            `;
+
+            ocrResults.forEach((r, idx) => {
+                // Encode HTML special chars để tránh lỗi format
+                const safeText = r.text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+                contentHtml += `
+                    <div class="file-block">
+                        <div class="file-name">${idx + 1}. File: ${r.fileName}</div>
+                        <div class="file-content">${safeText}</div>
+                    </div>
+                `;
+            });
+
+            contentHtml += `</body></html>`;
+
+            // Tạo Blob định dạng Word Document (.doc) chứa văn bản thuần
+            const blob = new Blob(['\ufeff' + contentHtml], {
+                type: 'application/msword'
+            });
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'OCR_Results.doc';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+// ================= OCR DRAG DROP =================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+    const dropZone=document.getElementById("ocrDropZone");
+
+    if(!dropZone) return;
+
+
+    ["dragenter","dragover"].forEach(e=>{
+
+        dropZone.addEventListener(e,event=>{
+
+            event.preventDefault();
+
+            dropZone.classList.add("bg-teal-100");
+
+        });
+
+    });
+
+
+
+    ["dragleave","drop"].forEach(e=>{
+
+        dropZone.addEventListener(e,event=>{
+
+            event.preventDefault();
+
+            dropZone.classList.remove("bg-teal-100");
+
+        });
+
+    });
+
+
+
+    dropZone.addEventListener("drop",e=>{
+
+        handleOCRFiles(e.dataTransfer.files);
+
+    });
+
+
+});
         async function updateOrder() {
             let notes = await getAllNotes();
             const items = Array.from(container.children);
@@ -1698,6 +2369,359 @@ setInterval(checkReminders, 30000);
         });
 
         function toggleEmojiPicker() { document.getElementById('emojiPicker').classList.toggle('hidden'); }
+
+// --- LOGIC XỬ LÝ QUẢN LÝ / GỘP / TÁCH TRANG PDF ---
+let pdfPagesList = [];
+let sortableGrid = null;
+
+// ================= DRAG DROP PDF =================
+
+const pdfDropZone = document.getElementById("pdfDropZone");
+
+
+pdfDropZone.addEventListener("dragover", e=>{
+    e.preventDefault();
+
+    pdfDropZone.classList.add("bg-emerald-200");
+});
+
+
+pdfDropZone.addEventListener("dragleave", ()=>{
+
+    pdfDropZone.classList.remove("bg-emerald-200");
+
+});
+
+
+pdfDropZone.addEventListener("drop", e=>{
+
+    e.preventDefault();
+
+    pdfDropZone.classList.remove("bg-emerald-200");
+
+
+    const files = e.dataTransfer.files;
+
+
+    handlePdfFilesUpload({
+        files: files,
+        value:""
+    });
+
+});
+
+    function openPdfModal() {
+        document.getElementById('pdfModal').classList.remove('hidden');
+        if (!sortableGrid) {
+            const gridEl = document.getElementById('pdfPageGrid');
+            sortableGrid = new Sortable(gridEl, {
+                animation: 200,
+                ghostClass: 'sortable-ghost',
+                draggable: '.pdf-page-card',
+                onEnd: function () {
+                    // Cập nhật lại vị trí mảng pdfPagesList theo DOM sau khi Kéo - Thả
+                    const newOrderList = [];
+                    const cardElements = gridEl.querySelectorAll('.pdf-page-card');
+                    cardElements.forEach(card => {
+                        const id = card.getAttribute('data-id');
+                        const pageObj = pdfPagesList.find(p => p.id === id);
+                        if (pageObj) newOrderList.push(pageObj);
+                    });
+                    pdfPagesList = newOrderList;
+                    updatePdfBadges();
+                }
+            });
+        }
+    }
+
+    function closePdfModal() {
+        document.getElementById('pdfModal').classList.add('hidden');
+    }
+// ================= FULLSCREEN PDF =================
+
+function openPdfFullscreen(){
+
+    const modal = document.getElementById("pdfModal");
+
+    if(!document.fullscreenElement){
+
+        modal.requestFullscreen()
+        .catch(err=>{
+            console.log(err);
+        });
+
+    }else{
+
+        document.exitFullscreen();
+
+    }
+
+}
+    async function handlePdfFilesUpload(input) {
+        const files = Array.from(input.files);
+        if (!files.length) return;
+
+        for (const file of files) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+            for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+                const page = await pdfDoc.getPage(pageNum);
+                const viewport = page.getViewport({ scale: 0.3 });
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                canvas.style.width = viewport.width + "px";
+                canvas.style.height = viewport.height + "px";
+
+                await page.render({ canvasContext: ctx, viewport }).promise;
+                const imgDataUrl = canvas.toDataURL('image/jpeg');
+
+                const pageId = 'pdf_page_' + Math.random().toString(36).substr(2, 9);
+                pdfPagesList.push({
+                    id: pageId,
+                    fileName: file.name,
+                    pageNum: pageNum,
+                    arrayBuffer: arrayBuffer,
+                    thumbnail: imgDataUrl
+                });
+            }
+        }
+        input.value = '';
+        renderPdfPagesGrid();
+    }
+
+    function renderPdfPagesGrid() {
+        const gridEl = document.getElementById('pdfPageGrid');
+        const emptyState = document.getElementById('pdfEmptyState');
+
+        if (pdfPagesList.length === 0) {
+            gridEl.innerHTML = '';
+            gridEl.appendChild(emptyState);
+            emptyState.classList.remove('hidden');
+        } else {
+            if (emptyState) emptyState.classList.add('hidden');
+            gridEl.innerHTML = '';
+
+            pdfPagesList.forEach((pageObj, idx) => {
+                const card = document.createElement('div');
+                card.className = 'pdf-page-card bg-white border border-slate-200 rounded-xl p-2 shadow-sm hover:shadow-md transition relative cursor-move flex flex-col group';
+                card.setAttribute('data-id', pageObj.id);
+
+                card.innerHTML = `
+                    <div class="relative bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center mb-2 aspect-[1/1.4]">
+                        <img src="${pageObj.thumbnail}" class="max-h-full max-w-full object-contain">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                            <button onclick="previewPdfPage('${pageObj.id}')" title="Xem thử / Phóng to" class="w-8 h-8 rounded-full bg-white text-gray-700 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition">
+                                <i class="fa-solid fa-magnifying-glass-plus text-xs"></i>
+                            </button>
+                            <button onclick="removePdfPage('${pageObj.id}')" title="Xóa trang này" class="w-8 h-8 rounded-full bg-white text-red-500 flex items-center justify-center hover:bg-red-600 hover:text-white transition">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                        <span class="absolute top-1 left-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-mono">#${idx + 1}</span>
+                    </div>
+                    <div class="mt-auto">
+                        <p class="text-[11px] font-medium text-slate-700 truncate" title="${pageObj.fileName}">${pageObj.fileName}</p>
+                        <p class="text-[10px] text-slate-400">Trang gốc: ${pageObj.pageNum}</p>
+                    </div>
+                `;
+                gridEl.appendChild(card);
+            });
+        }
+        updatePdfBadges();
+    }
+
+    function removePdfPage(id) {
+        pdfPagesList = pdfPagesList.filter(p => p.id !== id);
+        renderPdfPagesGrid();
+    }
+
+    function clearAllPdfPages() {
+        pdfPagesList = [];
+        renderPdfPagesGrid();
+    }
+
+    function updatePdfBadges() {
+        document.getElementById('pdfTotalPagesBadge').innerText = `${pdfPagesList.length} trang`;
+    }
+
+let previewIndex = 0;
+
+
+async function previewPdfPage(id) {
+
+    previewIndex = pdfPagesList.findIndex(p => p.id === id);
+    if (previewIndex < 0) return;
+
+    document.getElementById('pdfPreviewModal').classList.remove('hidden');
+
+    renderPreviewPdf();
+}
+
+
+
+async function renderPreviewPdf(){
+
+    const pageObj = pdfPagesList[previewIndex];
+    if (!pageObj) return;
+
+
+    document.getElementById('pdfPreviewTitle').innerText =
+    `${pageObj.fileName} - Trang ${pageObj.pageNum}`;
+
+
+    const count = document.getElementById('pdfPreviewCount');
+    if(count){
+        count.innerText =
+        `${previewIndex + 1} / ${pdfPagesList.length}`;
+    }
+
+
+    const pdfDoc = await pdfjsLib.getDocument({
+        data: pageObj.arrayBuffer
+    }).promise;
+
+
+    const page = await pdfDoc.getPage(pageObj.pageNum);
+
+
+const container = document.querySelector("#pdfPreviewModal .overflow-auto");
+
+const scale = Math.min(
+    (container.clientWidth - 30) / page.getViewport({ scale: 1 }).width,
+    2
+);
+
+const viewport = page.getViewport({ scale });
+
+
+    const canvas = document.getElementById('pdfPreviewCanvas');
+    const ctx = canvas.getContext('2d');
+
+
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+
+    await page.render({
+        canvasContext: ctx,
+        viewport
+    }).promise;
+
+}
+
+
+
+function nextPdfPage(){
+
+    if(previewIndex < pdfPagesList.length - 1){
+
+        previewIndex++;
+        renderPreviewPdf();
+
+    }
+
+}
+
+
+
+function prevPdfPage(){
+
+    if(previewIndex > 0){
+
+        previewIndex--;
+        renderPreviewPdf();
+
+    }
+
+}
+
+    function closePdfPreview() {
+        document.getElementById('pdfPreviewModal').classList.add('hidden');
+    }
+async function exportMergedPdf(){
+
+    if(!pdfPagesList.length){
+        alert("Vui lòng thêm ít nhất 1 trang PDF!");
+        return;
+    }
+
+    try{
+
+        if(typeof showToast==="function") showToast("Đang tạo PDF...");
+
+        const mergedPdf=await PDFLib.PDFDocument.create();
+
+        for(const p of pdfPagesList){
+
+            const src=await PDFLib.PDFDocument.load(p.arrayBuffer);
+
+            const [page]=await mergedPdf.copyPages(src,[p.pageNum-1]);
+
+            mergedPdf.addPage(page);
+
+        }
+
+        const pdfBytes=await mergedPdf.save();
+
+        let name=document.getElementById("pdfExportName")?.value.trim()||"Tai_Lieu_Gop";
+
+        name=name.replace(/[\\/:*?"<>|]/g,"");
+
+        if(!name.toLowerCase().endsWith(".pdf")) name+=".pdf";
+
+        const blob=new Blob([pdfBytes],{type:"application/pdf"});
+        const url=URL.createObjectURL(blob);
+
+        const a=document.createElement("a");
+        a.href=url;
+        a.download=name;
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        setTimeout(()=>URL.revokeObjectURL(url),1000);
+
+        if(typeof showToast==="function") showToast("Xuất PDF thành công!");
+
+    }catch(e){
+
+        console.error("Lỗi xuất PDF:",e);
+
+        alert("Không thể xuất file PDF!");
+
+    }
+
+}
+
+    async function exportSplitZip() {
+        if (pdfPagesList.length === 0) {
+            alert('Vui lòng thêm các trang PDF để thực hiện tách!');
+            return;
+        }
+
+        const zip = new JSZip();
+
+        for (let i = 0; i < pdfPagesList.length; i++) {
+            const pageObj = pdfPagesList[i];
+            const singlePdf = await PDFLib.PDFDocument.create();
+            const srcDoc = await PDFLib.PDFDocument.load(pageObj.arrayBuffer);
+            const [copiedPage] = await singlePdf.copyPages(srcDoc, [pageObj.pageNum - 1]);
+            singlePdf.addPage(copiedPage);
+
+            const pdfBytes = await singlePdf.save();
+            zip.file(`Trang_${i + 1}_${pageObj.fileName.replace('.pdf', '')}_p${pageObj.pageNum}.pdf`, pdfBytes);
+        }
+
+        const content = await zip.generateAsync({ type: 'blob' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(content);
+        link.download = `Thu_Muc_Tach_PDF_${Date.now()}.zip`;
+        link.click();
+    }
 // ================= QR CODE =================
 
 let qrCode=null;
@@ -2033,42 +3057,56 @@ renderCalendar();
 
 function renderCalendar(){
 
-let y=calCurrentDate.getFullYear(),m=calCurrentDate.getMonth(),today=new Date();
-calMonthYear.innerHTML=`Tháng ${m+1}/${y}`;
+let y=calCurrentDate.getFullYear(),
+    m=calCurrentDate.getMonth(),
+    today=new Date();
 
-let grid=calendarGrid; grid.innerHTML="";
+calMonthYear.innerHTML=`<span style="font-size:1.35rem;font-weight:700;">Tháng ${m+1}/${y}</span>`;
 
-for(let i=0;i<new Date(y,m,1).getDay();i++) grid.innerHTML+="<div></div>";
+let grid=calendarGrid;
+grid.innerHTML="";
 
-for(let d=1;d<=new Date(y,m+1,0).getDate();d++){
+// Chuyển tuần từ Thứ 2 -> Chủ nhật
+let first=new Date(y,m,1).getDay();
+first=(first===0)?6:first-1;
 
-let date=new Date(y,m,d),lunar="",holiday="";
+for(let i=0;i<first;i++) grid.innerHTML+="<div></div>";
 
-try{
-let l=Solar.fromYmd(y,m+1,d).getLunar();
-lunar=`${l.getDay()}/${l.getMonth()}`;
-holiday=VN_HOLIDAYS_SOLAR[`${d}-${m+1}`]||VN_HOLIDAYS_LUNAR[`${l.getDay()}-${l.getMonth()}`]||"";
-}catch(e){}
+let total=new Date(y,m+1,0).getDate();
 
-let div=document.createElement("div");
-div.className="calendar-day";
-if(date.toDateString()==today.toDateString()) div.classList.add("calendar-today");
+for(let d=1;d<=total;d++){
 
-div.innerHTML=`
-<div class="day-solar">${holiday?"🌸 ":""}${d}</div>
-<div class="day-lunar">${lunar}</div>`;
+    let date=new Date(y,m,d),lunar="",holiday="";
 
-if(holiday) div.title=holiday;
+    try{
+        let l=Solar.fromYmd(y,m+1,d).getLunar();
+        lunar=`${l.getDay()}/${l.getMonth()}`;
+        holiday=VN_HOLIDAYS_SOLAR[`${d}-${m+1}`]||
+                VN_HOLIDAYS_LUNAR[`${l.getDay()}-${l.getMonth()}`]||"";
+    }catch(e){}
 
-div.onclick=()=>{
-selectedCalendarDate=date;
-showCalendarInfo(date);
-document.querySelectorAll(".calendar-day").forEach(x=>x.classList.remove("calendar-selected"));
-div.classList.add("calendar-selected");
-};
+    let div=document.createElement("div");
+    div.className="calendar-day";
 
-grid.appendChild(div);
+    if(date.toDateString()===today.toDateString())
+        div.classList.add("calendar-today");
+
+    div.innerHTML=`
+        <div class="day-solar">${holiday?"🌸 ":""}${d}</div>
+        <div class="day-lunar">${lunar}</div>`;
+
+    if(holiday) div.title=holiday;
+
+    div.onclick=()=>{
+        selectedCalendarDate=date;
+        showCalendarInfo(date);
+        document.querySelectorAll(".calendar-day").forEach(x=>x.classList.remove("calendar-selected"));
+        div.classList.add("calendar-selected");
+    };
+
+    grid.appendChild(div);
 }
+
 }
 
 
@@ -2078,31 +3116,26 @@ function showCalendarInfo(date){
 
 try{
 
-let l=Solar.fromYmd(date.getFullYear(),date.getMonth()+1,date.getDate()).getLunar();
-
-let solar=VN_HOLIDAYS_SOLAR[`${date.getDate()}-${date.getMonth()+1}`]||"";
-let lunar=VN_HOLIDAYS_LUNAR[`${l.getDay()}-${l.getMonth()}`]||"";
-let tot=getNgayTotXau(l);
-
+let l=Solar.fromYmd(date.getFullYear(),date.getMonth()+1,date.getDate()).getLunar(),
+solar=VN_HOLIDAYS_SOLAR[`${date.getDate()}-${date.getMonth()+1}`]||"",
+lunar=VN_HOLIDAYS_LUNAR[`${l.getDay()}-${l.getMonth()}`]||"",
+tot=getNgayTotXau(l),
+tiet=typeof l.getJieQi=="function"?getVietnameseTietKhi(l.getJieQi()):"Không có";
 
 selectedDayInfo.innerHTML=`
-
 <div class="grid grid-cols-2 gap-3 mt-3">
-
 <div class="glass-box">
-☀ Dương: ${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}<br>
-🌙 Âm: ${l.getDay()}/${l.getMonth()}/${l.getYear()}<br>
-🐉 Năm: ${translateGanZhi(l.getYearInGanZhi())}<br>
-📅 Ngày: ${translateGanZhi(l.getDayInGanZhi())}
+☀ <b>Dương:</b> ${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}<br>
+🌙 <b>Âm:</b> ${l.getDay()}/${l.getMonth()}/${l.getYear()}<br>
+🐉 <b>Năm:</b> ${translateGanZhi(l.getYearInGanZhi())}<br>
+📅 <b>Ngày:</b> ${translateGanZhi(l.getDayInGanZhi())}
 </div>
-
 <div class="glass-box">
-🌤 Tiết khí: ${getVietnameseTietKhi(l.getJieQi())}<br>
+<div class="glass-sky">🌤 ${tiet}</div>
 <div class="${tot.class}">${tot.text}</div>
-${solar?`🎉 ${solar}<br>`:""}
-${lunar?`🎊 ${lunar}`:""}
+${solar?`<div class="glass-red">🎉 ${solar}</div>`:""}
+${lunar?`<div class="glass-blue">🎊 ${lunar}</div>`:""}
 </div>
-
 </div>`;
 
 }catch(e){
@@ -2118,18 +3151,16 @@ function getNgayTotXau(l){
 
 try{
 
-let chi=translateGanZhi(l.getDayInGanZhi()).split(" ")[1];
-let ok=["Tý","Ngọ","Dần","Thân"].includes(chi);
+let chi=(translateGanZhi(l.getDayInGanZhi()).split(" ")[1]||""),
+ok=["Tý","Ngọ","Dần","Thân"].includes(chi);
 
-return {
+return{
 text:ok?"🌟 Hoàng Đạo":"⚫ Hắc Đạo",
 class:ok?"glass-green":"glass-gray"
 };
 
 }catch(e){
-
-return {text:"",class:""};
-
+return{text:"",class:""};
 }
 
 }
