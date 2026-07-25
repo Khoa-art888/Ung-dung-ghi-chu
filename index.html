@@ -1153,25 +1153,6 @@ Chèn vào ghi chú
     </div>
 </div>
 
-  <!-- Nút mở Modal PDF Nâng Cấp -->
-          
-        </div>
-
-        <div id="editor" class="h-40 mb-4 rounded-xl overflow-hidden border"></div>
-        
-        <div class="flex flex-wrap gap-3 mb-8">
-            <div class="relative flex items-center">
-                <i class="fa-solid fa-calendar-days absolute left-3 text-red-500"></i>
-                <input type="text" id="datePicker" placeholder="Thêm ngày hẹn" class="p-2 border border-red-500 rounded-full w-48 pl-10 pr-4 outline-none">
-            </div>
-            <button id="saveBtn" onclick="saveNote()" class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition"><i class="fa-solid fa-floppy-disk"></i> Lưu</button>
-            <button id="cancelBtn" onclick="resetForm()" class="hidden bg-gray-500 text-white px-6 py-2 rounded-full hover:bg-gray-600 transition">Hủy</button>
-        </div>
-
-        <div id="notesContainer" class="grid grid-cols-1 gap-4"></div>
-        <div id="pagination" class="flex justify-center gap-2 mt-6"></div>
-    </div>
-
 <!-- ================= MODAL QUẢN LÝ / TÁCH / GỘP PDF TRỰC QUAN ================= -->
 <div id="pdfModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
     <div class="bg-white rounded-3xl p-6 w-full max-w-5xl shadow-2xl max-h-[92vh] flex flex-col">
@@ -1316,13 +1297,6 @@ Chèn vào ghi chú
     </div>
 </div>
 
-
-<script>
-    // Worker cấu hình PDF.js
-    if (window.pdfjsLib) {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-    }
-</script>
     <!-- ================= OCR BATCH MODAL ================= -->
     <div id="ocrModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-gray-100">
@@ -1476,11 +1450,16 @@ class="hidden bg-slate-100 p-3 rounded-xl border border-slate-200 space-y-2">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
 
+if(window.pdfjsLib){
+    pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
+}
+
+
         // --- IndexedDB Logic ---
         let db;
         const request = indexedDB.open("NotesDB", 1);
         request.onupgradeneeded = e => { db = e.target.result; db.createObjectStore("notes", { keyPath: "id" }); };
-       request.onsuccess=e=>{db=e.target.result;renderNotes();checkReminders();if("Notification"in window&&Notification.permission==="default")setTimeout(()=>Notification.requestPermission().catch(console.error),500);};
+      request.onsuccess=async e=>{db=e.target.result;renderNotes();("Notification"in window&&Notification.permission==="default")?Notification.requestPermission().finally(checkReminders):checkReminders();};
 
         const dbAction = (mode, callback) => {
             const tx = db.transaction("notes", mode);
@@ -1684,14 +1663,6 @@ FileAttachmentBlot.tagName = "div";
 
 Quill.register(FileAttachmentBlot);
 
-
-FileAttachmentBlot.blotName="fileAttachment";
-
-FileAttachmentBlot.tagName="div";
-
-Quill.register(FileAttachmentBlot);
-
-//====================================================
 //====================================================
 // INSERT FILE ATTACHMENT
 //====================================================
