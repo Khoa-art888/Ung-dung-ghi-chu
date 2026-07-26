@@ -2553,10 +2553,31 @@ function checkAuthStatus() {
         if (authContainer) authContainer.classList.add("hidden");
         if (mainAppContainer) mainAppContainer.classList.remove("hidden");
 
-        // Khởi tạo ghi chú nếu có
-        if (typeof initAppNotes === "function") {
-            initAppNotes();
-        }
+        // Khởi tạo ghi chú sau khi IndexedDB sẵn sàng
+        (async () => {
+
+            // Chờ db được mở
+            while (!db) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+
+            if (typeof initAppNotes === "function") {
+                await initAppNotes();
+            } else {
+                if (typeof renderNotes === "function") {
+                    await renderNotes();
+                }
+
+                if (typeof updateStats === "function") {
+                    await updateStats();
+                }
+
+                if (typeof checkReminders === "function") {
+                    checkReminders();
+                }
+            }
+
+        })();
 
     } else {
 
