@@ -1,40 +1,70 @@
-<!DOCTYPE html>  
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- CSS -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- Emoji -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+
+    <!-- Lunar Calendar -->
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.12/lunar.min.js"></script>
+
+    <!-- PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-   <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
-    <!-- ===== OCR ===== -->
+
+    <!-- QR -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+    <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+
+    <!-- Barcode -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+
+    <!-- BWIP-JS (QRCode, DataMatrix, Aztec, Code128...) -->
+    <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.4.3/dist/bwip-js-min.js"></script>
+
+    <!-- Sortable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
+    <!-- HEIC -->
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+
+    <!-- OCR -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
-<!-- ===== PDF MANAGER ===== -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <!-- ===== PDF MANAGER ===== -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- PDF Worker -->
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
+    </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-<!-- Khai báo Worker cho PDF.js -->
-<script>pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</script>
+    <script src="https://cdn.jsdelivr.net/npm/@neslinesli93/qpdf-wasm@1.3.0/dist/qpdf.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/@neslinesli93/qpdf-wasm@1.3.0/dist/qpdf.js"></script>
-    <!-- ===== Excel Export ===== -->
-
+    <!-- Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<!-- ===== FFmpeg Audio Converter ===== -->
-<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
-    
+
+    <!-- FFmpeg -->
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+
+    <!-- Word Export -->
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+
     <title>Modern Note App - IndexedDB</title>
+
     <style>
         .ql-toolbar.ql-snow { padding: 4px !important; border-radius: 12px 12px 0 0; }
         .ql-container.ql-snow { border-radius: 0 0 12px 12px; }
@@ -546,6 +576,47 @@ to{
     color:#ef4444 !important; 
 
 }
+
+        /* Mặc định ẩn vùng in trên màn hình thường */
+        #printArea {
+            display: none;
+        }
+
+        /* Cấu hình tối ưu khi gọi window.print() - Ẩn hoàn toàn code, thẻ HTML, giao diện gốc */
+        @media print {
+            html, body {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            body > *:not(#printArea) {
+                display: none !important;
+            }
+            #printArea {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 15px !important;
+                padding: 10px !important;
+                width: 100% !important;
+                margin: 0 !important;
+            }
+            .print-card {
+                border: 1px dashed #ccc !important;
+                padding: 10px !important;
+                text-align: center !important;
+                page-break-inside: avoid;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                background: white !important;
+            }
+            .print-card img {
+                width: 100px !important;
+                height: 100px !important;
+                object-fit: contain !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-100 p-4 md:p-10 font-sans">
@@ -629,7 +700,7 @@ to{
 
         <i class="fa-solid fa-heading text-lg"></i>
 
-        <i class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-70"></i>
+       <i class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-70"></i>
 
     </button>
                 <div id="fontSizeMenu" class="hidden absolute z-50 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl p-2 w-40">
@@ -873,8 +944,8 @@ onchange="insertImage(this)">
     class="hidden"
     accept="*/*"
     onchange="insertFileAttachment(this)">
+
 <!-- MENU QR + BARCODE -->
-<!-- MENU QR + BARCODE (macOS STYLE) -->
 <div class="relative">
 
     <!-- Nút mở menu -->
@@ -882,64 +953,105 @@ onchange="insertImage(this)">
         onclick="toggleCodeMenu()"
         class="w-10 h-10 flex items-center justify-center rounded-xl
                hover:bg-purple-50 active:bg-purple-100 transition-all"
-        title="Mã QR / Barcode">
+        title="QR Studio & Barcode">
 
-
-        <!-- QR 7 màu -->
         <i class="fa-solid fa-qrcode text-lg
-                  bg-gradient-to-r from-red-500 via-yellow-400 via-green-500 via-cyan-500 via-blue-500 to-purple-500
-                  bg-clip-text text-transparent"></i>
+            bg-gradient-to-r
+            from-fuchsia-500 via-violet-500 via-sky-500 to-cyan-400
+            bg-clip-text text-transparent"></i>
 
-
-        <!-- mũi tên nhỏ -->
-        <i class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-60"></i>
-
-
+        <i class="fa-solid fa-chevron-down text-[10px] ml-1 text-gray-400"></i>
     </button>
 
-
-    <!-- Dropdown macOS -->
+    <!-- Dropdown -->
     <div id="codeMenu"
-         class="hidden absolute right-0 mt-2 w-44
-                bg-white/95 backdrop-blur-xl
-                rounded-2xl shadow-xl border border-gray-200
-                overflow-hidden z-50">
+        class="hidden absolute right-0 mt-2 w-64
+        bg-white/95 dark:bg-slate-900/95
+        backdrop-blur-xl rounded-2xl
+        shadow-2xl
+        border border-gray-200 dark:border-slate-700
+        overflow-hidden z-50">
 
-
-        <!-- QR -->
+        <!-- QR Studio Pro -->
         <button
-            onclick="openQR(); toggleCodeMenu();"
-            class="w-full flex items-center gap-3 px-4 py-3
-                   hover:bg-purple-50 transition-all">
+            onclick="openQRModal();toggleCodeMenu();"
+            class="w-full flex items-start gap-3 px-4 py-3
+            hover:bg-purple-50 dark:hover:bg-slate-800
+            transition-all">
 
+            <div class="w-10 h-10 rounded-xl
+                bg-gradient-to-br
+                from-fuchsia-500 via-violet-500 to-sky-500
+                text-white flex items-center justify-center
+                shadow-md">
+                <i class="fa-solid fa-qrcode"></i>
+            </div>
 
-            <i class="fa-solid fa-qrcode text-lg
-                      text-purple-600"></i>
-
-            <span class="text-sm text-gray-700">
-                Tạo QR Code
-            </span>
-
+            <div class="text-left">
+                <div class="font-semibold text-gray-800 dark:text-white">
+                    QR Studio Pro
+                </div>
+                <div class="text-xs text-gray-500">
+                    QR SVG • Logo • VietQR • WiFi • vCard
+                </div>
+            </div>
         </button>
 
+        <!-- Divider -->
+        <div class="mx-4 border-t border-gray-200 dark:border-slate-700"></div>
 
-
-        <!-- Barcode -->
+        <!-- Tạo Hàng Loạt -->
         <button
-            onclick="openBarcode(); toggleCodeMenu();"
-            class="w-full flex items-center gap-3 px-4 py-3
-                   hover:bg-blue-50 transition-all">
+            onclick="openBatchModal();toggleCodeMenu();"
+            class="w-full flex items-start gap-3 px-4 py-3
+            hover:bg-emerald-50 dark:hover:bg-slate-800
+            transition-all">
 
+            <div class="w-10 h-10 rounded-xl
+                bg-gradient-to-br
+                from-emerald-500 to-green-500
+                text-white flex items-center justify-center
+                shadow-md">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
 
-            <i class="fa-solid fa-barcode text-lg
-                      text-blue-600"></i>
-
-            <span class="text-sm text-gray-700">
-                Tạo Barcode
-            </span>
-
+            <div class="text-left">
+                <div class="font-semibold text-gray-800 dark:text-white">
+                    Tạo Hàng Loạt
+                </div>
+                <div class="text-xs text-gray-500">
+                    QR • Barcode • DataMatrix • Aztec
+                </div>
+            </div>
         </button>
 
+        <!-- Divider -->
+        <div class="mx-4 border-t border-gray-200 dark:border-slate-700"></div>
+
+        <!-- Barcode Studio -->
+        <button
+            onclick="openBarcode();toggleCodeMenu();"
+            class="w-full flex items-start gap-3 px-4 py-3
+            hover:bg-sky-50 dark:hover:bg-slate-800
+            transition-all">
+
+            <div class="w-10 h-10 rounded-xl
+                bg-gradient-to-br
+                from-sky-500 to-cyan-500
+                text-white flex items-center justify-center
+                shadow-md">
+                <i class="fa-solid fa-barcode"></i>
+            </div>
+
+            <div class="text-left">
+                <div class="font-semibold text-gray-800 dark:text-white">
+                    Barcode Studio
+                </div>
+                <div class="text-xs text-gray-500">
+                    CODE128 • EAN13 • UPC • ITF • PNG • SVG
+                </div>
+            </div>
+        </button>
 
     </div>
 
@@ -990,8 +1102,8 @@ onchange="insertImage(this)">
     </div>
 
 </div>
-          <button onclick="openAI()" class="w-10 h-10 flex items-center justify-center rounded-lg text-indigo-600 hover:bg-indigo-100 active:bg-indigo-200 transition-all" title="ChatGPT"><i class="fa-solid fa-microchip text-lg"></i></button>
-         <button onclick="openCalendar()" class="w-10 h-10 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-100 transition" title="Calendar"><i class="fa-solid fa-calendar-days text-lg"></i></button>
+          <button onclick="openAI()" class="w-10 h-10 flex items-center justify-center rounded-lg text-sky-400 hover:bg-sky-100 active:bg-sky-200 transition-all" title="ChatGPT"><i class="fa-solid fa-robot text-lg"></i></button>
+         <button onclick="openCalendar()" class="w-10 h-10 flex items-center justify-center rounded-lg text-red-400 hover:bg-red-100 transition" title="Calendar"><i class="fa-solid fa-calendar-plus text-lg"></i></button>
 
 <!-- Nút chuyển giọng nói thành văn bản -->
 <button id="sttBtn" 
@@ -1036,147 +1148,337 @@ title="Chuyển giọng nói thành văn bản">
         <div id="pagination" class="flex justify-center gap-2 mt-6"></div>
     </div>
 
-<div id="qrModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+   <!-- Modal QR Studio Pro (Nâng Cấp Cao Cấp) với Hiệu ứng Glassmorphism -->
+    <div id="qrStudioModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/25 rounded-3xl p-6 md:p-8 w-full max-w-4xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] my-8 transition-all">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-200/60 pb-4">
+                <h2 class="text-xl md:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 flex items-center gap-3">
+                    <div class="p-2.5 bg-gradient-to-br from-purple-500 to-indigo-600 text-white rounded-2xl shadow-lg shadow-purple-500/30">
+                        <i class="fa-solid fa-qrcode"></i>
+                    </div>
+                    QR Code Studio 
+                </h2>
+                <button onclick="closeQRModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-purple-100 text-gray-500 hover:text-purple-600 transition-all">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
 
-    <div class="bg-white rounded-3xl p-6 w-80 shadow-xl">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Cột trái: Tùy chỉnh cấu hình -->
+                <div class="lg:col-span-7 space-y-4 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
+                    
+                    <!-- Loại nội dung -->
+                    <div class="bg-white/60 dark:bg-slate-800/60 p-4 rounded-2xl border border-white/40 shadow-sm backdrop-blur-sm">
+                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold">1</span>
+                            Loại nội dung QR:
+                        </label>
+                        <select id="qrContentType" onchange="changeQRType()" class="w-full border border-gray-200 rounded-xl p-3 text-sm bg-white/80 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-purple-500 transition-all shadow-sm">
+                            <option value="text">Nhập nội dung (Văn bản tự do)</option>
+                            <option value="url">Website URL (HTTPS)</option>
+                            <option value="vcard">Danh thiếp Điện Tử (vCard)</option>
+                            <option value="wifi">Kết nối Wi-Fi</option>
+                            <option value="email">Gửi Email</option>
+                            <option value="sms">Tin nhắn SMS</option>
+                            <option value="social">Mạng xã hội (Social Media)</option>
+                            <option value="bank">Mã QR Ngân Hàng (VietQR)</option>
+                        </select>
+                    </div>
 
-        <h2 class="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
-            <i class="fa-solid fa-qrcode text-purple-600"></i>
-            Tạo mã QR
-        </h2>
+                    <!-- Input nội dung động -->
+                    <div id="qrDynamicInputs" class="bg-gradient-to-br from-purple-50/80 to-indigo-50/50 p-4 rounded-2xl border border-purple-100/80 space-y-3 shadow-sm backdrop-blur-sm">
+                        <!-- Sẽ tự động render tùy thuộc chọn loại nội dung -->
+                    </div>
 
-        <input id="qrText" class="w-full border rounded-xl p-2 mb-3" placeholder="Nhập nội dung QR">
+                    <!-- Lời kêu gọi hành động (CTA) & UTM Analytics -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white/60 dark:bg-slate-800/60 p-4 rounded-2xl border border-white/40 shadow-sm backdrop-blur-sm">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Lời kêu gọi (CTA):</label>
+                            <input type="text" id="qrCTA" placeholder="VD: Quét để xem Menu" class="w-full border border-gray-200 rounded-xl p-2.5 text-sm bg-white/80 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-purple-500 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">UTM Campaign (Google Analytics):</label>
+                            <input type="text" id="qrUTM" placeholder="VD: utm_source=qrcode_banner" class="w-full border border-gray-200 rounded-xl p-2.5 text-sm bg-white/80 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-purple-500 transition-all">
+                        </div>
+                    </div>
 
-        <label class="text-sm text-gray-600">Màu QR</label>
-        <input id="qrColor" type="color" value="#000000" class="w-full h-10 mb-3">
+                    <!-- Thiết kế hình dáng & Mức sửa lỗi -->
+                    <div class="bg-white/60 dark:bg-slate-800/60 p-4 rounded-2xl border border-white/40 shadow-sm backdrop-blur-sm">
+                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold">2</span>
+                            Kiểu dáng & Tự hồi phục (Error Correction):
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Khả năng sửa lỗi:</label>
+                                <select id="qrErrorLevel" class="w-full border border-gray-200 rounded-xl p-2 text-xs bg-white/80 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="H" selected>Cao (30% - Rách/Bẩn vẫn quét tốt)</option>
+                                    <option value="Q">Khá (25%)</option>
+                                    <option value="M">Trung bình (15%)</option>
+                                    <option value="L">Thấp (7%)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Họa tiết Dot:</label>
+                                <select id="qrDotStyle" class="w-full border border-gray-200 rounded-xl p-2 text-xs bg-white/80 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="square">Vuông chuẩn</option>
+                                    <option value="dots">Chấm tròn (Dots)</option>
+                                    <option value="rounded">Bo tròn (Rounded)</option>
+                                    <option value="classy">Sang trọng (Classy)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Viền góc (Corners):</label>
+                                <select id="qrCornerStyle" class="w-full border border-gray-200 rounded-xl p-2 text-xs bg-white/80 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="square">Góc vuông</option>
+                                    <option value="dot">Góc tròn</option>
+                                    <option value="extra-rounded">Góc mềm</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 
-        <div id="qrcode" class="flex justify-center mb-4"></div>
+                    <!-- Màu sắc & Logo Thương hiệu -->
+                    <div class="bg-white/60 dark:bg-slate-800/60 p-4 rounded-2xl border border-white/40 shadow-sm backdrop-blur-sm">
+                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold">3</span>
+                            Màu sắc & Logo Thương hiệu:
+                        </label>
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div class="flex items-center justify-between border border-gray-200 dark:border-slate-700 p-2.5 rounded-xl bg-white/80 dark:bg-slate-800">
+                                <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Màu mã QR:</span>
+                                <input type="color" id="qrDotColor" value="#000000" class="w-8 h-8 cursor-pointer rounded-lg border-0 bg-transparent">
+                            </div>
+                            <div class="flex items-center justify-between border border-gray-200 dark:border-slate-700 p-2.5 rounded-xl bg-white/80 dark:bg-slate-800">
+                                <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Màu nền QR:</span>
+                                <input type="color" id="qrBgColor" value="#ffffff" class="w-8 h-8 cursor-pointer rounded-lg border-0 bg-transparent">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Chèn Logo vào giữa mã:</label>
+                            <input type="file" id="qrLogoInput" accept="image/*" class="text-xs w-full border border-gray-200 dark:border-slate-700 rounded-xl p-2 bg-white/80 dark:bg-slate-800 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 transition-all cursor-pointer">
+                        </div>
+                    </div>
+                </div>
 
-        <div class="flex gap-2">
+                <!-- Cột phải: Khung Xem Trước (Preview) & Xuất File -->
+                <div class="lg:col-span-5 flex flex-col items-center justify-between border-t lg:border-t-0 lg:border-l border-gray-200/60 pt-6 lg:pt-0 pl-0 lg:pl-6">
+                    <div class="w-full flex flex-col items-center">
+                        <span class="text-xs font-bold tracking-wider text-purple-600 bg-purple-50 dark:bg-purple-900/30 px-3 py-1 rounded-full mb-3 shadow-inner">XEM TRƯỚC SẢN PHẨM</span>
+                        
+                        <!-- Container thiết kế bao gồm CTA và Mã QR với hiệu ứng Glass/Neumorphism nhẹ nhàng -->
+                        <div id="qrPreviewWrapper" class="bg-gradient-to-b from-white to-gray-50 dark:from-slate-800 dark:to-slate-900 p-5 border border-white/60 dark:border-slate-700 rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex flex-col items-center justify-center max-w-[280px] w-full transition-all">
+                            <div id="qrCanvasContainer" class="flex justify-center items-center rounded-2xl overflow-hidden bg-white p-2 shadow-sm"></div>
+                            <div id="qrCTADisplay" class="mt-3 text-center font-bold text-gray-800 dark:text-gray-200 text-sm hidden"></div>
+                        </div>
+                    </div>
 
-            <button onclick="createQR()" class="flex-1 bg-purple-600 text-white rounded-xl p-2">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo
-            </button>
-
-            <button onclick="downloadQR()" class="flex-1 bg-green-600 text-white rounded-xl p-2">
-                <i class="fa-solid fa-download"></i> Tải
-            </button>
-
+                    <!-- Nút chức năng & Xuất định dạng -->
+                    <div class="w-full space-y-3 mt-6">
+                        <button onclick="renderQRStudio()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-2xl shadow-lg shadow-purple-500/25 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Cập Nhật QR
+                        </button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="downloadQR('svg')" class="bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-900 hover:bg-indigo-50 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 text-xs font-bold py-3 px-3 rounded-2xl transition-all shadow-sm flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-file-code text-indigo-500"></i> Tải SVG (Vector)
+                            </button>
+                            <button onclick="downloadQR('png')" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold py-3 px-3 rounded-2xl shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-file-image"></i> Tải PNG HD
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <button onclick="closeQR()" class="mt-3 w-full bg-gray-200 rounded-xl p-2">
-            Đóng
-        </button>
-
     </div>
+    <!-- Modal Tạo Mã Hàng Loạt & Xuất File -->
+    <div id="batchModal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white/90 backdrop-blur-xl border border-white/40 rounded-3xl p-6 w-full max-w-2xl shadow-2xl my-8">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-200/60 pb-3">
+                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-emerald-600"></i> Tạo Hàng Loạt & Xuất File PNG Full HD
+                </h2>
+                <button onclick="closeBatchModal()" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+            </div>
 
-</div>
-<!-- ================= Barcode ================= -->
-<div id="barcodeModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Loại mã muốn tạo:</label>
+                        <select id="batchType" class="w-full bg-white/70 border border-gray-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="qrcode">Mã QR (QR Code)</option>
+                            <option value="code128">Barcode Code 128</option>
+                            <option value="ean13">Barcode EAN-13</option>
+                            <option value="datamatrix">Data Matrix</option>
+                            <option value="azteccode">Aztec Code</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Định dạng hình ảnh xuất (ZIP):</label>
+                        <select id="batchImgFormat" class="w-full bg-white/70 border border-gray-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="PNG">PNG (Nền trong / Sắc nét HD)</option>
+                            <option value="JPG">JPG (Hình ảnh nén)</option>
+                        </select>
+                    </div>
+                </div>
 
-    <div class="bg-white rounded-3xl p-6 w-96 shadow-xl">
+                <!-- Bổ sung tính năng chọn màu mã và màu nền -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Màu sắc mã (Foreground):</label>
+                        <div class="flex items-center gap-2">
+                            <input type="color" id="batchBarColor" value="#000000" class="w-12 h-10 p-1 bg-white border border-gray-200 rounded-xl cursor-pointer">
+                            <input type="text" id="batchBarColorText" value="#000000" class="w-full bg-white/70 border border-gray-200 rounded-xl p-2 text-sm uppercase font-mono outline-none" oninput="document.getElementById('batchBarColor').value = this.value">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Màu nền (Background):</label>
+                        <div class="flex items-center gap-2">
+                            <input type="color" id="batchBgColor" value="#ffffff" class="w-12 h-10 p-1 bg-white border border-gray-200 rounded-xl cursor-pointer">
+                            <input type="text" id="batchBgColorText" value="#ffffff" class="w-full bg-white/70 border border-gray-200 rounded-xl p-2 text-sm uppercase font-mono outline-none" oninput="document.getElementById('batchBgColor').value = this.value">
+                        </div>
+                    </div>
+                </div>
 
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-barcode text-blue-600"></i>
-            Tạo Barcode
-        </h2>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Danh sách dữ liệu (mỗi dòng 1 mã):</label>
+                    <textarea id="batchInput" class="w-full bg-white/70 border border-gray-200 rounded-xl p-3 h-32 outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-sm"></textarea>
+                </div>
 
-        <input id="barcodeText"
-               class="w-full border rounded-xl p-2 mb-3"
-               placeholder="Nhập mã">
+                <div class="flex gap-2">
+                    <button onclick="generateBatchCodes()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-medium transition flex items-center gap-2 shadow-lg shadow-emerald-600/20">
+                        <i class="fa-solid fa-gears"></i> Tạo mã
+                    </button>
+                </div>
 
-        <select id="barcodeType"
-                class="w-full border rounded-xl p-2 mb-3">
-            <option value="CODE128">CODE128</option>
-            <option value="EAN13">EAN13</option>
-        </select>
+                <!-- Nơi chứa xem trước và xuất file -->
+                <div id="batchPreviewSection" class="hidden border-t border-gray-200/60 pt-4">
+                    <h3 class="text-md font-semibold mb-2 text-gray-700">Xem trước mã đã sinh (<span id="batchCount">0</span> mã)</h3>
+                    
+                    <div id="batchContainer" class="max-h-56 overflow-y-auto border border-gray-200/60 rounded-xl p-3 bg-white/50 grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4"></div>
 
-        <label class="text-sm text-gray-600">Màu Barcode</label>
-        <input id="barcodeColor"
-               type="color"
-               value="#000000"
-               class="w-full h-10 mb-3 rounded-lg border">
+                    <div class="border-t border-gray-200/60 pt-3">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Chọn thao tác xuất hoặc in danh sách:</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <button onclick="printBatchCodes()" class="bg-amber-600 hover:bg-amber-700 text-white py-2.5 px-3 rounded-xl font-medium flex items-center justify-center gap-2 transition text-sm shadow-md shadow-amber-600/20">
+                                <i class="fa-solid fa-print"></i> In Trực Tiếp
+                            </button>
+                            <button onclick="exportBatchToWord()" class="bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-3 rounded-xl font-medium flex items-center justify-center gap-2 transition text-sm shadow-md shadow-blue-600/20">
+                                <i class="fa-solid fa-file-word"></i> Tải Word (.docx)
+                            </button>
+                            <button onclick="exportBatchToZip()" class="bg-purple-600 hover:bg-purple-700 text-white py-2.5 px-3 rounded-xl font-medium flex items-center justify-center gap-2 transition text-sm shadow-md shadow-purple-600/20">
+                                <i class="fa-solid fa-file-zipper"></i> Tải File PNG HD (.ZIP)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <label class="text-sm text-gray-600">Màu nền</label>
-        <input id="barcodeBg"
-               type="color"
-               value="#ffffff"
-               class="w-full h-10 mb-4 rounded-lg border">
-
-        <div class="flex justify-center border rounded-xl bg-gray-50 p-4 mb-4">
-            <svg id="barcodeSvg"></svg>
+            <button onclick="closeBatchModal()" class="mt-5 w-full bg-gray-200/85 hover:bg-gray-300 rounded-xl p-2.5 text-gray-700 font-medium transition backdrop-blur-sm">Đóng</button>
         </div>
-
-        <div class="flex gap-2">
-
-            <button onclick="createBarcode()"
-                    class="flex-1 bg-blue-600 text-white rounded-xl p-2 hover:bg-blue-700">
-                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>
-                Tạo
-            </button>
-
-            <button onclick="downloadBarcode()"
-                    class="flex-1 bg-green-600 text-white rounded-xl p-2 hover:bg-green-700">
-                <i class="fa-solid fa-download mr-1"></i>
-                Tải
-            </button>
-
-        </div>
-
-        <button onclick="closeBarcode()"
-                class="mt-3 w-full bg-gray-200 hover:bg-gray-300 rounded-xl p-2">
-            Đóng
-        </button>
-
     </div>
+    <!-- Barcode Modal (Đã tích hợp phần chọn màu) -->
+    <div id="barcodeModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/25 rounded-3xl p-6 md:p-8 w-full max-w-md shadow-[0_20px_50px_rgba(0,0,0,0.2)] max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-5 border-b border-gray-200/60 pb-3">
+                <h2 class="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center gap-2.5">
+                    <div class="p-2 bg-blue-100 text-blue-600 rounded-xl shadow-inner">
+                        <i class="fa-solid fa-barcode"></i>
+                    </div>
+                    Tạo Barcode HD
+                </h2>
+                <button onclick="closeBarcode()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-all">✕</button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Nội dung mã vạch:</label>
+                    <input id="barcodeText" oninput="createBarcode()" class="w-full border border-gray-200 dark:border-slate-700 rounded-xl p-3 text-sm bg-white/80 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm" placeholder="Nhập nội dung mã">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Loại chuẩn Barcode:</label>
+                    <select id="barcodeType" onchange="createBarcode()" class="w-full border border-gray-200 dark:border-slate-700 rounded-xl p-3 text-sm bg-white/80 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm">
+                        <option value="code128">Code 128</option>
+                        <option value="ean13">EAN-13</option>
+                        <option value="upca">Mã UPC (UPC-A)</option>
+                        <option value="ean8">Mã EAN (EAN-8)</option>
+                        <option value="code39">Mã Code 39</option>
+                        <option value="itf14">Mã vạch ITF (Interleaved 2 of 5)</option>
+                        <option value="codabar">Mã Codabar</option>
+                        <option value="code93">Mã vạch 93</option>
+                        <option value="msi">Mã vạch MSI Plessey</option>
+                    </select>
+                </div>
+                
+                <!-- Bộ chọn màu cho Barcode -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="flex items-center justify-between border border-gray-200 dark:border-slate-700 p-2.5 rounded-xl bg-white/80 dark:bg-slate-800">
+                        <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Màu nét vạch:</span>
+                        <input type="color" id="barcodeLineColor" value="#000000" onchange="createBarcode()" class="w-8 h-8 cursor-pointer rounded-lg border-0 bg-transparent">
+                    </div>
+                    <div class="flex items-center justify-between border border-gray-200 dark:border-slate-700 p-2.5 rounded-xl bg-white/80 dark:bg-slate-800">
+                        <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Màu nền:</span>
+                        <input type="color" id="barcodeBgColor" value="#ffffff" onchange="createBarcode()" class="w-8 h-8 cursor-pointer rounded-lg border-0 bg-transparent">
+                    </div>
+                </div>
 
-</div>
+                <div class="flex justify-center border border-gray-200 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-800 p-4 overflow-hidden shadow-inner">
+                    <canvas id="barcodeCanvas" class="max-w-full object-contain"></canvas>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-2">
+                    <button onclick="createBarcode()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-md shadow-blue-500/20 transition flex items-center justify-center gap-1.5"><i class="fa-solid fa-wand-magic-sparkles"></i> Tạo HD</button>
+                    <button onclick="downloadSingleBarcode()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-md shadow-emerald-500/20 transition flex items-center justify-center gap-1.5"><i class="fa-solid fa-download"></i> Tải PNG HD</button>
+                </div>
+                <button onclick="closeBarcode()" class="w-full bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 font-semibold rounded-xl p-2.5 text-xs transition">Đóng</button>
+            </div>
+        </div>
+    </div>
 <!-- ================= Symbol================= -->
-<div id="symbolModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+<div id="symbolModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
 
-<div class="bg-white rounded-3xl w-[650px] max-h-[80vh] flex flex-col shadow-2xl">
+    <div class="bg-white/80 backdrop-blur-md border border-white/50 rounded-3xl w-[650px] max-h-[80vh] flex flex-col shadow-2xl">
 
-<div class="p-5 border-b flex justify-between items-center">
+        <div class="p-5 border-b border-gray-200/50 flex justify-between items-center">
 
-<h2 class="text-xl font-bold">
-<i class="fa-solid fa-square-root-variable text-lg"></i>
-Unicode Symbol
-</h2>
+            <h2 class="text-xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-square-root-variable text-lg"></i>
+                Unicode Symbol
+            </h2>
 
-<button onclick="closeSymbolModal()">
-<i class="fa-solid fa-xmark text-xl"></i>
-</button>
+            <button onclick="closeSymbolModal()" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-200/50 transition-colors">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
 
-</div>
+        </div>
 
-<div id="symbolGrid" class="grid grid-cols-10 gap-2 p-5 overflow-auto"></div>
+        <div id="symbolGrid" class="grid grid-cols-10 gap-2 p-5 overflow-auto"></div>
 
-</div>
+    </div>
 
 </div>
 <!-- ================= AI Modal ================= -->
-<div id="aiModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+<div id="aiModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
 
-    <div class="bg-white rounded-3xl p-6 w-96 shadow-xl">
+    <div class="bg-white/80 backdrop-blur-md border border-white/50 rounded-3xl p-6 w-96 shadow-2xl">
 
         <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-wand-magic-sparkles text-indigo-600"></i>
-            Trợ lý AI
+           <i class="fa-solid fa-robot text-lg bg-gradient-to-br from-sky-400 via-sky-500 to-blue-600 bg-clip-text text-transparent"></i>
+           ChatGPT
         </h2>
 
         <textarea id="aiText"
-        class="w-full border rounded-xl p-3 h-32"
+        class="w-full bg-white/50 border border-gray-200/60 rounded-xl p-3 h-32 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 backdrop-blur-sm transition-all"
         placeholder="Nhập nội dung cần AI hỗ trợ..."></textarea>
 
         <div class="flex gap-2 mt-4">
 
             <button onclick="askAI()"
-            class="flex-1 bg-indigo-600 text-white rounded-xl p-2">
+            class="flex-1 bg-indigo-600/90 hover:bg-indigo-600 text-white rounded-xl p-2 shadow-lg shadow-indigo-500/30 transition-all">
                 <i class="fa-solid fa-paper-plane"></i> Gửi
             </button>
 
             <button onclick="closeAI()"
-            class="flex-1 bg-gray-200 rounded-xl p-2">
+            class="flex-1 bg-gray-200/60 hover:bg-gray-200/90 border border-gray-300/50 backdrop-blur-sm rounded-xl p-2 transition-all">
                 Đóng
             </button>
 
@@ -1325,24 +1627,24 @@ Chèn vào ghi chú
 
 </div>
 <!-- Modal -->
-<div id="iconModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-    <div class="bg-white p-8 rounded-3xl w-full max-w-5xl h-[80vh] flex flex-col shadow-2xl">
+<div id="iconModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 transition-all">
+    <div class="bg-white/75 backdrop-blur-2xl border border-white/80 p-8 rounded-3xl w-full max-w-5xl h-[80vh] flex flex-col shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
 
         <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="font-bold text-2xl text-slate-700">
-                <i class="fa-brands fa-font-awesome text-indigo-500 mr-2"></i>
-               Font Awesome
+        <div class="flex justify-between items-center mb-6 pb-3 border-b border-gray-200/60">
+            <h3 class="font-bold text-2xl text-slate-800 flex items-center">
+                <i class="fa-brands fa-font-awesome text-indigo-500 mr-2 drop-shadow-sm"></i>
+                Font Awesome
             </h3>
 
-            <div class="flex items-center gap-4 bg-slate-100 p-2 rounded-2xl">
-                <span class="text-xs font-bold text-slate-500 ml-2">
+            <div class="flex items-center gap-4 bg-white/40 backdrop-blur-md p-2 rounded-2xl border border-white/60 shadow-sm">
+                <span class="text-xs font-bold text-slate-600 ml-2">
                     Chọn Màu Cho Icon:
                 </span>
 
                 <button id="colorToggle"
                         onclick="toggleColorMode()"
-                        class="px-4 py-1.5 bg-white shadow rounded-xl text-xs font-bold">
+                        class="px-4 py-1.5 bg-white/80 hover:bg-white shadow-sm rounded-xl text-xs font-bold text-slate-700 transition border border-white/80">
                     OFF
                 </button>
 
@@ -1353,7 +1655,7 @@ Chèn vào ghi chú
             </div>
 
             <button onclick="closeIconModal()"
-                    class="text-2xl text-slate-400 hover:text-slate-600">
+                    class="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-white/60 transition-all">
                 ✕
             </button>
         </div>
@@ -1363,20 +1665,20 @@ Chèn vào ghi chú
 
             <button id="tabGeneral"
                     onclick="showIconTab('general')"
-                    class="px-5 py-2 rounded-xl bg-indigo-600 text-white font-semibold transition">
+                    class="px-5 py-2.5 rounded-2xl bg-indigo-600/90 hover:bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-600/25 backdrop-blur-md transition">
                 ⭐ Icon chung
             </button>
 
             <button id="tabBrand"
                     onclick="showIconTab('brand')"
-                    class="px-5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 font-semibold transition">
+                    class="px-5 py-2.5 rounded-2xl bg-white/40 hover:bg-white/70 text-slate-700 font-semibold border border-white/60 backdrop-blur-md transition">
                 🌐 Mạng xã hội
             </button>
 
         </div>
 
         <!-- Nội dung -->
-        <div class="icon-scroll flex-1 pr-2">
+        <div class="icon-scroll flex-1 pr-2 overflow-y-auto">
 
             <!-- Gần đây -->
             <div id="recentIconsSection" class="mb-8 hidden">
@@ -1403,33 +1705,32 @@ Chèn vào ghi chú
 
     </div>
 </div>
-
-<!-- ================= MODAL QUẢN LÝ / TÁCH / GỘP PDF TRỰC QUAN ================= -->
-<div id="pdfModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-5xl shadow-2xl max-h-[92vh] flex flex-col">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold flex items-center gap-2 text-emerald-600">
-                <i class="fa-solid fa-file-pdf text-2xl text-red-600"></i> Quản Lý, Tách & Gộp PDF 
+<!-- ================= MODAL QUẢN LÝ / TÁCH / GỘP PDF TRỰC QUAN (GLASS VERSION) ================= -->
+<div id="pdfModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-md">
+    <div class="bg-white/80 backdrop-blur-xl border border-white/60 rounded-3xl p-6 w-full max-w-5xl shadow-2xl max-h-[92vh] flex flex-col">
+        <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200/50">
+            <h2 class="text-xl font-bold flex items-center gap-2 text-emerald-700">
+                <i class="fa-solid fa-file-pdf text-2xl text-red-500 drop-shadow-sm"></i> Quản Lý, Tách & Gộp PDF 
             </h2>
-            <button onclick="closePdfModal()" class="text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            <button onclick="closePdfModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-200/50 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
         </div>
 
 <!-- PDF TOOL -->
-<div class="bg-slate-50 border p-4 rounded-2xl mb-4 space-y-3">
+<div class="bg-white/40 backdrop-blur-md border border-white/50 p-4 rounded-2xl mb-4 space-y-3 shadow-sm">
 
     <!-- DROP ZONE -->
     <div id="pdfDropZone"
-        class="border-2 border-dashed border-emerald-300 bg-emerald-50
-        rounded-xl p-5 text-center cursor-pointer hover:bg-emerald-100">
+        class="border-2 border-dashed border-emerald-400/60 bg-emerald-50/40 backdrop-blur-sm
+        rounded-xl p-5 text-center cursor-pointer hover:bg-emerald-100/55 transition-all">
 
-        <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-600"></i>
+        <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-600 mb-1"></i>
 
-        <p class="text-sm text-emerald-700 font-semibold">
+        <p class="text-sm text-emerald-800 font-semibold">
             Kéo thả PDF hoặc
         </p>
 
         <label class="inline-flex items-center gap-2 mt-2
-            bg-emerald-600 text-white px-4 py-2 rounded-xl cursor-pointer">
+            bg-emerald-600/90 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl cursor-pointer shadow-md shadow-emerald-600/20 transition-all">
 
             <i class="fa-solid fa-file-pdf"></i> Chọn PDF
 
@@ -1448,38 +1749,36 @@ Chèn vào ghi chú
     <!-- TOOL BAR -->
     <div class="flex flex-wrap gap-2 items-center">
 
-
         <button onclick="clearAllPdfPages()"
-            class="px-3 py-2 rounded-xl bg-gray-200 hover:text-red-600">
+            class="px-3 py-2 rounded-xl bg-gray-200/60 hover:bg-gray-200 hover:text-red-600 border border-gray-300/40 backdrop-blur-sm transition-all">
             <i class="fa-solid fa-trash"></i>
         </button>
 
 
         <button onclick="openPdfFullscreen()"
-            class="px-3 py-2 rounded-xl bg-blue-100 text-blue-700">
+            class="px-3 py-2 rounded-xl bg-blue-100/60 text-blue-700 hover:bg-blue-100 border border-blue-200/40 backdrop-blur-sm transition-all">
             <i class="fa-solid fa-expand"></i>
         </button>
 
 
         <input id="pdfExportName"
             value="Tai_Lieu_Gop"
-            class="border rounded-xl px-3 py-2 w-36 text-sm"
+            class="bg-white/60 backdrop-blur-sm border border-gray-200/60 rounded-xl px-3 py-2 w-36 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 transition-all"
             placeholder="Tên file">
 
 
         <span id="pdfTotalPagesBadge"
-            class="bg-emerald-100 text-emerald-700
+            class="bg-emerald-100/80 backdrop-blur-sm text-emerald-800 border border-emerald-200/50
             px-3 py-2 rounded-full text-xs font-semibold">
             0 trang
         </span>
-
 
     </div>
 
 </div>
 
         <!-- Khung Kéo - Thả Danh Sách Trang Trực Quan -->
-        <div class="flex-1 border-2 border-dashed border-slate-200 rounded-2xl p-4 bg-slate-50/50 overflow-y-auto">
+        <div class="flex-1 border-2 border-dashed border-slate-300/60 rounded-2xl p-4 bg-slate-50/40 backdrop-blur-sm overflow-y-auto">
             <div id="pdfPageGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 <div id="pdfEmptyState" class="col-span-full flex flex-col items-center justify-center py-16 text-slate-400">
                     <i class="fa-solid fa-file-pdf text-5xl mb-3 text-slate-300"></i>
@@ -1490,11 +1789,11 @@ Chèn vào ghi chú
         </div>
 
         <!-- Các Nút Chức Năng Hoàn Tất -->
-        <div class="mt-4 pt-3 border-t flex flex-wrap gap-3 justify-end items-center">
-            <button onclick="exportMergedPdf()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-semibold transition shadow flex items-center gap-2">
+        <div class="mt-4 pt-3 border-t border-gray-200/50 flex flex-wrap gap-3 justify-end items-center">
+            <button onclick="exportMergedPdf()" class="bg-emerald-600/90 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-semibold transition shadow-lg shadow-emerald-600/30 flex items-center gap-2 backdrop-blur-sm">
                 <i class="fa-solid fa-object-group"></i> Gộp Các Trang Thành 1 File PDF
             </button>
-            <button onclick="exportSplitZip()" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl font-semibold transition shadow flex items-center gap-2">
+            <button onclick="exportSplitZip()" class="bg-teal-600/90 hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl font-semibold transition shadow-lg shadow-teal-600/30 flex items-center gap-2 backdrop-blur-sm">
                 <i class="fa-solid fa-file-zipper"></i> Tách Thành Thư Mục Nén (.ZIP)
             </button>
         </div>
@@ -1502,21 +1801,21 @@ Chèn vào ghi chú
 </div>
 
 <!-- Modal Xem Thử Trang PDF Phóng To -->
-<div id="pdfPreviewModal" class="hidden fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white rounded-2xl p-4 w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl">
+<div id="pdfPreviewModal" class="hidden fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4 backdrop-blur-md">
+    <div class="bg-white/85 backdrop-blur-xl border border-white/60 rounded-2xl p-4 w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl">
 
-        <div class="flex justify-between items-center mb-2 pb-2 border-b">
+        <div class="flex justify-between items-center mb-2 pb-2 border-b border-gray-200/50">
             <h3 id="pdfPreviewTitle" class="text-sm font-bold text-gray-700 truncate">
                 Xem Trước Trang PDF
             </h3>
 
-            <button onclick="closePdfPreview()" class="text-gray-500 hover:text-black text-xl">
-                <i class="fa-solid fa-xmark"></i>
+            <button onclick="closePdfPreview()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-200/50 transition-colors">
+                <i class="fa-solid fa-xmark text-xl"></i>
             </button>
         </div>
 
 
-        <div class="flex-1 overflow-auto flex justify-center bg-gray-100 p-2 rounded-xl">
+        <div class="flex-1 overflow-auto flex justify-center bg-gray-100/50 backdrop-blur-sm p-2 rounded-xl border border-gray-200/40">
            <canvas id="pdfPreviewCanvas" class="shadow-md rounded bg-white mx-auto block"></canvas>
         </div>
 
@@ -1525,20 +1824,20 @@ Chèn vào ghi chú
         <div class="flex justify-between items-center mt-3">
 
             <button onclick="prevPdfPage()"
-            class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300">
+            class="px-4 py-2 bg-gray-200/60 hover:bg-gray-200 border border-gray-300/40 rounded-xl backdrop-blur-sm transition-all flex items-center gap-2 text-sm font-medium">
                 <i class="fa-solid fa-chevron-left"></i>
                 Trang trước
             </button>
 
 
             <span id="pdfPreviewCount"
-            class="text-sm font-semibold text-gray-600">
+            class="text-sm font-semibold text-gray-700">
                 1 / 1
             </span>
 
 
             <button onclick="nextPdfPage()"
-            class="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700">
+            class="px-4 py-2 bg-emerald-600/90 hover:bg-emerald-600 text-white rounded-xl shadow-md shadow-emerald-600/20 backdrop-blur-sm transition-all flex items-center gap-2 text-sm font-medium">
                 Trang sau
                 <i class="fa-solid fa-chevron-right"></i>
             </button>
@@ -1548,11 +1847,11 @@ Chèn vào ghi chú
     </div>
 </div>
 
-    <!-- ================= MODAL CHUYỂN ĐỔI TỆP TIN CAO CẤP ================= -->
-<div id="converterModal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto">
+<!-- ================= MODAL CHUYỂN ĐỔI TỆP TIN CAO CẤP (GLASS VERSION) ================= -->
+<div id="converterModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-white/80 backdrop-blur-xl border border-white/60 rounded-3xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
 
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-between items-center mb-6 pb-2 border-b border-gray-200/50">
 
             <h2 class="text-xl font-bold text-gray-800 flex items-center gap-3">
 
@@ -1562,7 +1861,7 @@ Chèn vào ghi chú
                    via-red-500
                    via-blue-500
                    to-emerald-500
-                   bg-clip-text text-transparent"></i>
+                   bg-clip-text text-transparent drop-shadow-sm"></i>
 
                 <span class="bg-gradient-to-r
                     from-orange-500
@@ -1576,165 +1875,166 @@ Chèn vào ghi chú
             </h2>
 
             <button onclick="closeConverterModal()"
-                class="text-gray-400 hover:text-red-500 text-xl font-bold transition">
+                class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-gray-200/50 transition">
                 ✕
             </button>
 
         </div>
 
             <!-- Tabs chọn chiều chuyển đổi -->
-            <div class="grid grid-cols-2 gap-2 mb-4 bg-gray-100 p-1 rounded-xl">
-                <button id="tabPdfToOffice" onclick="switchConverterTab('pdfToOffice')" class="py-2 text-sm font-medium rounded-lg bg-white text-gray-800 shadow-sm">PDF sang Office</button>
-                <button id="tabOfficeToPdf" onclick="switchConverterTab('officeToPdf')" class="py-2 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-800">Office sang PDF</button>
+            <div class="grid grid-cols-2 gap-2 mb-4 bg-gray-200/50 backdrop-blur-sm p-1 rounded-xl border border-gray-300/40">
+                <button id="tabPdfToOffice" onclick="switchConverterTab('pdfToOffice')" class="py-2 text-sm font-medium rounded-lg bg-white/80 backdrop-blur-md text-gray-800 shadow-sm transition-all">PDF sang Office</button>
+                <button id="tabOfficeToPdf" onclick="switchConverterTab('officeToPdf')" class="py-2 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-800 transition-all">Office sang PDF</button>
             </div>
 
             <!-- CHÂN 1: PDF sang Word / Excel / PowerPoint -->
             <div id="panelPdfToOffice" class="space-y-4">
-                <div class="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-indigo-500 transition cursor-pointer relative" onclick="document.getElementById('pdfInputFile').click()">
-                    <i class="fa-solid fa-file-pdf text-red-500 text-4xl mb-2"></i>
-                    <p id="pdfFileName" class="text-sm text-gray-600 font-medium">Chọn hoặc Kéo thả file PDF vào đây</p>
+                <div class="border-2 border-dashed border-gray-300/80 bg-white/40 backdrop-blur-sm rounded-2xl p-6 text-center hover:border-indigo-500/80 hover:bg-white/60 transition cursor-pointer relative shadow-sm" onclick="document.getElementById('pdfInputFile').click()">
+                    <i class="fa-solid fa-file-pdf text-red-500 text-4xl mb-2 drop-shadow-sm"></i>
+                    <p id="pdfFileName" class="text-sm text-gray-700 font-medium">Chọn hoặc Kéo thả file PDF vào đây</p>
                     <input type="file" id="pdfInputFile" class="hidden" accept=".pdf" onchange="handlePdfSelect(this)">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase">Chọn định dạng đầu ra muốn chuyển đổi:</label>
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Chọn định dạng đầu ra muốn chuyển đổi:</label>
                     <div class="grid grid-cols-3 gap-2">
-                        <button onclick="convertPdfTo('word')" class="p-3 bg-blue-50 text-blue-700 rounded-xl border border-blue-200 text-center font-semibold hover:bg-blue-100 transition"><i class="fa-solid fa-file-word text-lg block mb-1"></i> Sang Word</button>
-                        <button onclick="convertPdfTo('excel')" class="p-3 bg-green-50 text-green-700 rounded-xl border border-green-200 text-center font-semibold hover:bg-green-100 transition"><i class="fa-solid fa-file-excel text-lg block mb-1"></i> Sang Excel</button>
-                        <button onclick="convertPdfTo('powerpoint')" class="p-3 bg-orange-50 text-orange-700 rounded-xl border border-orange-200 text-center font-semibold hover:bg-orange-100 transition"><i class="fa-solid fa-file-powerpoint text-lg block mb-1"></i> Sang PPT</button>
+                        <button onclick="convertPdfTo('word')" class="p-3 bg-blue-50/70 hover:bg-blue-100/80 text-blue-700 rounded-xl border border-blue-200/60 backdrop-blur-sm text-center font-semibold shadow-sm transition flex flex-col items-center justify-center"><i class="fa-solid fa-file-word text-lg mb-1"></i> Sang Word</button>
+                        <button onclick="convertPdfTo('excel')" class="p-3 bg-green-50/70 hover:bg-green-100/80 text-green-700 rounded-xl border border-green-200/60 backdrop-blur-sm text-center font-semibold shadow-sm transition flex flex-col items-center justify-center"><i class="fa-solid fa-file-excel text-lg mb-1"></i> Sang Excel</button>
+                        <button onclick="convertPdfTo('powerpoint')" class="p-3 bg-orange-50/70 hover:bg-orange-100/80 text-orange-700 rounded-xl border border-orange-200/60 backdrop-blur-sm text-center font-semibold shadow-sm transition flex flex-col items-center justify-center"><i class="fa-solid fa-file-powerpoint text-lg mb-1"></i> Sang PPT</button>
                     </div>
                 </div>
             </div>
 
             <!-- CHÂN 2: Word / Excel / PowerPoint sang PDF -->
             <div id="panelOfficeToPdf" class="space-y-4 hidden">
-                <div class="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-indigo-500 transition cursor-pointer relative" onclick="document.getElementById('officeInputFile').click()">
-                    <i class="fa-solid fa-file-invoice text-indigo-500 text-4xl mb-2"></i>
-                    <p id="officeFileName" class="text-sm text-gray-600 font-medium">Chọn file .docx, .xlsx hoặc .pptx</p>
+                <div class="border-2 border-dashed border-gray-300/80 bg-white/40 backdrop-blur-sm rounded-2xl p-6 text-center hover:border-indigo-500/80 hover:bg-white/60 transition cursor-pointer relative shadow-sm" onclick="document.getElementById('officeInputFile').click()">
+                    <i class="fa-solid fa-file-invoice text-indigo-500 text-4xl mb-2 drop-shadow-sm"></i>
+                    <p id="officeFileName" class="text-sm text-gray-700 font-medium">Chọn file .docx, .xlsx hoặc .pptx</p>
                     <input type="file" id="officeInputFile" class="hidden" accept=".docx,.xlsx,.pptx,.txt" onchange="handleOfficeSelect(this)">
                 </div>
-                <button onclick="convertOfficeToPdf()" class="w-full p-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition flex items-center justify-center gap-2">
+                <button onclick="convertOfficeToPdf()" class="w-full p-3 bg-indigo-600/90 hover:bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/30 backdrop-blur-sm transition flex items-center justify-center gap-2">
                     <i class="fa-solid fa-file-pdf"></i> Tiến Hành Chuyển Thành PDF
                 </button>
             </div>
 
-            <div id="convertLoading" class="hidden mt-4 text-center p-3 bg-gray-50 rounded-xl text-sm font-semibold text-indigo-600 animate-pulse">
+            <div id="convertLoading" class="hidden mt-4 text-center p-3 bg-white/50 backdrop-blur-sm border border-gray-200/50 rounded-xl text-sm font-semibold text-indigo-600 animate-pulse shadow-sm">
                 <i class="fa-solid fa-spinner animate-spin mr-2"></i> Đang phân tích cú pháp font dữ liệu và sinh tệp...
             </div>
         </div>
     </div>
+</div>
     <!-- ========================================== -->
-    <!-- MODAL CHUYỂN ĐỔI ĐUÔI FILE ẢNH (MỚI THÊM) -->
-    <!-- ========================================== -->
-    <div id="imgConverterModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl w-full max-w-2xl p-6 shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center pb-4 border-b border-gray-100">
-                <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <i class="fa-solid fa-arrows-rotate text-emerald-600"></i> Công Cụ Chuyển Đổi Định Dạng Ảnh
-                </h3>
-                <button onclick="closeImgConverterModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+<!-- MODAL CHUYỂN ĐỔI ĐUÔI FILE ẢNH (GLASS VERSION) -->
+<!-- ========================================== -->
+<div id="imgConverterModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-white/80 backdrop-blur-xl border border-white/60 rounded-3xl w-full max-w-2xl p-6 shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center pb-4 border-b border-gray-200/50">
+            <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="fa-solid fa-arrows-rotate text-emerald-600 drop-shadow-sm"></i> Công Cụ Chuyển Đổi Định Dạng Ảnh
+            </h3>
+            <button onclick="closeImgConverterModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-200/50 text-2xl font-bold transition-colors">&times;</button>
+        </div>
+
+        <div class="mt-4 space-y-4">
+            <!-- Vùng Chọn File / Drag & Drop -->
+            <div class="border-2 border-dashed border-emerald-400/60 hover:border-emerald-500 bg-emerald-50/40 backdrop-blur-sm rounded-2xl p-6 text-center cursor-pointer transition shadow-sm hover:bg-emerald-100/50" onclick="document.getElementById('convFileInput').click()">
+                <i class="fa-solid fa-cloud-arrow-up text-4xl text-emerald-500 mb-2 drop-shadow-sm"></i>
+                <p class="text-gray-700 font-medium">Nhấp để chọn ảnh hoặc kéo thả ảnh vào đây</p>
+                <p class="text-xs text-gray-400 mt-1">Hỗ trợ: JPG, PNG, WEBP, GIF, BMP, TIFF, AVIF, HEIC, SVG, ICO,...</p>
+                <input type="file" id="convFileInput" class="hidden" accept="image/*,.heic,.heif,.svg,.ico,.bmp,.tiff,.webp,.avif" onchange="handleConvFileSelect(event)">
             </div>
 
-            <div class="mt-4 space-y-4">
-                <!-- Vùng Chọn File / Drag & Drop -->
-                <div class="border-2 border-dashed border-emerald-300 hover:border-emerald-500 bg-emerald-50/50 rounded-2xl p-6 text-center cursor-pointer transition" onclick="document.getElementById('convFileInput').click()">
-                    <i class="fa-solid fa-cloud-arrow-up text-4xl text-emerald-500 mb-2"></i>
-                    <p class="text-gray-700 font-medium">Nhấp để chọn ảnh hoặc kéo thả ảnh vào đây</p>
-                    <p class="text-xs text-gray-400 mt-1">Hỗ trợ: JPG, PNG, WEBP, GIF, BMP, TIFF, AVIF, HEIC, SVG, ICO,...</p>
-                    <input type="file" id="convFileInput" class="hidden" accept="image/*,.heic,.heif,.svg,.ico,.bmp,.tiff,.webp,.avif" onchange="handleConvFileSelect(event)">
-                </div>
-
-                <!-- Xem Trước Ảnh Gốc & Thông Tin -->
-                <div id="convPreviewArea" class="hidden bg-gray-50 p-4 rounded-xl border flex flex-col md:flex-row gap-4 items-center">
-                    <img id="convSourceImg" class="w-28 h-28 object-contain rounded-lg border bg-white p-1" alt="Preview">
-                    <div class="flex-1 text-sm text-gray-600 space-y-1">
-                        <p><strong class="text-gray-800">Tên file:</strong> <span id="convFileName">-</span></p>
-                        <p><strong class="text-gray-800">Định dạng gốc:</strong> <span id="convFileType" class="uppercase text-blue-600 font-bold">-</span></p>
-                        <p><strong class="text-gray-800">Kích thước gốc:</strong> <span id="convFileSize">-</span> (<span id="convFileDim">-</span> px)</p>
-                    </div>
-                </div>
-
-                <!-- Tùy Chọn Định Dạng Đích & Kích Thước -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Định dạng muốn chuyển đổi sang:</label>
-                        <select id="convTargetFormat" class="w-full border border-gray-300 rounded-xl p-2.5 bg-white text-gray-800 font-medium outline-none focus:ring-2 focus:ring-emerald-500">
-                            <option value="png">PNG (.png)</option>
-                            <option value="jpeg">JPG / JPEG (.jpg)</option>
-                            <option value="webp">WEBP (.webp)</option>
-                            <option value="ico">ICON (.ico)</option>
-                            <option value="bmp">BMP (.bmp)</option>
-                            <option value="gif">GIF (.gif)</option>
-                            <option value="svg">SVG (.svg - Vector Wrapper)</option>
-                            <option value="avif">AVIF (.avif)</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Chất lượng ảnh (%) / Tỷ lệ:</label>
-                        <input type="number" id="convQuality" value="90" min="10" max="100" class="w-full border border-gray-300 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500" placeholder="10 - 100%">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs text-gray-500 mb-1">Rộng (Width - px):</label>
-                        <input type="number" id="convWidth" placeholder="Tự động" class="w-full border rounded-xl p-2 text-sm outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-500 mb-1">Cao (Height - px):</label>
-                        <input type="number" id="convHeight" placeholder="Tự động" class="w-full border rounded-xl p-2 text-sm outline-none">
-                    </div>
-                </div>
-
-                <div id="convStatus" class="hidden text-center py-2 font-medium text-emerald-600 animate-pulse">
-                    <i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang xử lý chuyển đổi dữ liệu ảnh...
+            <!-- Xem Trước Ảnh Gốc & Thông Tin -->
+            <div id="convPreviewArea" class="hidden bg-white/50 backdrop-blur-md p-4 rounded-xl border border-gray-200/50 flex flex-col md:flex-row gap-4 items-center shadow-sm">
+                <img id="convSourceImg" class="w-28 h-28 object-contain rounded-lg border border-gray-200/60 bg-white/80 p-1 shadow-inner" alt="Preview">
+                <div class="flex-1 text-sm text-gray-600 space-y-1">
+                    <p><strong class="text-gray-800">Tên file:</strong> <span id="convFileName">-</span></p>
+                    <p><strong class="text-gray-800">Định dạng gốc:</strong> <span id="convFileType" class="uppercase text-blue-600 font-bold">-</span></p>
+                    <p><strong class="text-gray-800">Kích thước gốc:</strong> <span id="convFileSize">-</span> (<span id="convFileDim">-</span> px)</p>
                 </div>
             </div>
 
-            <div class="mt-6 flex justify-end gap-3 pt-4 border-t border-gray-100">
-                <button onclick="closeImgConverterModal()" class="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition">Đóng</button>
-                <button onclick="processImageConversion()" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-lg shadow-emerald-200 flex items-center gap-2 transition">
-                    <i class="fa-solid fa-file-export"></i> Chuyển Đổi & Tải Tệp
-                </button>
+            <!-- Tùy Chọn Định Dạng Đích & Kích Thước -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Định dạng muốn chuyển đổi sang:</label>
+                    <select id="convTargetFormat" class="w-full border border-gray-200/60 rounded-xl p-2.5 bg-white/60 backdrop-blur-sm text-gray-800 font-medium outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-sm transition">
+                        <option value="png">PNG (.png)</option>
+                        <option value="jpeg">JPG / JPEG (.jpg)</option>
+                        <option value="webp">WEBP (.webp)</option>
+                        <option value="ico">ICON (.ico)</option>
+                        <option value="bmp">BMP (.bmp)</option>
+                        <option value="gif">GIF (.gif)</option>
+                        <option value="svg">SVG (.svg - Vector Wrapper)</option>
+                        <option value="avif">AVIF (.avif)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Chất lượng ảnh (%) / Tỷ lệ:</label>
+                    <input type="number" id="convQuality" value="90" min="10" max="100" class="w-full border border-gray-200/60 rounded-xl p-2.5 bg-white/60 backdrop-blur-sm outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-sm transition" placeholder="10 - 100%">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1 font-medium">Rộng (Width - px):</label>
+                    <input type="number" id="convWidth" placeholder="Tự động" class="w-full border border-gray-200/60 rounded-xl p-2 text-sm bg-white/60 backdrop-blur-sm outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-sm transition">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1 font-medium">Cao (Height - px):</label>
+                    <input type="number" id="convHeight" placeholder="Tự động" class="w-full border border-gray-200/60 rounded-xl p-2 text-sm bg-white/60 backdrop-blur-sm outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-sm transition">
+                </div>
+            </div>
+
+            <div id="convStatus" class="hidden text-center py-2 font-medium text-emerald-600 animate-pulse bg-emerald-50/50 backdrop-blur-sm rounded-xl border border-emerald-200/40">
+                <i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang xử lý chuyển đổi dữ liệu ảnh...
             </div>
         </div>
+
+        <div class="mt-6 flex justify-end gap-3 pt-4 border-t border-gray-200/50">
+            <button onclick="closeImgConverterModal()" class="px-5 py-2.5 rounded-xl bg-gray-200/60 hover:bg-gray-200 text-gray-700 font-medium border border-gray-300/40 backdrop-blur-sm transition">Đóng</button>
+            <button onclick="processImageConversion()" class="px-6 py-2.5 rounded-xl bg-emerald-600/90 hover:bg-emerald-600 text-white font-medium shadow-lg shadow-emerald-600/30 flex items-center gap-2 backdrop-blur-sm transition">
+                <i class="fa-solid fa-file-export"></i> Chuyển Đổi & Tải Tệp
+            </button>
+        </div>
     </div>
-    <!-- ================= OCR BATCH MODAL ================= -->
-    <div id="ocrModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-gray-100">
+</div>
+<!-- ================= OCR BATCH MODAL (GLASS VERSION) ================= -->
+    <div id="ocrModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-md z-[70] flex items-center justify-center p-4">
+        <div class="bg-white/85 backdrop-blur-xl rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-white/60">
             <!-- Header -->
-            <div class="p-5 bg-gradient-to-r from-teal-600 to-emerald-600 text-white flex justify-between items-center">
+            <div class="p-5 bg-gradient-to-r from-teal-600/90 to-emerald-600/90 backdrop-blur-md text-white flex justify-between items-center border-b border-white/20">
                 <h2 class="text-xl font-bold flex items-center gap-2">
-                   <i class="fa-solid fa-broom text-2xl"></i>
-                    OCR Quét & Nhận Dạng Văn Bản
+                   <i class="fa-solid fa-broom text-2xl drop-shadow-sm"></i>
+                   OCR Quét & Nhận Dạng Văn Bản
                 </h2>
-                <button onclick="closeOCRModal()" class="text-white hover:text-gray-200 text-2xl font-bold">&times;</button>
+                <button onclick="closeOCRModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/20 text-2xl font-bold transition-colors">&times;</button>
             </div>
 
             <!-- Content Area -->
             <div class="p-6 overflow-y-auto flex-1 space-y-4">
                 <!-- Controls bar -->
-                <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div class="flex flex-wrap items-center justify-between gap-3 bg-white/40 backdrop-blur-md p-4 rounded-2xl border border-white/50 shadow-sm">
                     <div class="flex items-center gap-2">
-                        <label class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-xl cursor-pointer text-sm font-semibold transition shadow-md flex items-center gap-2">
+                        <label class="bg-teal-600/90 hover:bg-teal-600 text-white px-4 py-2 rounded-xl cursor-pointer text-sm font-semibold transition shadow-md shadow-teal-600/20 flex items-center gap-2 backdrop-blur-sm">
                             <i class="fa-solid fa-images"></i> Chọn Ảnh (Nhiều)
                             <input type="file" id="ocrFilesInput" multiple accept="image/*" class="hidden" onchange="handleOCRFiles(this.files)">
                         </label>
-                        <span id="ocrStatusText" class="text-sm text-gray-600 font-medium ml-2">Chưa chọn ảnh nào.</span>
+                        <span id="ocrStatusText" class="text-sm text-gray-700 font-medium ml-2">Chưa chọn ảnh nào.</span>
                     </div>
 
                     <!-- Filter / Search OCR Results -->
                     <div class="relative w-full sm:w-64">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                        <input type="text" id="ocrSearchInput" oninput="filterOCRResults()" placeholder="Tìm từ khóa trong chữ OCR..." class="w-full p-2 pl-9 text-sm border border-gray-300 rounded-xl outline-none focus:border-teal-500">
+                        <input type="text" id="ocrSearchInput" oninput="filterOCRResults()" placeholder="Tìm từ khóa trong chữ OCR..." class="w-full p-2 pl-9 text-sm bg-white/60 backdrop-blur-sm border border-gray-200/60 rounded-xl outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/30 shadow-sm transition">
                     </div>
                 </div>
 
 <!-- ================= DROP ZONE ================= -->
 <div id="ocrDropZone"
-class="border-2 border-dashed border-teal-400 rounded-xl p-3 text-center bg-gradient-to-br from-teal-50 to-emerald-50 hover:bg-teal-100 transition cursor-pointer">
+class="border-2 border-dashed border-teal-400/60 rounded-xl p-3 text-center bg-gradient-to-br from-teal-50/50 to-emerald-50/50 backdrop-blur-sm hover:bg-teal-100/50 transition cursor-pointer shadow-sm">
 
-    <i class="fa-solid fa-cloud-arrow-up text-3xl text-teal-500"></i>
+    <i class="fa-solid fa-cloud-arrow-up text-3xl text-teal-500 mb-1 drop-shadow-sm"></i>
 
     <div class="font-bold text-sm text-gray-700">
         Kéo & Thả Ảnh
@@ -1750,7 +2050,7 @@ class="border-2 border-dashed border-teal-400 rounded-xl p-3 text-center bg-grad
 
 <!-- ================= OCR PROGRESS ================= -->
 <div id="ocrProgressContainer"
-class="hidden bg-slate-100 p-3 rounded-xl border border-slate-200 space-y-2">
+class="hidden bg-white/50 backdrop-blur-md p-3 rounded-xl border border-white/60 space-y-2 shadow-sm">
 
 
     <!-- Tiêu đề -->
@@ -1762,7 +2062,7 @@ class="hidden bg-slate-100 p-3 rounded-xl border border-slate-200 space-y-2">
         </span>
 
         <span id="ocrProgressCount"
-        class="text-xs text-gray-600">
+        class="text-xs text-gray-600 font-medium">
             0 / 0 ảnh
         </span>
 
@@ -1773,13 +2073,13 @@ class="hidden bg-slate-100 p-3 rounded-xl border border-slate-200 space-y-2">
     <!-- Ảnh hiện tại -->
     <div>
 
-        <div class="flex justify-between text-[11px] text-gray-600">
+        <div class="flex justify-between text-[11px] text-gray-600 font-medium">
             <span>Ảnh hiện tại</span>
             <span id="ocrImagePercent">0%</span>
         </div>
 
 
-        <div class="bg-gray-200 rounded-full h-1.5 overflow-hidden">
+        <div class="bg-gray-200/60 backdrop-blur-sm rounded-full h-1.5 overflow-hidden border border-gray-300/40">
 
             <div id="ocrImageProgressBar"
             class="bg-emerald-500 h-1.5 rounded-full transition-all"
@@ -1795,13 +2095,13 @@ class="hidden bg-slate-100 p-3 rounded-xl border border-slate-200 space-y-2">
     <!-- Tổng tiến trình -->
     <div>
 
-        <div class="flex justify-between text-[11px] text-gray-600">
+        <div class="flex justify-between text-[11px] text-gray-600 font-medium">
             <span>Tổng</span>
             <span id="ocrProgressPercent">0%</span>
         </div>
 
 
-        <div class="bg-gray-200 rounded-full h-2 overflow-hidden">
+        <div class="bg-gray-200/60 backdrop-blur-sm rounded-full h-2 overflow-hidden border border-gray-300/40">
 
             <div id="ocrProgressBar"
             class="bg-teal-600 h-2 rounded-full transition-all"
@@ -1818,29 +2118,29 @@ class="hidden bg-slate-100 p-3 rounded-xl border border-slate-200 space-y-2">
                 <!-- OCR Items Container -->
                 <div id="ocrResultsList" class="space-y-4">
                     <div class="text-center py-10 text-gray-400">
-                        <i class="fa-regular fa-image text-5xl mb-3"></i>
-                        <p class="text-sm">Hãy tải lên một hoặc nhiều hình ảnh chứa chữ viết để đọc văn bản.</p>
+                        <i class="fa-regular fa-image text-5xl mb-3 drop-shadow-sm"></i>
+                        <p class="text-sm font-medium">Hãy tải lên một hoặc nhiều hình ảnh chứa chữ viết để đọc văn bản.</p>
                     </div>
                 </div>
             </div>
 
             <!-- Footer / Export Buttons -->
-            <div class="p-4 bg-gray-50 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2">
-                <button onclick="insertOCRToEditor()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2">
+            <div class="p-4 bg-white/60 backdrop-blur-md border-t border-white/60 flex flex-wrap items-center justify-between gap-2 shadow-inner">
+                <button onclick="insertOCRToEditor()" class="bg-indigo-600/90 hover:bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow-md shadow-indigo-600/20 flex items-center gap-2 backdrop-blur-sm">
                     <i class="fa-solid fa-file-import"></i> Chèn Tất Cả Vào Editor
                 </button>
 
                 <div class="flex flex-wrap gap-2">
-                    <button onclick="exportOCRExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-1.5">
+                    <button onclick="exportOCRExcel()" class="bg-emerald-600/90 hover:bg-emerald-600 text-white px-3 py-2 rounded-xl text-sm font-semibold transition shadow-md shadow-emerald-600/20 flex items-center gap-1.5 backdrop-blur-sm">
                         <i class="fa-solid fa-file-excel"></i> Xuất Excel (.xlsx)
                     </button>
-                    <button onclick="exportOCRCSV()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-1.5">
+                    <button onclick="exportOCRCSV()" class="bg-blue-600/90 hover:bg-blue-600 text-white px-3 py-2 rounded-xl text-sm font-semibold transition shadow-md shadow-blue-600/20 flex items-center gap-1.5 backdrop-blur-sm">
                         <i class="fa-solid fa-file-csv"></i> Xuất CSV
                     </button>
-                    <button onclick="exportOCRWord()" class="bg-blue-800 hover:bg-blue-900 text-white px-3 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-1.5">
+                    <button onclick="exportOCRWord()" class="bg-blue-800/90 hover:bg-blue-800 text-white px-3 py-2 rounded-xl text-sm font-semibold transition shadow-md shadow-blue-800/20 flex items-center gap-1.5 backdrop-blur-sm">
                         <i class="fa-solid fa-file-word"></i> Xuất Word
                     </button>
-                    <button onclick="closeOCRModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-semibold transition">
+                    <button onclick="closeOCRModal()" class="bg-gray-200/60 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-semibold transition border border-gray-300/40 backdrop-blur-sm">
                         Đóng
                     </button>
                 </div>
@@ -1848,19 +2148,19 @@ class="hidden bg-slate-100 p-3 rounded-xl border border-slate-200 space-y-2">
         </div>
     </div>
 
-    <!-- MODAL CHUYỂN ĐỔI ÂM THANH 2 CHIỀU (9 ĐỊNH DẠNG FULL MULTI-DIRECTIONAL) -->
-    <div id="audioConverterModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl">
-            <h2 class="text-xl font-bold mb-4 text-emerald-600 flex items-center justify-between">
-                <span><i class="fa-solid fa-right-left mr-2 text-sky-500"></i> Chuyển đổi âm thanh</span>
-                <button onclick="closeAudioConverter()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+<!-- ================= MODAL CHUYỂN ĐỔI ÂM THANH 2 CHIỀU (ULTIMATE GLASS VERSION) ================= -->
+    <div id="audioConverterModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all">
+        <div class="bg-white/75 backdrop-blur-2xl border border-white/80 rounded-3xl p-6 w-full max-w-lg shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] max-h-[90vh] overflow-y-auto">
+            <h2 class="text-xl font-bold mb-4 text-emerald-800 flex items-center justify-between pb-3 border-b border-gray-200/60">
+                <span class="flex items-center gap-2.5"><i class="fa-solid fa-right-left text-sky-500 drop-shadow-sm"></i> Chuyển đổi âm thanh</span>
+                <button onclick="closeAudioConverter()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-800 hover:bg-white/60 transition-all"><i class="fa-solid fa-xmark text-xl"></i></button>
             </h2>
 
             <div class="space-y-4">
                 <!-- Chọn Định Dạng Đầu Vào -->
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Chiếu 1 - Định dạng Nguồn (Input):</label>
-                    <select id="inputFormatSelect" onchange="updateOutputOptions()" class="w-full border rounded-xl p-2 outline-none font-medium bg-emerald-50 text-emerald-800">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Chiều 1 - Định dạng Nguồn (Input):</label>
+                    <select id="inputFormatSelect" onchange="updateOutputOptions()" class="w-full border border-white/60 rounded-xl p-2.5 outline-none font-medium bg-emerald-50/50 backdrop-blur-md text-emerald-900 shadow-sm transition focus:ring-2 focus:ring-emerald-500/40">
                         <option value="mp4">MP4 (.mp4)</option>
                         <option value="mp3">MP3 (.mp3)</option>
                         <option value="wav">WAV (.wav)</option>
@@ -1876,106 +2176,237 @@ class="hidden bg-slate-100 p-3 rounded-xl border border-slate-200 space-y-2">
                 <!-- Chọn File Nguồn -->
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Tải File Nguồn Lên:</label>
-                    <input type="file" id="mediaFileInput" accept="video/*,audio/*" class="w-full border p-2 rounded-xl text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                    <input type="file" id="mediaFileInput" accept="video/*,audio/*" class="w-full border border-white/60 bg-white/40 backdrop-blur-md p-2 rounded-xl text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-100/90 file:text-emerald-900 hover:file:bg-emerald-200 shadow-sm transition">
                 </div>
 
                 <!-- Chọn Định Dạng Đầu Ra -->
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Chiều 2 - Định dạng Đích (Output):</label>
-                    <select id="outputFormatSelect" class="w-full border rounded-xl p-2 outline-none font-medium bg-blue-50 text-blue-800">
+                    <select id="outputFormatSelect" class="w-full border border-white/60 rounded-xl p-2.5 outline-none font-medium bg-blue-50/50 backdrop-blur-md text-blue-900 shadow-sm transition focus:ring-2 focus:ring-blue-500/40">
                         <!-- Tự động điền dữ liệu bằng Javascript -->
                     </select>
                 </div>
 
                 <!-- Thanh Tiến Trình -->
-                <div id="conversionProgress" class="hidden">
-                    <div class="flex justify-between text-xs text-gray-500 mb-1">
+                <div id="conversionProgress" class="hidden bg-white/40 backdrop-blur-xl p-3.5 rounded-2xl border border-white/60 shadow-sm space-y-1.5">
+                    <div class="flex justify-between text-xs text-gray-700 font-semibold mb-1">
                         <span id="progressStatus">Đang giải mã và xử lý Audio/Video...</span>
                         <span id="progressPercent">0%</span>
                     </div>
-                    <div class="w-full bg-gray-200 h-2.5 rounded-full overflow-hidden">
-                        <div id="progressBar" class="bg-emerald-600 h-2.5 w-0 transition-all duration-200"></div>
+                    <div class="w-full bg-white/60 backdrop-blur-md h-2.5 rounded-full overflow-hidden border border-white/50">
+                        <div id="progressBar" class="bg-gradient-to-r from-emerald-500 to-teal-500 h-2.5 w-0 transition-all duration-200 shadow-sm"></div>
                     </div>
                 </div>
 
                 <!-- Kết quả & Tải về -->
-                <div id="downloadResult" class="hidden bg-emerald-50 p-4 rounded-xl text-center border border-emerald-100">
-                    <p class="text-emerald-800 font-semibold mb-2"><i class="fa-solid fa-circle-check mr-1"></i> Chuyển đổi thành công!</p>
+                <div id="downloadResult" class="hidden bg-emerald-50/50 backdrop-blur-xl p-4 rounded-2xl text-center border border-emerald-200/60 shadow-sm">
+                    <p class="text-emerald-900 font-semibold mb-2"><i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> Chuyển đổi thành công!</p>
                     <div id="mediaPreviewContainer" class="mb-3"></div>
-                    <a id="audioDownloadBtn" href="#" download class="inline-flex items-center gap-2 bg-emerald-600 text-white px-5 py-2 rounded-xl hover:bg-emerald-700 font-semibold transition">
+                    <a id="audioDownloadBtn" href="#" download class="inline-flex items-center gap-2 bg-emerald-600/90 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-600/25 font-semibold transition backdrop-blur-md">
                         <i class="fa-solid fa-download"></i> Tải File Về
                     </a>
                 </div>
 
-                <div class="flex gap-2 pt-2">
-                    <button onclick="startAudioConversion()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+                <div class="flex gap-2.5 pt-2">
+                    <button onclick="startAudioConversion()" class="flex-1 bg-emerald-600/90 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2 backdrop-blur-md">
                         <i class="fa-solid fa-bolt"></i> Bắt đầu chuyển đổi
                     </button>
-                    <button onclick="closeAudioConverter()" class="bg-gray-200 hover:bg-gray-300 font-semibold px-4 py-2.5 rounded-xl">Đóng</button>
+                    <button onclick="closeAudioConverter()" class="bg-white/50 hover:bg-white/80 text-gray-700 font-semibold px-5 py-2.5 rounded-xl border border-white/70 backdrop-blur-md shadow-sm transition">Đóng</button>
                 </div>
             </div>
         </div>
     </div>
+<!-- MODAL LỰA CHỌN AUDIO & TẢI MP3 -->
+<div id="audioModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-3xl p-6 w-80 shadow-xl text-center">
+        <h3 class="text-lg font-bold mb-4 text-gray-800">🎙 Xử lý file thu âm</h3>
 
-  <!-- MODAL LỰA CHỌN AUDIO & TẢI MP3 -->
-    <div id="audioModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-        <div class="bg-white rounded-3xl p-6 w-80 shadow-xl text-center">
-            <h3 class="text-lg font-bold mb-4 text-gray-800">🎙 Xử lý file thu âm</h3>
-            <div id="audioStatus" class="text-xs text-blue-600 mb-2 font-medium hidden">Đang xử lý dữ liệu...</div>
-            <div class="flex flex-col gap-3">
-                <button onclick="insertAudioToNote()" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl flex items-center justify-center gap-2 font-medium">
-                    <i class="fa-solid fa-pen-to-square"></i> Chèn vào ghi chú
-                </button>
-                <button onclick="downloadAudioAsMP3()" class="bg-orange-600 hover:bg-orange-700 text-white p-3 rounded-xl flex items-center justify-center gap-2 font-medium">
-                    <i class="fa-solid fa-file-arrow-down"></i> Tải xuống .MP3
-                </button>
-                <button onclick="playAudioDirectly()" class="bg-green-600 hover:bg-green-700 text-white p-3 rounded-xl flex items-center justify-center gap-2 font-medium">
-                    <i class="fa-solid fa-play"></i> Phát trực tiếp
-                </button>
-                <button onclick="closeAudioModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-xl mt-1">
-                    Hủy bỏ
-                </button>
-            </div>
+        <div id="audioStatus"
+            class="hidden text-xs text-blue-600 mb-2 font-medium">
+            Đang xử lý dữ liệu...
+        </div>
+
+        <div class="flex flex-col gap-3">
+            <button onclick="insertAudioToNote()"
+                class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl flex items-center justify-center gap-2 font-medium">
+                <i class="fa-solid fa-pen-to-square"></i>
+                Chèn vào ghi chú
+            </button>
+
+            <button onclick="downloadAudioAsMP3()"
+                class="bg-orange-600 hover:bg-orange-700 text-white p-3 rounded-xl flex items-center justify-center gap-2 font-medium">
+                <i class="fa-solid fa-file-arrow-down"></i>
+                Tải xuống .MP3
+            </button>
+
+            <button onclick="playAudioDirectly()"
+                class="bg-green-600 hover:bg-green-700 text-white p-3 rounded-xl flex items-center justify-center gap-2 font-medium">
+                <i class="fa-solid fa-play"></i>
+                Phát trực tiếp
+            </button>
+
+            <button onclick="closeAudioModal()"
+                class="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-xl">
+                Hủy bỏ
+            </button>
         </div>
     </div>
+</div>
 
+<!-- Khu vực dùng để in -->
+<div id="printArea"></div>
+
+<!-- Library -->
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <script>
 
-if(window.pdfjsLib){
-    pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
+//======================
+// PDF.js Worker
+//======================
+
+if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
 }
 
+//======================
+// Biến toàn cục
+//======================
 
-        // --- IndexedDB Logic ---
-        let db;
-        const request = indexedDB.open("NotesDB", 1);
-        request.onupgradeneeded = e => { db = e.target.result; db.createObjectStore("notes", { keyPath: "id" }); };
-      request.onsuccess=async e=>{db=e.target.result;renderNotes();("Notification"in window&&Notification.permission==="default")?Notification.requestPermission().finally(checkReminders):checkReminders();};
+const $ = id => document.getElementById(id);
 
-        const dbAction = (mode, callback) => {
-            const tx = db.transaction("notes", mode);
-            const store = tx.objectStore("notes");
-            return new Promise(resolve => {
-                const req = callback(store);
-                req.onsuccess = () => resolve(req.result);
-                tx.oncomplete = () => {};
-            });
-        };
+let batchDataList = [];
+let qrCodeInstance = null;
+let uploadedLogoBase64 = "";
 
-        const getAllNotes = () => dbAction("readonly", s => s.getAll());
-        const saveNotesToDB = (notes) => {
-            const tx = db.transaction("notes", "readwrite");
-            const store = tx.objectStore("notes");
-            store.clear();
-            notes.forEach(n => store.put(n));
-        };
-        // -----------------------
+//======================
+// Quill Editor
+//======================
 
-        const toolbarOptions=[[{'header':['1','2','3',false]}],[{'size':['small',false,'large','huge']}],['bold','italic','underline','strike'],[{'script':'sub'},{'script':'super'}],[{'color':[]},{'background':[]}],[{'align':[]}],[{'list':'ordered'},{'list':'bullet'}],['link','image']];
-        const quill = new Quill('#editor', { theme: 'snow', modules: { toolbar: toolbarOptions } });
+const quill = new Quill("#editor", {
+    theme: "snow",
+    modules: {
+        toolbar: [
+            [{ header: ["1", "2", "3", false] }],
+            [{ size: ["small", false, "large", "huge"] }],
+            ["bold", "italic", "underline", "strike"],
+            [{ script: "sub" }, { script: "super" }],
+            [{ color: [] }, { background: [] }],
+            [{ align: [] }],
+            [{ list: "ordered" }, { list: "bullet" }],
+            ["link", "image"]
+        ]
+    }
+});
 
+//======================
+// Modal
+//======================
+
+function openBarcode() {
+    $("barcodeModal").classList.remove("hidden");
+}
+
+function closeBarcode() {
+    $("barcodeModal").classList.add("hidden");
+}
+
+function openBatchModal() {
+    $("batchModal").classList.remove("hidden");
+}
+
+function closeBatchModal() {
+    $("batchModal").classList.add("hidden");
+}
+
+function openQRModal() {
+    $("qrStudioModal").classList.remove("hidden");
+    changeQRType();
+    renderQRStudio();
+}
+
+function closeQRModal() {
+    $("qrStudioModal").classList.add("hidden");
+}
+
+//======================
+// Khởi tạo sau khi HTML tải xong
+//======================
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    if ($("batchBarColor") && $("batchBarColorText")) {
+        $("batchBarColor").addEventListener("input", e => {
+            $("batchBarColorText").value = e.target.value;
+        });
+    }
+
+    if ($("batchBgColor") && $("batchBgColorText")) {
+        $("batchBgColor").addEventListener("input", e => {
+            $("batchBgColorText").value = e.target.value;
+        });
+    }
+
+});
+
+//======================
+// IndexedDB
+//======================
+
+let db;
+
+const request = indexedDB.open("NotesDB", 1);
+
+request.onupgradeneeded = e => {
+    db = e.target.result;
+    db.createObjectStore("notes", {
+        keyPath: "id"
+    });
+};
+
+request.onsuccess = async e => {
+    db = e.target.result;
+
+    renderNotes();
+
+    if ("Notification" in window &&
+        Notification.permission === "default") {
+
+        Notification
+            .requestPermission()
+            .finally(checkReminders);
+
+    } else {
+        checkReminders();
+    }
+};
+
+const dbAction = (mode, callback) => {
+    const tx = db.transaction("notes", mode);
+    const store = tx.objectStore("notes");
+
+    return new Promise(resolve => {
+        const req = callback(store);
+
+        req.onsuccess = () => resolve(req.result);
+        tx.oncomplete = () => {};
+    });
+};
+
+const getAllNotes = () =>
+    dbAction("readonly", s => s.getAll());
+
+const saveNotesToDB = notes => {
+
+    const tx = db.transaction("notes", "readwrite");
+    const store = tx.objectStore("notes");
+
+    store.clear();
+
+    notes.forEach(n => store.put(n));
+};
 
 // FILE ATTACHMENT BLOT (OneNote Style)
 //====================================================
@@ -3773,147 +4204,450 @@ async function exportMergedPdf(){
 
             return new Blob([arrayBuffer], { type: mimeType });
         }
-// ================= QR CODE =================
 
-let qrCode=null;
-
-function openQR(){
-    document.getElementById("qrModal").classList.remove("hidden");
-}
-
-function closeQR(){
-    document.getElementById("qrModal").classList.add("hidden");
-}
-
-function createQR(){
-
-    const text=document.getElementById("qrText").value || "Ghi chú cá nhân";
-
-    const color=document.getElementById("qrColor").value;
-
-    if(typeof QRCode==="undefined"){
-        alert("Chưa tải thư viện QR Code!");
-        return;
+    // --- XỬ LÝ QUẢN LÝ LOẠI NỘI DUNG MÃ QR (Đã thêm tùy chọn Mặc định - Nhập nội dung văn bản) ---
+    function changeQRType() {
+        const type = document.getElementById('qrContentType').value;
+        const container = document.getElementById('qrDynamicInputs');
+        
+        let html = '';
+        if (type === 'text') {
+            html = `
+                <label class="block text-xs font-bold text-gray-600 dark:text-gray-300">Nội dung văn bản / Thông tin tùy chỉnh:</label>
+                <textarea id="qrInputText" placeholder="Nhập bất kỳ nội dung văn bản nào bạn muốn..." class="w-full border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-sm bg-white/80 dark:bg-slate-800 dark:text-white outline-none h-20 shadow-sm"></textarea>
+            `;
+        } else if (type === 'url') {
+            html = `
+                <label class="block text-xs font-bold text-gray-600 dark:text-gray-300">Đường dẫn Website (HTTPS):</label>
+                <input type="url" id="qrInputURL" value="https://" class="w-full border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-sm bg-white/80 dark:bg-slate-800 dark:text-white outline-none shadow-sm">
+            `;
+        } else if (type === 'vcard') {
+            html = `
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="vName" placeholder="Họ và Tên *" class="border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm outline-none">
+                    <input type="text" id="vPhone" placeholder="Số điện thoại *" class="border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm outline-none">
+                    <input type="email" id="vEmail" placeholder="Email" class="border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm outline-none">
+                    <input type="text" id="vOrg" placeholder="Công ty / Tổ chức" class="border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm outline-none">
+                </div>
+            `;
+        } else if (type === 'wifi') {
+            html = `
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="wfSSID" placeholder="Tên Wi-Fi (SSID) *" class="border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm outline-none">
+                    <input type="password" id="wfPass" placeholder="Mật khẩu" class="border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm outline-none">
+                    <select id="wfType" class="border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs col-span-2 bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm outline-none">
+                        <option value="WPA">WPA/WPA2</option>
+                        <option value="WEP">WEP</option>
+                        <option value="nopass">Không mật khẩu</option>
+                    </select>
+                </div>
+            `;
+        } else if (type === 'email') {
+            html = `
+                <input type="email" id="emTo" placeholder="Địa chỉ email nhận *" class="w-full border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm mb-2 outline-none">
+                <input type="text" id="emSub" placeholder="Tiêu đề email" class="w-full border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm mb-2 outline-none">
+                <textarea id="emBody" placeholder="Nội dung thư..." class="w-full border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm h-16 outline-none"></textarea>
+            `;
+        } else if (type === 'sms') {
+            html = `
+                <input type="text" id="smsPhone" placeholder="Số điện thoại nhận SMS *" class="w-full border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm mb-2 outline-none">
+                <textarea id="smsBody" placeholder="Nội dung tin nhắn..." class="w-full border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm h-16 outline-none"></textarea>
+            `;
+        } else if (type === 'social') {
+            html = `
+                <label class="block text-xs font-bold text-gray-600 dark:text-gray-300">Link Mạng Xã Hội:</label>
+                <input type="url" id="qrInputSocial" placeholder="https://facebook.com/trang-ca-nhan" class="w-full border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-sm bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm outline-none">
+            `;
+        } else if (type === 'bank') {
+            html = `
+                <div class="grid grid-cols-2 gap-2">
+                    <select id="bankId" class="border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs col-span-2 bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm outline-none">
+                        <option value="970436">Vietcombank (VCB)</option>
+                        <option value="970415">VietinBank (CTG)</option>
+                        <option value="970418">BIDV</option>
+                        <option value="970405">Agribank (VBA)</option>
+                        <option value="970422">MB Bank (MB)</option>
+                        <option value="970407">Techcombank (TCB)</option>
+                        <option value="970416">ACB</option>
+                        <option value="970432">VPBank (VPB)</option>
+                    </select>
+                    <input type="text" id="bankAccount" placeholder="Số tài khoản ngân hàng *" class="border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs col-span-2 bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm outline-none">
+                    <input type="number" id="bankAmount" placeholder="Số tiền (VNĐ - Không bắt buộc)" class="border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm outline-none">
+                    <input type="text" id="bankNote" placeholder="Nội dung chuyển khoản" class="border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs bg-white/80 dark:bg-slate-800 dark:text-white shadow-sm outline-none">
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+        if(typeof renderQRStudio === 'function' && document.getElementById('qrStudioModal') && !document.getElementById('qrStudioModal').classList.contains('hidden')) {
+            renderQRStudio();
+        }
     }
 
-    const qrBox=document.getElementById("qrcode");
-
-    qrBox.innerHTML="";
-
-    qrCode=new QRCode(qrBox,{
-        text:text,
-        width:200,
-        height:200,
-        colorDark:color,
-        colorLight:"#ffffff"
+    // Đọc file Logo người dùng tải lên
+    document.getElementById('qrLogoInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                uploadedLogoBase64 = evt.target.result;
+                renderQRStudio();
+            };
+            reader.readAsDataURL(file);
+        }
     });
 
-}
+    // Lấy chuỗi dữ liệu thực tế dựa theo form
+    function buildQRContent() {
+        const type = document.getElementById('qrContentType').value;
+        let content = "Nội dung mặc định";
 
-function downloadQR(){
+        if (type === 'text') {
+            content = document.getElementById('qrInputText')?.value.trim() || "Nội dung văn bản";
+        } else if (type === 'url') {
+            content = document.getElementById('qrInputURL')?.value.trim() || "https://google.com";
+        } else if (type === 'vcard') {
+            const name = document.getElementById('vName')?.value || '';
+            const phone = document.getElementById('vPhone')?.value || '';
+            const email = document.getElementById('vEmail')?.value || '';
+            const org = document.getElementById('vOrg')?.value || '';
+            content = `BEGIN:VCARD\nVERSION:3.0\nN:${name}\nTEL:${phone}\nEMAIL:${email}\nORG:${org}\nEND:VCARD`;
+        } else if (type === 'wifi') {
+            const ssid = document.getElementById('wfSSID')?.value || '';
+            const pass = document.getElementById('wfPass')?.value || '';
+            const enc = document.getElementById('wfType')?.value || 'WPA';
+            content = `WIFI:S:${ssid};T:${enc};P:${pass};;`;
+        } else if (type === 'email') {
+            const to = document.getElementById('emTo')?.value || '';
+            const sub = encodeURIComponent(document.getElementById('emSub')?.value || '');
+            const body = encodeURIComponent(document.getElementById('emBody')?.value || '');
+            content = `mailto:${to}?subject=${sub}&body=${body}`;
+        } else if (type === 'sms') {
+            const phone = document.getElementById('smsPhone')?.value || '';
+            const body = encodeURIComponent(document.getElementById('smsBody')?.value || '');
+            content = `sms:${phone}?body=${body}`;
+        } else if (type === 'social') {
+            content = document.getElementById('qrInputSocial')?.value.trim() || 'https://facebook.com';
+        } else if (type === 'bank') {
+            const bankId = document.getElementById('bankId')?.value || '970436';
+            const account = document.getElementById('bankAccount')?.value || '';
+            const amount = document.getElementById('bankAmount')?.value || '';
+            const note = document.getElementById('bankNote')?.value || '';
+            content = `https://img.vietqr.io/image/${bankId}-${account}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(note)}`;
+        }
 
-    const img=document.querySelector("#qrcode img");
+        const utm = document.getElementById('qrUTM').value.trim();
+        if (utm && (type === 'url' || type === 'social') && content.includes('http')) {
+            content += (content.includes('?') ? '&' : '?') + utm;
+        }
 
-    if(!img){
-        alert("Vui lòng tạo QR trước!");
-        return;
+        return content;
     }
 
-    const link=document.createElement("a");
+    // Render mã QR theo cấu hình tùy chỉnh
+    function renderQRStudio() {
+        const content = buildQRContent();
+        const errLevel = document.getElementById('qrErrorLevel').value;
+        const dotStyle = document.getElementById('qrDotStyle').value;
+        const cornerStyle = document.getElementById('qrCornerStyle').value;
+        const dotColor = document.getElementById('qrDotColor').value;
+        const bgColor = document.getElementById('qrBgColor').value;
+        const ctaText = document.getElementById('qrCTA').value.trim();
 
-    link.href=img.src;
+        const container = document.getElementById('qrCanvasContainer');
+        container.innerHTML = "";
 
-    link.download="QRCode.png";
+        const options = {
+            width: 200,
+            height: 200,
+            data: content,
+            margin: 5,
+            qrOptions: {
+                errorCorrectionLevel: errLevel
+            },
+            dotsOptions: {
+                color: dotColor,
+                type: dotStyle
+            },
+            backgroundOptions: {
+                color: bgColor,
+            },
+            cornersSquareOptions: {
+                type: cornerStyle,
+                color: dotColor
+            },
+            image: uploadedLogoBase64 ? uploadedLogoBase64 : undefined,
+            imageOptions: {
+                hideBackgroundDots: true,
+                imageSize: 0.4,
+                margin: 5
+            }
+        };
 
-    link.click();
+        qrCodeInstance = new QRCodeStyling(options);
+        qrCodeInstance.append(container);
 
-}
-// ================= BARCODE =================
-function openBarcode(){
-    document.getElementById("barcodeModal").classList.remove("hidden");
-}
-
-function closeBarcode(){
-    document.getElementById("barcodeModal").classList.add("hidden");
-}
-
-function createBarcode(){
-
-    let text=document.getElementById("barcodeText").value.trim();
-
-    const type=document.getElementById("barcodeType").value;
-
-    const color=document.getElementById("barcodeColor").value;
-
-    const bg=document.getElementById("barcodeBg").value;
-
-    if(!text){
-        alert("Nhập dữ liệu.");
-        return;
+        const ctaDisplay = document.getElementById('qrCTADisplay');
+        if (ctaText) {
+            ctaDisplay.textContent = ctaText;
+            ctaDisplay.classList.remove('hidden');
+        } else {
+            ctaDisplay.classList.add('hidden');
+        }
     }
 
-    if(type==="EAN13" && !/^\d{12,13}$/.test(text)){
-        alert("EAN13 phải gồm 12 hoặc 13 số.");
-        return;
+    function downloadQR(format) {
+        if (!qrCodeInstance) return;
+        qrCodeInstance.download({ name: "qr-code-pro", extension: format });
     }
 
-    JsBarcode("#barcodeSvg",text,{
-        format:type,
-        lineColor:color,
-        background:bg,
-        width:2,
-        height:80,
-        margin:10,
-        displayValue:true
-    });
+ // --- TẠO MÃ HÀNG LOẠT SẮC NÉT (CÓ MÀU SẮC) ---
+        function generateBatchCodes() {
+            const input = document.getElementById('batchInput').value.trim();
+            const type = document.getElementById('batchType').value;
+            const barColor = document.getElementById('batchBarColor').value.replace('#', '');
+            const bgColor = document.getElementById('batchBgColor').value.replace('#', '');
+            const lines = input.split('\n').map(l => l.trim()).filter(l => l !== "");
 
-}
-// DÁN HÀM NÀY NGAY TẠI ĐÂY
-function downloadBarcode(){
+            if (lines.length === 0) return alert("Vui lòng nhập danh sách dữ liệu!");
 
-    const svg=document.getElementById("barcodeSvg");
+            const container = document.getElementById('batchContainer');
+            container.innerHTML = "";
+            batchDataList = [];
 
-    if(!svg.innerHTML){
-        alert("Hãy tạo Barcode trước.");
-        return;
+            lines.forEach((text) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "bg-white/80 p-3 border border-gray-200/60 rounded-xl flex flex-col items-center justify-center text-center h-32 shadow-sm";
+                
+                const canvas = document.createElement('canvas');
+                try {
+                    bwipjs.toCanvas(canvas, {
+                        bcid: type,
+                        text: text,
+                        scale: 4, 
+                        height: type === 'qrcode' || type === 'datamatrix' || type === 'azteccode' ? 20 : 10,
+                        includetext: true,
+                        textxalign: 'center',
+                        barcolor: barColor,   // Màu của vạch/mã QR
+                        backgroundcolor: bgColor // Màu nền
+                    });
+
+                    const dataUrlPNG = canvas.toDataURL('image/png');
+                    
+                    const jpgCanvas = document.createElement('canvas');
+                    jpgCanvas.width = canvas.width;
+                    jpgCanvas.height = canvas.height;
+                    const ctx = jpgCanvas.getContext('2d');
+                    ctx.fillStyle = '#' + bgColor;
+                    ctx.fillRect(0, 0, jpgCanvas.width, jpgCanvas.height);
+                    ctx.drawImage(canvas, 0, 0);
+                    const dataUrlJPG = jpgCanvas.toDataURL('image/jpeg', 0.95);
+
+                    batchDataList.push({ 
+                        text, 
+                        png: dataUrlPNG, 
+                        jpg: dataUrlJPG,
+                        width: canvas.width,
+                        height: canvas.height
+                    });
+
+                    const img = document.createElement('img');
+                    img.src = dataUrlPNG;
+                    img.className = "w-[100px] h-[100px] object-contain mb-2";
+                    
+                    const label = document.createElement('span');
+                    label.className = "text-xs font-mono truncate w-full text-gray-600";
+                    label.innerText = text;
+
+                    itemDiv.appendChild(img);
+                    itemDiv.appendChild(label);
+                    container.appendChild(itemDiv);
+                } catch (err) {
+                    itemDiv.innerHTML = `<span class="text-xs text-red-500 font-bold">Lỗi dữ liệu: ${text}</span>`;
+                    container.appendChild(itemDiv);
+                }
+            });
+
+            document.getElementById('batchCount').innerText = batchDataList.length;
+            document.getElementById('batchPreviewSection').classList.remove('hidden');
+        }
+
+        function printBatchCodes() {
+            if (batchDataList.length === 0) return alert("Chưa có dữ liệu để in!");
+
+            const printArea = document.getElementById('printArea');
+            printArea.innerHTML = "";
+
+            batchDataList.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "print-card";
+                
+                const img = document.createElement('img');
+                img.src = item.png;
+                
+                const txt = document.createElement('div');
+                txt.style.fontSize = "11px";
+                txt.style.fontFamily = "monospace";
+                txt.style.marginTop = "4px";
+                txt.innerText = item.text;
+
+                card.appendChild(img);
+                card.appendChild(txt);
+                printArea.appendChild(card);
+            });
+
+            window.print();
+        }
+
+        async function exportBatchToWord() {
+            if (batchDataList.length === 0) return alert("Chưa có dữ liệu để xuất!");
+
+            const { Document, Packer, Paragraph, TextRun, ImageRun, Table, TableRow, TableCell, WidthType, AlignmentType, BorderStyle } = window.docx;
+
+            const cols = 3;
+            const tableRows = [];
+            let currentRowCells = [];
+
+            const cellBorders = {
+                top: { style: BorderStyle.SINGLE, size: 2, color: "CCCCCC" },
+                bottom: { style: BorderStyle.SINGLE, size: 2, color: "CCCCCC" },
+                left: { style: BorderStyle.SINGLE, size: 2, color: "CCCCCC" },
+                right: { style: BorderStyle.SINGLE, size: 2, color: "CCCCCC" },
+            };
+
+            for (let i = 0; i < batchDataList.length; i++) {
+                const item = batchDataList[i];
+                
+                const response = await fetch(item.png);
+                const buffer = await response.arrayBuffer();
+
+                let imgWidth = 100;
+                let imgHeight = 100;
+
+                const cell = new TableCell({
+                    width: { size: 100 / cols, unit: WidthType.PERCENTAGE },
+                    margins: { top: 150, bottom: 150, left: 150, right: 150 },
+                    borders: cellBorders,
+                    children: [
+                        new Paragraph({
+                            alignment: AlignmentType.CENTER,
+                            spacing: { after: 100 },
+                            children: [
+                                new ImageRun({
+                                    data: buffer,
+                                    transformation: { width: imgWidth, height: imgHeight }
+                                })
+                            ]
+                        }),
+                        new Paragraph({
+                            alignment: AlignmentType.CENTER,
+                            children: [
+                                new TextRun({ text: item.text, size: 18, font: "Courier New" })
+                            ]
+                        })
+                    ]
+                });
+
+                currentRowCells.push(cell);
+
+                if (currentRowCells.length === cols) {
+                    tableRows.push(new TableRow({ children: currentRowCells }));
+                    currentRowCells = [];
+                }
+            }
+
+            if (currentRowCells.length > 0) {
+                while (currentRowCells.length < cols) {
+                    currentRowCells.push(new TableCell({
+                        width: { size: 100 / cols, unit: WidthType.PERCENTAGE },
+                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                        children: [new Paragraph({})]
+                    }));
+                }
+                tableRows.push(new TableRow({ children: currentRowCells }));
+            }
+
+            const doc = new Document({
+                sections: [{
+                    properties: {
+                        page: {
+                            margin: { top: 720, bottom: 720, left: 720, right: 720 }
+                        }
+                    },
+                    children: [
+                        new Paragraph({
+                            children: [
+                                new TextRun({ text: "DANH SÁCH MÃ VẠCH / QR CODE HD", bold: true, size: 28 })
+                            ],
+                            alignment: AlignmentType.CENTER,
+                            spacing: { after: 300 }
+                        }),
+                        new Table({
+                            rows: tableRows,
+                            width: { size: 100, unit: WidthType.PERCENTAGE }
+                        })
+                    ]
+                }]
+            });
+
+            Packer.toBlob(doc).then(blob => {
+                saveAs(blob, "Danh_Sach_Ma_Vach_HD.docx");
+            });
+        }
+
+        function exportBatchToZip() {
+            if (batchDataList.length === 0) return alert("Chưa có dữ liệu để tải!");
+
+            const zip = new JSZip();
+            const format = document.getElementById('batchImgFormat').value;
+            const folder = zip.folder("Ma_Hinh_Anh_HD");
+
+            batchDataList.forEach((item, index) => {
+                const isPng = format === 'PNG';
+                const dataUrl = isPng ? item.png : item.jpg;
+                const base64Data = dataUrl.replace(/^data:image\/(png|jpeg);base64,/, "");
+                const fileName = `${index + 1}_${item.text.replace(/[^a-zA-Z0-9]/g, "_")}.${isPng ? 'png' : 'jpg'}`;
+                folder.file(fileName, base64Data, { base64: true });
+            });
+
+            zip.generateAsync({ type: "blob" }).then(function(content) {
+                saveAs(content, `Danh_Sach_Ma_HD_${format}.zip`);
+            });
+        }
+
+    // --- BARCODE FUNCTIONS ---
+    function createBarcode() {
+        const text = document.getElementById('barcodeText').value || '123456789';
+        const type = document.getElementById('barcodeType').value;
+        const lineColor = document.getElementById('barcodeLineColor').value || '#000000';
+        const bgColor = document.getElementById('barcodeBgColor').value || '#ffffff';
+
+        try {
+            JsBarcode("#barcodeCanvas", text, {
+                format: type,
+                lineColor: lineColor,
+                background: bgColor,
+                width: 2,
+                height: 100,
+                displayValue: true
+            });
+        } catch (e) {
+            console.error("Lỗi tạo mã vạch:", e);
+        }
     }
 
-    const serializer=new XMLSerializer();
+    function downloadSingleBarcode() {
+        const canvas = document.getElementById('barcodeCanvas');
+        const link = document.createElement('a');
+        link.download = 'barcode-hd.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
 
-    const source=serializer.serializeToString(svg);
-
-    const img=new Image();
-
-    img.onload=function(){
-
-        const canvas=document.createElement("canvas");
-
-        canvas.width=img.width;
-
-        canvas.height=img.height;
-
-        const ctx=canvas.getContext("2d");
-
-        // Nên lấy màu nền đang chọn
-        ctx.fillStyle=document.getElementById("barcodeBg").value;
-
-        ctx.fillRect(0,0,canvas.width,canvas.height);
-
-        ctx.drawImage(img,0,0);
-
-        const a=document.createElement("a");
-
-        a.download="Barcode.png";
-
-        a.href=canvas.toDataURL("image/png");
-
-        a.click();
-
+    // Khởi tạo mặc định khi load trang
+    window.onload = function() {
+        createBarcode();
     };
 
-    img.src="data:image/svg+xml;base64,"+btoa(unescape(encodeURIComponent(source)));
-
-}
 // ===== SYMBOL =====
 function openSymbolModal(){
 
