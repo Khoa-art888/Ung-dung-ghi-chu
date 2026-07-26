@@ -620,6 +620,159 @@ to{
     </style>
 </head>
 <body class="bg-gray-100 p-4 md:p-10 font-sans">
+    <!-- ================= AUTH CONTAINER SECTION ================= -->
+    <div id="authContainer" class="max-w-md mx-auto bg-white p-8 rounded-3xl shadow-md border border-gray-100 my-10 hidden">
+        <!-- Form Đăng Nhập -->
+        <div id="loginForm" class="">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center"><i class="fa-solid fa-lock text-blue-500 mr-2"></i>Đăng Nhập</h2>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-600 mb-1">Tên cá nhân</label>
+                <input type="text" id="loginUsername" class="w-full p-3 border rounded-xl outline-none focus:border-blue-500" placeholder="Nhập tên cá nhân của bạn...">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-600 mb-1">Mật khẩu</label>
+                <input type="password" id="loginPassword" class="w-full p-3 border rounded-xl outline-none focus:border-blue-500" placeholder="Nhập mật khẩu...">
+            </div>
+            <div class="flex items-center justify-between mb-6">
+                <label class="flex items-center text-sm text-gray-600 cursor-pointer">
+                    <input type="checkbox" id="rememberMe" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Ghi nhớ đăng nhập
+                </label>
+                <button onclick="switchAuthView('forgot')" class="text-sm text-blue-500 hover:underline">Quên mật khẩu?</button>
+            </div>
+            <button onclick="handleLogin()" class="w-full bg-blue-600 text-white p-3 rounded-xl hover:bg-blue-700 transition font-bold mb-4">Đăng Nhập</button>
+            <p class="text-sm text-center text-gray-500">Chưa có tài khoản? <button onclick="switchAuthView('register')" class="text-blue-500 hover:underline font-medium">Đăng ký ngay</button></p>
+        </div>
+
+        <!-- Form Đăng Ký -->
+        <div id="registerForm" class="hidden">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center"><i class="fa-solid fa-user-plus text-green-500 mr-2"></i>Đăng Ký Tài Khoản</h2>
+            
+            <!-- Upload ảnh đại diện cá nhân -->
+            <div class="mb-4 flex flex-col items-center">
+                <label class="block text-sm font-medium text-gray-600 mb-2">Ảnh đại diện cá nhân</label>
+                <div class="relative w-20 h-20 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50 cursor-pointer hover:border-green-500 transition" onclick="document.getElementById('regAvatarInput').click()">
+                    <img id="regAvatarPreview" class="w-full h-full object-cover hidden">
+                    <div id="regAvatarPlaceholder" class="text-center text-gray-400">
+                        <i class="fa-solid fa-camera text-xl"></i>
+                    </div>
+                </div>
+                <input type="file" id="regAvatarInput" class="hidden" accept="image/*" onchange="previewRegisterAvatar(this)">
+                <span class="text-xs text-gray-400 mt-1">Bấm để tải ảnh lên</span>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-600 mb-1">Tên cá nhân</label>
+                <input type="text" id="regMain" class="w-full p-3 border rounded-xl outline-none focus:border-green-500" placeholder="Nhập tên hiển thị của bạn...">
+            </div>
+
+            <!-- Email hoặc SĐT dùng để khôi phục mật khẩu -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-600 mb-1">Email hoặc Số điện thoại (Dùng để khôi phục mật khẩu)</label>
+                <input type="text" id="regProtect" class="w-full p-3 border rounded-xl outline-none focus:border-green-500" placeholder="Nhập email hoặc số điện thoại khôi phục...">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-600 mb-1">Mật khẩu mới</label>
+                <input type="password" id="regPassword" class="w-full p-3 border rounded-xl outline-none focus:border-green-500" placeholder="Tối thiểu 6 ký tự...">
+            </div>
+            <button onclick="handleRegister()" class="w-full bg-green-600 text-white p-3 rounded-xl hover:bg-green-700 transition font-bold mb-4">Đăng Ký</button>
+            <p class="text-sm text-center text-gray-500">Đã có tài khoản? <button onclick="switchAuthView('login')" class="text-blue-500 hover:underline font-medium">Đăng nhập</button></p>
+        </div>
+
+        <!-- Form Quên / Thay Đổi Mật Khẩu -->
+        <div id="forgotForm" class="hidden">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center"><i class="fa-solid fa-key text-orange-500 mr-2"></i>Đặt Lại Mật Khẩu</h2>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-600 mb-1">Tên cá nhân cần khôi phục</label>
+                <input type="text" id="forgotUsername" class="w-full p-3 border rounded-xl outline-none focus:border-orange-500" placeholder="Nhập tên cá nhân...">
+            </div>
+            <div id="protectVerifySection" class="mb-4">
+                <label class="block text-sm font-medium text-gray-600 mb-1">Email hoặc Số điện thoại đã đăng ký</label>
+                <input type="text" id="forgotProtectInput" class="w-full p-3 border rounded-xl outline-none focus:border-orange-500" placeholder="Nhập email hoặc SĐT khôi phục...">
+            </div>
+            <div id="otpSection" class="mb-4 hidden">
+                <div class="bg-amber-50 border border-amber-200 text-amber-700 p-2 rounded-xl text-xs mb-2 text-center">
+                    Mã xác thực OTP giả định: <span id="mockOtpDisplay" class="font-bold text-sm text-red-600 tracking-wider"></span>
+                    <div class="mt-1 text-gray-500">Mã có hiệu lực trong: <span id="otpCountdown" class="font-bold text-orange-600">60</span> giây</div>
+                </div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">Mã xác thực (OTP)</label>
+                <input type="text" id="forgotOtp" class="w-full p-3 border rounded-xl outline-none focus:border-orange-500" placeholder="Nhập mã xác thực...">
+            </div>
+            <div id="newPasswordSection" class="mb-4 hidden">
+                <label class="block text-sm font-medium text-gray-600 mb-1">Mật khẩu mới</label>
+                <input type="password" id="forgotNewPassword" class="w-full p-3 border rounded-xl outline-none focus:border-orange-500" placeholder="Nhập mật khẩu mới...">
+            </div>
+            <button id="forgotActionBtn" onclick="sendOtpRequest()" class="w-full bg-orange-500 text-white p-3 rounded-xl hover:bg-orange-600 transition font-bold mb-4">Gửi yêu cầu OTP</button>
+            <button onclick="switchAuthView('login')" class="w-full bg-gray-200 text-gray-700 p-2 rounded-xl hover:bg-gray-300 transition text-sm">Quay lại đăng nhập</button>
+        </div>
+    </div>
+
+    <!-- ================= MAIN APP INTERFACE SECTION ================= -->
+    <div id="mainAppContainer" class="max-w-4xl mx-auto bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hidden">
+        <h1 class="text-2xl font-bold mb-6 text-gray-800 flex items-center justify-between flex-wrap gap-4">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-blue-500"></i> Ghi Chú Cá Nhân</span>
+            
+            <div class="flex items-center gap-4">
+                <!-- User Profile Dropdown & Log out -->
+                <div class="relative">
+                    <button onclick="toggleUserMenu()" class="flex items-center justify-center w-10 h-10 bg-slate-100 rounded-full text-slate-700 border hover:bg-slate-200 transition overflow-hidden" title="Tài khoản">
+                        <img id="userAvatarBtn" class="w-full h-full object-cover hidden">
+                        <i id="userIconBtn" class="fa-solid fa-circle-user text-blue-500 text-xl"></i>
+                    </button>
+                    <div id="userMenuDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white border rounded-2xl shadow-xl p-4 z-50">
+                        <div class="flex items-center gap-3 mb-3 pb-3 border-b">
+                            <div class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center border">
+                                <img id="userAvatarMenu" class="w-full h-full object-cover hidden">
+                                <i id="userIconMenu" class="fa-solid fa-circle-user text-blue-500 text-2xl"></i>
+                            </div>
+                            <div class="overflow-hidden">
+                                <p class="text-xs text-gray-400">Đăng nhập với tên</p>
+                                <span id="currentUsername" class="text-sm font-semibold text-slate-700 truncate block">Tên cá nhân</span>
+                            </div>
+                        </div>
+                        <button onclick="handleLogout()" class="w-full flex items-center gap-2 text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-xl transition text-sm font-medium">
+                            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button onclick="toggleView('grid')" class="text-sm p-2 bg-gray-100 rounded-lg"><i class="fa-solid fa-border-all"></i></button>
+                    <button onclick="toggleView('list')" class="text-sm p-2 bg-gray-100 rounded-lg"><i class="fa-solid fa-list"></i></button>
+                </div>
+            </div>
+        </h1>
+
+        <div id="statsContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"></div>
+        
+        <div class="flex flex-wrap gap-2 mb-4">
+            <div class="relative flex-1"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="searchInput" oninput="renderNotes()" placeholder="Tìm kiếm ghi chú..." class="w-full p-2 pl-10 border rounded-xl outline-none"></div>
+            
+            <div class="relative">
+                <button onclick="toggleSortMenu()" class="p-2 border rounded-xl hover:bg-gray-100 text-gray-600">
+                    <i class="fa-solid fa-arrow-down-wide-short"></i>
+                </button>
+
+                <div id="sortMenu" class="hidden absolute z-50 mt-2 right-0 bg-white border rounded-xl shadow-xl p-2 w-48">
+                    <button onclick="changeSort('newest')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
+                        <i class="fa-solid fa-clock text-blue-500 mr-2"></i> Mới nhất
+                    </button>
+                    <button onclick="changeSort('oldest')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
+                        <i class="fa-solid fa-clock-rotate-left text-gray-500 mr-2"></i> Cũ nhất
+                    </button>
+                    <button onclick="changeSort('title')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
+                        <i class="fa-solid fa-font text-green-500 mr-2"></i> Theo tiêu đề
+                    </button>
+                    <button onclick="changeSort('date')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
+                        <i class="fa-solid fa-calendar-days text-red-500 mr-2"></i> Theo ngày hẹn
+                    </button>
+                    <button onclick="changeSort('color')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
+                        <i class="fa-solid fa-palette text-purple-500 mr-2"></i> Theo màu
+                    </button>
+                </div>
+            </div>
+        </div>
+       <input id="title" type="text" placeholder="Tiêu đề..." class="w-full p-3 mb-2 border rounded-xl outline-none">
     <div class="max-w-4xl mx-auto bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
         <h1 class="text-2xl font-bold mb-6 text-gray-800 flex items-center justify-between">
             <span class="flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-blue-500"></i> Ghi Chú Cá Nhân</span>
@@ -2280,7 +2433,313 @@ const $ = id => document.getElementById(id);
 let batchDataList = [];
 let qrCodeInstance = null;
 let uploadedLogoBase64 = "";
+//======================
+// AUTH LOGIN
+//======================
+       let activeUser = null;
+        let generatedOtp = null;
+        let tempRegAvatarBase64 = "";
+        let otpTimerInterval = null; // Biến lưu khoảng thời gian đếm ngược OTP
 
+        // Xử lý preview ảnh đại diện lúc đăng ký
+        function previewRegisterAvatar(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    tempRegAvatarBase64 = e.target.result;
+                    const preview = document.getElementById('regAvatarPreview');
+                    const placeholder = document.getElementById('regAvatarPlaceholder');
+                    preview.src = tempRegAvatarBase64;
+                    preview.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function maskInfo(val) {
+            if (!val) return "";
+            if (val.includes('@')) {
+                const parts = val.split('@');
+                const name = parts[0];
+                if (name.length <= 3) return name[0] + 'xxxxxxxxx@' + parts[1];
+                return name.substring(0, 3) + 'xxxxxxxxxxx@' + parts[1];
+            } else {
+                if (val.length <= 4) return val.substring(0, 2) + 'xxxxxxxxx';
+                return val.substring(0, 2) + 'xxxxxxxxxxx';
+            }
+        }
+
+        function toggleUserMenu() {
+            const menu = document.getElementById('userMenuDropdown');
+            menu.classList.toggle('hidden');
+        }
+
+        window.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('userMenuDropdown');
+            const userBtn = dropdown?.previousElementSibling;
+            if (dropdown && !dropdown.classList.contains('hidden') && !dropdown.contains(e.target) && !userBtn.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+function checkAuthStatus() {
+
+    const remembered = localStorage.getItem("rememberedUser");
+    const session = sessionStorage.getItem("activeUser");
+    const user = remembered || session;
+
+    const authContainer = document.getElementById("authContainer");
+    const mainAppContainer = document.getElementById("mainAppContainer");
+
+    if (user) {
+
+        activeUser = user;
+
+        // Hiển thị tên người dùng
+        const currentUsername = document.getElementById("currentUsername");
+        if (currentUsername) {
+            currentUsername.innerText = user;
+        }
+
+        // Đọc dữ liệu user
+        const users = JSON.parse(localStorage.getItem("appUsers") || "{}");
+        const userData = users[user];
+
+        // Hiển thị avatar nếu có
+        if (userData && userData.avatar) {
+
+            const avatarBtn = document.getElementById("userAvatarBtn");
+            const iconBtn = document.getElementById("userIconBtn");
+
+            const avatarMenu = document.getElementById("userAvatarMenu");
+            const iconMenu = document.getElementById("userIconMenu");
+
+            if (avatarBtn) {
+                avatarBtn.src = userData.avatar;
+                avatarBtn.classList.remove("hidden");
+            }
+
+            if (iconBtn) {
+                iconBtn.classList.add("hidden");
+            }
+
+            if (avatarMenu) {
+                avatarMenu.src = userData.avatar;
+                avatarMenu.classList.remove("hidden");
+            }
+
+            if (iconMenu) {
+                iconMenu.classList.add("hidden");
+            }
+
+        } else {
+
+            // Không có avatar thì hiện icon mặc định
+            const avatarBtn = document.getElementById("userAvatarBtn");
+            const iconBtn = document.getElementById("userIconBtn");
+
+            const avatarMenu = document.getElementById("userAvatarMenu");
+            const iconMenu = document.getElementById("userIconMenu");
+
+            if (avatarBtn) avatarBtn.classList.add("hidden");
+            if (iconBtn) iconBtn.classList.remove("hidden");
+
+            if (avatarMenu) avatarMenu.classList.add("hidden");
+            if (iconMenu) iconMenu.classList.remove("hidden");
+        }
+
+        // Chuyển sang giao diện chính
+        if (authContainer) authContainer.classList.add("hidden");
+        if (mainAppContainer) mainAppContainer.classList.remove("hidden");
+
+        // Khởi tạo ghi chú nếu có
+        if (typeof initAppNotes === "function") {
+            initAppNotes();
+        }
+
+    } else {
+
+        // Chưa đăng nhập
+        if (mainAppContainer) {
+            mainAppContainer.classList.add("hidden");
+        }
+
+        if (authContainer) {
+            authContainer.classList.remove("hidden");
+        }
+
+        switchAuthView("login");
+    }
+
+}
+
+        function switchAuthView(view) {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('forgotForm').classList.add('hidden');
+            
+            if (view === 'login') document.getElementById('loginForm').classList.remove('hidden');
+            if (view === 'register') {
+                document.getElementById('registerForm').classList.remove('hidden');
+                tempRegAvatarBase64 = "";
+                document.getElementById('regAvatarPreview').classList.add('hidden');
+                document.getElementById('regAvatarPlaceholder').classList.remove('hidden');
+                document.getElementById('regAvatarInput').value = "";
+            }
+            if (view === 'forgot') {
+                document.getElementById('forgotForm').classList.remove('hidden');
+                resetForgotForm();
+            }
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const pass = document.getElementById('loginPassword').value.trim();
+            const remember = document.getElementById('rememberMe').checked;
+
+            if (!username || !pass) { alert("Vui lòng điền đầy đủ tên cá nhân và mật khẩu."); return; }
+
+            const users = JSON.parse(localStorage.getItem('appUsers') || '{}');
+
+            if (users[username] && users[username].pass === pass) {
+                if (remember) {
+                    localStorage.setItem("rememberedUser", username);
+                } else {
+                    sessionStorage.setItem("activeUser", username);
+                }
+                checkAuthStatus();
+            } else {
+                alert("Tên cá nhân hoặc mật khẩu không chính xác!");
+            }
+        }
+
+        function handleRegister() {
+            const username = document.getElementById('regMain').value.trim();
+            const protect = document.getElementById('regProtect').value.trim();
+            const pass = document.getElementById('regPassword').value.trim();
+
+            if (!username || !protect || !pass) { alert("Vui lòng điền đầy đủ thông tin đăng ký."); return; }
+            if (pass.length < 6) { alert("Mật khẩu phải có ít nhất 6 ký tự."); return; }
+
+            const users = JSON.parse(localStorage.getItem('appUsers') || '{}');
+            if (users[username]) {
+                alert("Tên cá nhân này đã tồn tại, vui lòng chọn tên khác!");
+                return;
+            }
+
+            users[username] = {
+                pass: pass,
+                protect: protect,
+                avatar: tempRegAvatarBase64 || ""
+            };
+
+            localStorage.setItem('appUsers', JSON.stringify(users));
+            alert("Đăng ký thành công! Vui lòng đăng nhập.");
+            switchAuthView('login');
+        }
+
+        function resetForgotForm() {
+            document.getElementById('forgotUsername').value = "";
+            document.getElementById('forgotProtectInput').value = "";
+            document.getElementById('forgotOtp').value = "";
+            document.getElementById('forgotNewPassword').value = "";
+            document.getElementById('otpSection').classList.add('hidden');
+            document.getElementById('newPasswordSection').classList.add('hidden');
+            document.getElementById('protectVerifySection').classList.remove('hidden');
+            document.getElementById('forgotActionBtn').innerText = "Gửi yêu cầu OTP";
+            document.getElementById('forgotActionBtn').setAttribute("onclick", "sendOtpRequest()");
+            generatedOtp = null;
+            if (otpTimerInterval) clearInterval(otpTimerInterval);
+        }
+
+        function startOtpCountdown() {
+            if (otpTimerInterval) clearInterval(otpTimerInterval);
+            let timeLeft = 60;
+            const countdownEl = document.getElementById('otpCountdown');
+            if (countdownEl) countdownEl.innerText = timeLeft;
+
+            otpTimerInterval = setInterval(() => {
+                timeLeft--;
+                if (countdownEl) countdownEl.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(otpTimerInterval);
+                    generatedOtp = null; // Hết hạn mã OTP
+                }
+            }, 1000);
+        }
+
+        function sendOtpRequest() {
+            const username = document.getElementById('forgotUsername').value.trim();
+            const protectVal = document.getElementById('forgotProtectInput').value.trim();
+
+            if (!username || !protectVal) { alert("Vui lòng nhập tên cá nhân và thông tin khôi phục."); return; }
+
+            const users = JSON.parse(localStorage.getItem('appUsers') || '{}');
+            if (!users[username] || users[username].protect !== protectVal) {
+                alert("Thông tin khôi phục hoặc tên cá nhân không khớp với hệ thống!");
+                return;
+            }
+
+            generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+            document.getElementById('mockOtpDisplay').innerText = generatedOtp;
+            document.getElementById('otpSection').classList.remove('hidden');
+            document.getElementById('protectVerifySection').classList.add('hidden');
+            
+            // Kích hoạt đếm ngược 60 giây
+            startOtpCountdown();
+
+            const btn = document.getElementById('forgotActionBtn');
+            btn.innerText = "Xác nhận OTP";
+            btn.setAttribute("onclick", "verifyOtpAndReset()");
+            alert("Đã gửi mã OTP giả định thành công!");
+        }
+
+        function verifyOtpAndReset() {
+            const inputOtp = document.getElementById('forgotOtp').value.trim();
+            if (!generatedOtp) {
+                alert("Mã OTP đã hết hiệu lực (quá 60 giây)! Vui lòng yêu cầu mã mới.");
+                return;
+            }
+            if (inputOtp !== generatedOtp) {
+                alert("Mã OTP không chính xác!");
+                return;
+            }
+
+            if (otpTimerInterval) clearInterval(otpTimerInterval);
+            document.getElementById('otpSection').classList.add('hidden');
+            document.getElementById('newPasswordSection').classList.remove('hidden');
+            
+            const btn = document.getElementById('forgotActionBtn');
+            btn.innerText = "Cập nhật mật khẩu mới";
+            btn.setAttribute("onclick", "executePasswordReset()");
+        }
+
+        function executePasswordReset() {
+            const username = document.getElementById('forgotUsername').value.trim();
+            const newPass = document.getElementById('forgotNewPassword').value.trim();
+
+            if (!newPass || newPass.length < 6) {
+                alert("Mật khẩu mới phải có ít nhất 6 ký tự.");
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('appUsers') || '{}');
+            if (users[username]) {
+                users[username].pass = newPass;
+                localStorage.setItem('appUsers', JSON.stringify(users));
+                alert("Đặt lại mật khẩu thành công! Vui lòng đăng nhập lại.");
+                switchAuthView('login');
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem("rememberedUser");
+            sessionStorage.removeItem("activeUser");
+            activeUser = null;
+            document.getElementById('userMenuDropdown').classList.add('hidden');
+            checkAuthStatus();
+        }
 //======================
 // Quill Editor
 //======================
@@ -2335,19 +2794,36 @@ function closeQRModal() {
 // Khởi tạo sau khi HTML tải xong
 //======================
 
+//======================
+// Khởi tạo sau khi HTML tải xong
+//======================
+
 window.addEventListener("DOMContentLoaded", () => {
 
+    // Đồng bộ màu Barcode
     if ($("batchBarColor") && $("batchBarColorText")) {
-        $("batchBarColor").addEventListener("input", e => {
+        $("batchBarColor").addEventListener("input", (e) => {
             $("batchBarColorText").value = e.target.value;
+        });
+
+        $("batchBarColorText").addEventListener("input", (e) => {
+            $("batchBarColor").value = e.target.value;
         });
     }
 
+    // Đồng bộ màu nền Barcode
     if ($("batchBgColor") && $("batchBgColorText")) {
-        $("batchBgColor").addEventListener("input", e => {
+        $("batchBgColor").addEventListener("input", (e) => {
             $("batchBgColorText").value = e.target.value;
         });
+
+        $("batchBgColorText").addEventListener("input", (e) => {
+            $("batchBgColor").value = e.target.value;
+        });
     }
+
+    // Kiểm tra trạng thái đăng nhập
+    checkAuthStatus();
 
 });
 
@@ -2359,28 +2835,49 @@ let db;
 
 const request = indexedDB.open("NotesDB", 1);
 
-request.onupgradeneeded = e => {
+request.onupgradeneeded = (e) => {
     db = e.target.result;
-    db.createObjectStore("notes", {
-        keyPath: "id"
-    });
+
+    // Chỉ tạo ObjectStore nếu chưa tồn tại
+    if (!db.objectStoreNames.contains("notes")) {
+        db.createObjectStore("notes", {
+            keyPath: "id"
+        });
+    }
 };
 
-request.onsuccess = async e => {
+request.onsuccess = async (e) => {
+
     db = e.target.result;
 
-    renderNotes();
+    // Kiểm tra đăng nhập trước
+    checkAuthStatus();
 
+    // Nếu chưa đăng nhập thì không load dữ liệu
+    if (!activeUser) return;
+
+    // Load ghi chú
+    await renderNotes();
+
+    // Xin quyền thông báo
     if ("Notification" in window &&
         Notification.permission === "default") {
 
-        Notification
-            .requestPermission()
-            .finally(checkReminders);
+        Notification.requestPermission()
+            .finally(() => {
+                checkReminders();
+            });
 
     } else {
+
         checkReminders();
+
     }
+
+};
+
+request.onerror = (e) => {
+    console.error("Không mở được IndexedDB:", e.target.error);
 };
 
 const dbAction = (mode, callback) => {
@@ -5596,159 +6093,120 @@ symbolSource.forEach(symbol => {
 async function renderNotes() {
 
     const searchTerm =
-        (document.getElementById('searchInput')?.value || "")
+        (document.getElementById("searchInput")?.value || "")
         .toLowerCase()
         .trim();
 
-
     const sortVal = window.sortValue || "newest";
 
-
     let notes = await getAllNotes();
-
-
 
     //==============================
     // Filter
     //==============================
     notes = notes.filter(n => {
 
-        const matchTrash =
-            showTrash ? n.deleted : !n.deleted;
+        const matchTrash = showTrash
+            ? n.deleted
+            : !n.deleted;
 
+        const searchText = (
+            (n.title || "") + " " +
+            (n.content || "").replace(/<[^>]*>/g, "") + " " +
+            (n.date || "")
+        ).toLowerCase();
 
-        const searchText =
-            (
-                (n.title || "") +
-                " " +
-                (n.content || "").replace(/<[^>]*>/g,"") +
-                " " +
-                (n.date || "")
-            )
-            .toLowerCase();
-
-
-        return matchTrash &&
-               searchText.includes(searchTerm);
+        return matchTrash && searchText.includes(searchTerm);
 
     });
-
-
 
     //==============================
     // Sort
     //==============================
-    switch(sortVal){
+    switch (sortVal) {
 
         case "newest":
-            notes.sort((a,b)=>b.id-a.id);
+            notes.sort((a, b) => b.id - a.id);
             break;
-
 
         case "oldest":
-            notes.sort((a,b)=>a.id-b.id);
+            notes.sort((a, b) => a.id - b.id);
             break;
-
 
         case "title":
-            notes.sort((a,b)=>
-                (a.title||"")
-                .localeCompare(b.title||"")
+            notes.sort((a, b) =>
+                (a.title || "").localeCompare(b.title || "")
             );
             break;
-
 
         case "date":
-            notes.sort((a,b)=>
-                new Date(a.date || "9999") -
-                new Date(b.date || "9999")
+            notes.sort((a, b) =>
+                new Date(a.date || "9999-12-31") -
+                new Date(b.date || "9999-12-31")
             );
             break;
 
-
         case "color":
-            notes.sort((a,b)=>
-                (a.bgColor||"")
-                .localeCompare(b.bgColor||"")
+            notes.sort((a, b) =>
+                (a.bgColor || "").localeCompare(b.bgColor || "")
             );
             break;
     }
 
-
-
+    //==============================
     // Pin lên đầu
-    notes.sort((a,b)=>
-        Number(b.pinned||0) -
-        Number(a.pinned||0)
+    //==============================
+    notes.sort((a, b) =>
+        Number(b.pinned || 0) -
+        Number(a.pinned || 0)
     );
-
-
 
     //==============================
     // Pagination
     //==============================
-    const start =
-        (currentPage - 1) * notesPerPage;
-
+    const start = (currentPage - 1) * notesPerPage;
 
     const paginated =
-        notes.slice(
-            start,
-            start + notesPerPage
-        );
-
-
+        notes.slice(start, start + notesPerPage);
 
     //==============================
-    // Container
+    // Layout
     //==============================
     container.className =
-        viewMode === 'grid'
-        ?
-        'grid grid-cols-1 md:grid-cols-2 gap-4'
-        :
-        'grid grid-cols-1 gap-4';
-
-
+        viewMode === "grid"
+            ? "grid grid-cols-1 md:grid-cols-2 gap-4"
+            : "grid grid-cols-1 gap-4";
 
     //==============================
-    // Render Notes
+    // Render
     //==============================
-    container.innerHTML = `
-
+    let html = `
     <div class="col-span-full flex justify-between items-center mb-2">
 
         <div class="text-sm text-gray-500">
             ${
                 showTrash
-                ?
-                `<i class="fa-solid fa-trash text-red-500"></i>
-                 Đang xem Thùng rác`
-                :
-                `<i class="fa-solid fa-note-sticky text-blue-500"></i>
-                 Ghi chú`
+                ? `<i class="fa-solid fa-trash text-red-500"></i> Đang xem Thùng rác`
+                : `<i class="fa-solid fa-note-sticky text-blue-500"></i> Ghi chú`
             }
         </div>
 
         <div class="flex gap-2">
 
             <button onclick="toggleTrash()"
-                class="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-200 hover:text-red-600 transition"
-                title="Xem Thùng rác">
+                class="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-200 hover:text-red-600 transition">
 
                 <i class="fa-solid fa-trash"></i>
 
             </button>
 
-            <button onclick="emptyTrash()"
-                class="
-                px-3 h-10 rounded-lg
-                ${showTrash ?
-                'bg-red-600 hover:bg-red-700 text-white' :
-                'bg-gray-200 text-gray-400 cursor-not-allowed'}
-                transition
-                "
-                title="Xóa toàn bộ Thùng rác"
+            <button
+                onclick="emptyTrash()"
+                class="px-3 h-10 rounded-lg ${
+                    showTrash
+                        ? "bg-red-600 hover:bg-red-700 text-white"
+                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                }"
                 ${showTrash ? "" : "disabled"}>
 
                 <i class="fa-solid fa-trash-can"></i>
@@ -5758,14 +6216,25 @@ async function renderNotes() {
         </div>
 
     </div>
+    `;
 
-    ${
-    paginated.map(n=>`
+    if (paginated.length === 0) {
+
+        html += `
+        <div class="col-span-full text-center py-12 text-gray-400">
+            <i class="fa-solid fa-note-sticky text-5xl mb-4"></i>
+            <p>Chưa có ghi chú nào</p>
+        </div>
+        `;
+
+    } else {
+
+        html += paginated.map(n => `
 
         <div
             data-id="${n.id}"
-            class="p-5 border rounded-3xl ${n.fontSize || ''} cursor-move"
-            style="background-color:${n.bgColor || '#ffffff'}">
+            class="p-5 border rounded-3xl ${n.fontSize || ""} cursor-move"
+            style="background:${n.bgColor || "#fff"}">
 
             <div class="flex justify-between items-start mb-2">
 
@@ -5775,102 +6244,67 @@ async function renderNotes() {
 
                 <div class="flex gap-2">
 
-                ${
-                !n.deleted
-                ?
+                    ${
+                        !n.deleted
+                        ? `
+                        <button onclick="togglePin(${n.id})"
+                            class="${n.pinned ? "text-yellow-500" : "text-gray-400"}">
+                            <i class="fa-solid fa-thumbtack"></i>
+                        </button>
 
-                `
+                        <button onclick="exportFile(${n.id},'pdf')" class="text-red-500">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </button>
 
-                <button onclick="togglePin(${n.id})"
-                    class="${n.pinned ?
-                    'text-yellow-500' :
-                    'text-gray-400'}">
+                        <button onclick="exportFile(${n.id},'txt')" class="text-gray-500">
+                            <i class="fa-solid fa-file-lines"></i>
+                        </button>
 
-                    <i class="fa-solid fa-thumbtack"></i>
+                        <button onclick="editNote(${n.id})" class="text-blue-500">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        `
+                        : `
+                        <button onclick="restoreNote(${n.id})" class="text-green-500">
+                            <i class="fa-solid fa-trash-arrow-up"></i>
+                        </button>
+                        `
+                    }
 
-                </button>
-
-                <button onclick="exportFile(${n.id},'pdf')"
-                    class="text-red-600">
-
-                    <i class="fa-solid fa-file-pdf"></i>
-
-                </button>
-
-                <button onclick="exportFile(${n.id},'txt')"
-                    class="text-gray-600">
-
-                    <i class="fa-solid fa-file-lines"></i>
-
-                </button>
-
-                <button onclick="editNote(${n.id})"
-                    class="text-blue-500">
-
-                    <i class="fa-solid fa-pen-to-square"></i>
-
-                </button>
-
-                `
-
-                :
-
-                `
-
-                <button onclick="restoreNote(${n.id})"
-                    class="text-green-500">
-
-                    <i class="fa-solid fa-trash-arrow-up"></i>
-
-                </button>
-
-                `
-                }
-
-                <button onclick="deleteNote(${n.id})"
-                    class="text-red-500">
-
-                    <i class="fa-solid fa-trash"></i>
-
-                </button>
+                    <button onclick="deleteNote(${n.id})" class="text-red-500">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
 
                 </div>
 
             </div>
 
-            <p class="text-xs text-gray-400 mb-4 font-medium italic">
+            <div class="text-xs text-gray-400 mb-3">
 
                 ${
-                n.date
-                ?
-                `
-                <i class="fa-solid fa-calendar-days"></i>
-                ${n.date}
-                |
-                ${getLunarDate(n.date)}
-                `
-                :
-                "Không có ngày hẹn"
+                    n.date
+                        ? `<i class="fa-solid fa-calendar-days"></i>
+                           ${n.date} | ${getLunarDate(n.date)}`
+                        : "Không có ngày hẹn"
                 }
 
-            </p>
+            </div>
 
-            <div class="text-gray-700 ql-editor p-0">
-
+            <div class="ql-editor p-0">
                 ${n.content || ""}
-
             </div>
 
         </div>
 
-    `).join("")
+        `).join("");
+
     }
 
-    `;
+    container.innerHTML = html;
 
-    //==================================================
-    // Gắn lại sự kiện click cho File Attachment
-    //==================================================
+    //==============================
+    // File Attachment
+    //==============================
     container.querySelectorAll(".onenote-file-blot").forEach(blot => {
 
         blot.onclick = function (e) {
@@ -5878,18 +6312,18 @@ async function renderNotes() {
             e.preventDefault();
             e.stopPropagation();
 
-            const url = blot.getAttribute("data-url");
-            const name = blot.getAttribute("data-name");
+            const url = blot.dataset.url;
+            const name = blot.dataset.name;
 
             if (!url) return;
 
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = name || "file";
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = name || "file";
 
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
 
         };
 
@@ -5897,11 +6331,10 @@ async function renderNotes() {
 
     renderPagination(notes.length);
 
-    updateStats();
+    // Luôn cập nhật thống kê
+    await updateStats();
 
 }
-
-
 function renderPagination(total){
 
     const count=Math.ceil(total/notesPerPage)||1;
