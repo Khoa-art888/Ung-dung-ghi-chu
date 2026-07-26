@@ -772,51 +772,7 @@ to{
                 </div>
             </div>
         </div>
-       <input id="title" type="text" placeholder="Tiêu đề..." class="w-full p-3 mb-2 border rounded-xl outline-none">
-    <div class="max-w-4xl mx-auto bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-        <h1 class="text-2xl font-bold mb-6 text-gray-800 flex items-center justify-between">
-            <span class="flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-blue-500"></i> Ghi Chú Cá Nhân</span>
-            <div class="flex gap-2">
-                <button onclick="toggleView('grid')" class="text-sm p-2 bg-gray-100 rounded-lg"><i class="fa-solid fa-border-all"></i></button>
-                <button onclick="toggleView('list')" class="text-sm p-2 bg-gray-100 rounded-lg"><i class="fa-solid fa-list"></i></button>
-            </div>
-        </h1>
-
-        <div id="statsContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"></div>
         
-        <div class="flex flex-wrap gap-2 mb-4">
-            <div class="relative flex-1"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="searchInput" oninput="renderNotes()" placeholder="Tìm kiếm ghi chú..." class="w-full p-2 pl-10 border rounded-xl outline-none"></div>
-            
-<div class="relative">
-    <button onclick="toggleSortMenu()" class="p-2 border rounded-xl hover:bg-gray-100 text-gray-600">
-        <i class="fa-solid fa-arrow-down-wide-short"></i>
-    </button>
-
-    <div id="sortMenu" class="hidden absolute z-50 mt-2 right-0 bg-white border rounded-xl shadow-xl p-2 w-48">
-
-        <button onclick="changeSort('newest')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
-            <i class="fa-solid fa-clock text-blue-500 mr-2"></i> Mới nhất
-        </button>
-
-        <button onclick="changeSort('oldest')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
-            <i class="fa-solid fa-clock-rotate-left text-gray-500 mr-2"></i> Cũ nhất
-        </button>
-
-        <button onclick="changeSort('title')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
-            <i class="fa-solid fa-font text-green-500 mr-2"></i> Theo tiêu đề
-        </button>
-
-        <button onclick="changeSort('date')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
-            <i class="fa-solid fa-calendar-days text-red-500 mr-2"></i> Theo ngày hẹn
-        </button>
-
-        <button onclick="changeSort('color')" class="w-full text-left p-2 rounded-lg hover:bg-gray-100">
-            <i class="fa-solid fa-palette text-purple-500 mr-2"></i> Theo màu
-        </button>
-
-    </div>
-</div>
-     </div>
         <input id="title" type="text" placeholder="Tiêu đề..." class="w-full p-3 mb-2 border rounded-xl outline-none">
         
         <div class="flex flex-wrap gap-2 mb-2 items-center">
