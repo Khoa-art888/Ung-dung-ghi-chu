@@ -2398,142 +2398,139 @@ class="hidden bg-white/50 backdrop-blur-md p-3 rounded-xl border border-white/60
     </div>
 </div>
 <!-- Modal Quản Lý Bookmark / Link Thiết Kế -->
-    <div id="bookmarkModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="glass-panel rounded-3xl p-6 w-full max-w-3xl shadow-2xl my-8 border border-white/20">
-            <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-lg font-bold border border-indigo-500/30">
-                        <i class="fa-solid fa-bookmark text-indigo-400"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-lg font-bold text-white">Danh sách link </h2>
-                        <p class="text-xs text-gray-400">Lưu trữ và quản lý các website</p>
-                    </div>
+<div id="bookmarkModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-panel rounded-3xl p-6 w-full max-w-3xl shadow-2xl my-8 border border-white/20">
+        <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-lg font-bold border border-indigo-500/30">
+                    <i class="fa-solid fa-bookmark text-indigo-400"></i>
                 </div>
-                <button onclick="closeBookmarkModal()" class="w-9 h-9 rounded-full bg-white/10 text-gray-400 hover:text-white hover:bg-white/20 flex items-center justify-center transition">✕</button>
+                <div>
+                    <h2 class="text-lg font-bold text-white">Danh sách link </h2>
+                    <p class="text-xs text-gray-400">Lưu trữ và quản lý các website</p>
+                </div>
+            </div>
+            <button onclick="closeBookmarkModal()" class="w-9 h-9 rounded-full bg-white/10 text-gray-400 hover:text-white hover:bg-white/20 flex items-center justify-center transition">✕</button>
+        </div>
+
+        <!-- Form Thêm / Sửa Bookmark -->
+        <div class="bg-indigo-950/40 p-4 rounded-2xl border border-indigo-500/20 mb-6">
+            <h3 id="bmFormTitle" class="text-xs font-bold text-indigo-300 mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-circle-plus text-indigo-400"></i> Thêm Bookmark Mới
+            </h3>
+
+            <input type="hidden" id="bmEditIndex" value="">
+
+            <!-- Hàng 1 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1.5">
+                       <i class="fa-solid fa-window-maximize text-indigo-400"></i> Tên trang / Giao diện:
+                    </label>
+                    <input type="text" id="bmTitle" class="w-full glass-input rounded-xl p-2.5 text-xs outline-none" placeholder="Ví dụ: OpenAI ChatGPT...">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1 flex items-center justify-between">
+                        <span class="flex items-center gap-1.5">
+                            <i class="fa-solid fa-link text-amber-400"></i> Đường dẫn URL:
+                        </span>
+                        <span id="faviconPreviewWrapper" class="flex items-center gap-1 text-[10px] text-gray-400">
+                            <img id="bmFaviconPreview" src="" class="w-4 h-4 rounded object-contain hidden" alt="favicon">
+                        </span>
+                    </label>
+
+                    <!-- Đã fix lỗi thiếu dấu đóng ">" tại đây -->
+                    <input type="url"
+                           id="bmUrl"
+                           oninput="fetchFaviconPreview()"
+                           class="w-full glass-input rounded-xl p-2.5 text-xs outline-none"
+                           placeholder="https://chat.openai.com">
+
+                    <input type="hidden" id="bmFavicon" value="">
+                </div>
             </div>
 
-<!-- Form Thêm / Sửa Bookmark -->
-<div class="bg-indigo-950/40 p-4 rounded-2xl border border-indigo-500/20 mb-6">
-    <h3 id="bmFormTitle" class="text-xs font-bold text-indigo-300 mb-3 flex items-center gap-2">
-        <i class="fa-solid fa-circle-plus text-indigo-400"></i> Thêm Bookmark Mới
-    </h3>
+            <!-- Hàng 2 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                <!-- Danh mục -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1.5">
+                       <i class="fa-solid fa-layer-group text-sky-400"></i> Danh mục / Chủ đề:
+                    </label>
 
-    <input type="hidden" id="bmEditIndex" value="">
+                    <div class="relative">
+                        <i class="fa-solid fa-layer-group absolute left-3 top-1/2 -translate-y-1/2 text-sky-400/80 text-xs pointer-events-none"></i>
 
-    <!-- Hàng 1 -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-        <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1.5">
-               <i class="fa-solid fa-window-maximize text-indigo-400"></i> Tên trang / Giao diện:
-            </label>
-            <input type="text" id="bmTitle" class="w-full glass-input rounded-xl p-2.5 text-xs outline-none" placeholder="Ví dụ: OpenAI ChatGPT...">
+                        <select id="bmCategory" class="w-full glass-input rounded-xl p-2.5 pl-9 text-xs outline-none appearance-none cursor-pointer">
+                             <option value="Công nghệ" class="bg-slate-900">Công nghệ</option>
+                             <option value="Giải trí" class="bg-slate-900">Giải trí</option>
+                             <option value="Công việc" class="bg-slate-900">Công việc</option>
+                            <option value="Video" class="bg-slate-900">Video</option>
+                             <option value="Khác" class="bg-slate-900">Khác</option>
+                        </select>
+
+                        <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Mô tả -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1.5">
+                       <i class="fa-solid fa-file-lines text-indigo-400"></i> Mô tả ngắn:
+                    </label>
+
+                    <input type="text"
+                           id="bmDesc"
+                           class="w-full glass-input rounded-xl p-2.5 text-xs outline-none"
+                           placeholder="Ví dụ: Trợ lý AI của OpenAI...">
+                </div>
+            </div>
+
+            <!-- Nút -->
+            <div class="flex gap-2 justify-end">
+                <button id="bmCancelEditBtn"
+                        onclick="resetBookmarkForm()"
+                        class="hidden bg-white/10 hover:bg-white/20 text-gray-300 text-xs font-semibold px-4 py-2 rounded-xl transition">
+                    Hủy
+                </button>
+
+                <button onclick="saveBookmark()"
+                        class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-indigo-500/25">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Lưu Bookmark
+                </button>
+            </div>
         </div>
 
-        <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1 flex items-center justify-between">
-                <span class="flex items-center gap-1.5">
-                    <i class="fa-solid fa-link text-amber-400"></i> Đường dẫn URL:
-                </span>
-
-                <span id="faviconPreviewWrapper" class="flex items-center gap-1 text-[10px] text-gray-400">
-                    <img id="bmFaviconPreview" src="" class="w-4 h-4 rounded object-contain hidden" alt="favicon">
-                </span>
-            </label>
-
-            <input type="url"
-                   id="bmUrl"
-                   oninput="fetchFaviconPreview()"
-                   class="w-full glass-input rounded-xl p-2.5 text-xs outline-none"
-                 placeholder="https://chat.openai.com"
-
-            <input type="hidden" id="bmFavicon" value="">
-        </div>
-    </div>
-
-    <!-- Hàng 2 -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-
-        <!-- Danh mục -->
-        <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1.5">
-               <i class="fa-solid fa-layer-group text-sky-400"></i> Danh mục / Chủ đề:
-            </label>
-
+        <!-- Thanh tìm kiếm & lọc bookmark -->
+        <div class="flex flex-wrap gap-2 mb-4">
+            <div class="relative flex-1">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-indigo-400 text-xs"></i>
+                <input type="text" id="bmSearchInput" oninput="renderBookmarks()" placeholder="Tìm kiếm tên, mô tả bookmark..." class="w-full glass-input rounded-xl p-2 pl-9 text-xs outline-none focus:ring-2 focus:ring-indigo-500/50 transition">
+            </div>
             <div class="relative">
-                <i class="fa-solid fa-layer-group absolute left-3 top-1/2 -translate-y-1/2 text-sky-400/80 text-xs pointer-events-none"></i>
-
-                <select id="bmCategory" class="w-full glass-input rounded-xl p-2.5 pl-9 text-xs outline-none appearance-none cursor-pointer">
-                     <option value="Công nghệ" class="bg-slate-900">Công nghệ</option>
-                     <option value="Giải trí" class="bg-slate-900">Giải trí</option>
-                     <option value="Công việc" class="bg-slate-900">Công việc</option>
+                <select id="bmFilterCategory" onchange="renderBookmarks()" class="glass-input rounded-xl py-2 pl-8 pr-8 text-xs outline-none appearance-none cursor-pointer">
+                    <option value="" class="bg-slate-900">Tất cả danh mục</option>
+                    <option value="Công nghệ" class="bg-slate-900">Công nghệ</option>
+                    <option value="Giải trí" class="bg-slate-900">Giải trí</option>
+                    <option value="Công việc" class="bg-slate-900">Công việc</option>
                     <option value="Video" class="bg-slate-900">Video</option>
-                     <option value="Khác" class="bg-slate-900">Khác</option>
+                    <option value="Khác" class="bg-slate-900">Khác</option>
                 </select>
-
+                <i class="fa-solid fa-filter absolute left-2.5 top-1/2 -translate-y-1/2 text-teal-400 text-[10px] pointer-events-none"></i>
                 <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] pointer-events-none"></i>
             </div>
         </div>
 
-        <!-- Mô tả -->
-        <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1.5">
-               <i class="fa-solid fa-file-lines text-indigo-400"></i> Mô tả ngắn:
-            </label>
+        <!-- Danh sách Bookmark -->
+        <div id="bookmarkListContainer" class="max-h-72 overflow-y-auto space-y-2.5 pr-1"></div>
 
-            <input type="text"
-                   id="bmDesc"
-                   class="w-full glass-input rounded-xl p-2.5 text-xs outline-none"
-                  placeholder="Ví dụ: Trợ lý AI của OpenAI...">
+        <div class="mt-6 pt-4 border-t border-white/10 flex justify-end">
+            <button onclick="closeBookmarkModal()" class="bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-xl text-xs font-medium transition">Đóng</button>
         </div>
-
     </div>
-
-    <!-- Nút -->
-    <div class="flex gap-2 justify-end">
-        <button id="bmCancelEditBtn"
-                onclick="resetBookmarkForm()"
-                class="hidden bg-white/10 hover:bg-white/20 text-gray-300 text-xs font-semibold px-4 py-2 rounded-xl transition">
-            Hủy
-        </button>
-
-        <button onclick="saveBookmark()"
-                class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-indigo-500/25">
-            <i class="fa-solid fa-floppy-disk"></i>
-            Lưu Bookmark
-        </button>
-    </div>
-
 </div>
-
-            <!-- Thanh tìm kiếm & lọc bookmark -->
-            <div class="flex flex-wrap gap-2 mb-4">
-                <div class="relative flex-1">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-indigo-400 text-xs"></i>
-                    <input type="text" id="bmSearchInput" oninput="renderBookmarks()" placeholder="Tìm kiếm tên, mô tả bookmark..." class="w-full glass-input rounded-xl p-2 pl-9 text-xs outline-none focus:ring-2 focus:ring-indigo-500/50 transition">
-                </div>
-                <div class="relative">
-                    <select id="bmFilterCategory" onchange="renderBookmarks()" class="glass-input rounded-xl py-2 pl-8 pr-8 text-xs outline-none appearance-none cursor-pointer">
-                        <option value="" class="bg-slate-900">Tất cả danh mục</option>
-                        <option value="Công nghệ" class="bg-slate-900">Công nghệ</option>
-                        <option value="Giải trí" class="bg-slate-900">Giải trí</option>
-                        <option value="Công việc" class="bg-slate-900">Công việc</option>
-                        <option value="Video" class="bg-slate-900">Video</option>
-                        <option value="Khác" class="bg-slate-900">Khác</option>
-                    </select>
-                    <i class="fa-solid fa-filter absolute left-2.5 top-1/2 -translate-y-1/2 text-teal-400 text-[10px] pointer-events-none"></i>
-                    <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] pointer-events-none"></i>
-                </div>
-            </div>
-
-            <!-- Danh sách Bookmark -->
-            <div id="bookmarkListContainer" class="max-h-72 overflow-y-auto space-y-2.5 pr-1"></div>
-
-            <div class="mt-6 pt-4 border-t border-white/10 flex justify-end">
-                <button onclick="closeBookmarkModal()" class="bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-xl text-xs font-medium transition">Đóng</button>
-            </div>
-        </div>
-    </div>
 
 <!-- Khu vực dùng để in -->
 <div id="printArea"></div>
@@ -4851,207 +4848,219 @@ async function exportMergedPdf(){
 
             return new Blob([arrayBuffer], { type: mimeType });
         }
-    // --- LOGIC QUẢN LÝ BOOKMARK & GOOGLE FAVICON API ---
-    let bookmarks = JSON.parse(localStorage.getItem('glass_bookmarks')) || [
-        { title: "Dribbble - UI/UX Inspiration", url: "https://dribbble.com", category: "UI/UX Inspiration", desc: "Cảm hứng thiết kế giao diện đỉnh cao.", favicon: "https://www.google.com/s2/favicons?domain=https://dribbble.com" },
-        { title: "Tailwind CSS Docs", url: "https://tailwindcss.com", category: "Component Library", desc: "Framework CSS utility-first hiện đại.", favicon: "https://www.google.com/s2/favicons?domain=https://tailwindcss.com" }
-    ];
+// --- LOGIC QUẢN LÝ BOOKMARK & GOOGLE FAVICON API ---
+let bookmarks = JSON.parse(localStorage.getItem('glass_bookmarks')) || [];
 
-    function fetchFaviconPreview() {
-        const urlInput = document.getElementById('bmUrl').value.trim();
-        const previewImg = document.getElementById('bmFaviconPreview');
-        const hiddenFaviconInput = document.getElementById('bmFavicon');
-        
-        if (!urlInput) {
-            previewImg.classList.add('hidden');
-            previewImg.src = '';
-            hiddenFaviconInput.value = '';
-            return;
-        }
-
-        let formattedUrl = urlInput;
-        if (!/^https?:\/\//i.test(formattedUrl)) {
-            formattedUrl = 'https://' + formattedUrl;
-        }
-
-        const faviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(formattedUrl)}`;
-        previewImg.src = faviconUrl;
-        previewImg.classList.remove('hidden');
-        hiddenFaviconInput.value = faviconUrl;
+function fetchFaviconPreview() {
+    const urlInput = document.getElementById('bmUrl').value.trim();
+    const previewImg = document.getElementById('bmFaviconPreview');
+    const hiddenFaviconInput = document.getElementById('bmFavicon');
+    
+    if (!urlInput) {
+        previewImg.classList.add('hidden');
+        previewImg.src = '';
+        hiddenFaviconInput.value = '';
+        return;
     }
 
-    function openBookmarkModal() { 
-        document.getElementById('bookmarkModal').classList.remove('hidden');
-        renderBookmarks();
-    }
-    function closeBookmarkModal() { 
-        document.getElementById('bookmarkModal').classList.add('hidden');
-        resetBookmarkForm();
+    let formattedUrl = urlInput;
+    if (!/^https?:\/\//i.test(formattedUrl)) {
+        formattedUrl = 'https://' + formattedUrl;
     }
 
-    function saveBookmark() {
-        const editIdx = document.getElementById('bmEditIndex').value;
-        const title = document.getElementById('bmTitle').value.trim();
-        const url = document.getElementById('bmUrl').value.trim();
-        const category = document.getElementById('bmCategory').value;
-        const desc = document.getElementById('bmDesc').value.trim();
+    const faviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(formattedUrl)}`;
+    previewImg.src = faviconUrl;
+    previewImg.classList.remove('hidden');
+    hiddenFaviconInput.value = faviconUrl;
+}
 
-        if (!title || !url) {
-            alert("Vui lòng nhập tên tiêu đề và đường dẫn URL!");
-            return;
-        }
+function openBookmarkModal() { 
+    document.getElementById('bookmarkModal').classList.remove('hidden');
+    renderBookmarks();
+}
 
-        let formattedUrl = url;
-        if (!/^https?:\/\//i.test(formattedUrl)) {
-            formattedUrl = 'https://' + formattedUrl;
-        }
+function closeBookmarkModal() { 
+    document.getElementById('bookmarkModal').classList.add('hidden');
+    resetBookmarkForm();
+}
 
-        const favicon = document.getElementById('bmFavicon').value || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(formattedUrl)}`;
+function saveBookmark() {
+    const editIdx = document.getElementById('bmEditIndex').value;
+    const title = document.getElementById('bmTitle').value.trim();
+    const url = document.getElementById('bmUrl').value.trim();
+    const category = document.getElementById('bmCategory').value;
+    const desc = document.getElementById('bmDesc').value.trim();
 
-        const newBookmark = { title, url: formattedUrl, category, desc, favicon };
+    if (!title || !url) {
+        alert("Vui lòng nhập tên tiêu đề và đường dẫn URL!");
+        return;
+    }
 
-        if (editIdx === "") {
-            bookmarks.unshift(newBookmark);
-        } else {
-            bookmarks[editIdx] = newBookmark;
-        }
+    let formattedUrl = url;
+    if (!/^https?:\/\//i.test(formattedUrl)) {
+        formattedUrl = 'https://' + formattedUrl;
+    }
 
-        localStorage.setItem('glass_bookmarks', JSON.stringify(bookmarks));
-        resetBookmarkForm();
-        renderBookmarks();
-        renderQuickBookmarks();
+    const favicon = document.getElementById('bmFavicon').value || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(formattedUrl)}`;
+
+    const newBookmark = { title, url: formattedUrl, category, desc, favicon };
+
+    if (editIdx === "") {
+        bookmarks.unshift(newBookmark);
+    } else {
+        bookmarks[editIdx] = newBookmark;
+    }
+
+    localStorage.setItem('glass_bookmarks', JSON.stringify(bookmarks));
+    resetBookmarkForm();
+    renderBookmarks();
+    renderQuickBookmarks();
+    
+    if (typeof updateStats === 'function') {
         updateStats();
     }
+}
 
-    function resetBookmarkForm() {
-        document.getElementById('bmEditIndex').value = "";
-        document.getElementById('bmTitle').value = "";
-        document.getElementById('bmUrl').value = "";
-        document.getElementById('bmDesc').value = "";
-        document.getElementById('bmFavicon').value = "";
-        document.getElementById('bmFaviconPreview').src = "";
-        document.getElementById('bmFaviconPreview').classList.add('hidden');
-        document.getElementById('bmFormTitle').innerHTML = `<i class="fa-solid fa-circle-plus text-indigo-400"></i> Thêm Bookmark Mới`;
-        document.getElementById('bmCancelEditBtn').classList.add('hidden');
-    }
+function resetBookmarkForm() {
+    document.getElementById('bmEditIndex').value = "";
+    document.getElementById('bmTitle').value = "";
+    document.getElementById('bmUrl').value = "";
+    document.getElementById('bmDesc').value = "";
+    document.getElementById('bmFavicon').value = "";
+    
+    const previewImg = document.getElementById('bmFaviconPreview');
+    previewImg.src = "";
+    previewImg.classList.add('hidden');
+    
+    document.getElementById('bmFormTitle').innerHTML = `<i class="fa-solid fa-circle-plus text-indigo-400"></i> Thêm Bookmark Mới`;
+    document.getElementById('bmCancelEditBtn').classList.add('hidden');
+}
 
-    function editBookmark(index) {
-        const bm = bookmarks[index];
-        document.getElementById('bmEditIndex').value = index;
-        document.getElementById('bmTitle').value = bm.title;
-        document.getElementById('bmUrl').value = bm.url;
-        document.getElementById('bmCategory').value = bm.category;
-        document.getElementById('bmDesc').value = bm.desc || "";
-        document.getElementById('bmFavicon').value = bm.favicon || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(bm.url)}`;
+function editBookmark(index) {
+    const bm = bookmarks[index];
+    document.getElementById('bmEditIndex').value = index;
+    document.getElementById('bmTitle').value = bm.title;
+    document.getElementById('bmUrl').value = bm.url;
+    document.getElementById('bmCategory').value = bm.category;
+    document.getElementById('bmDesc').value = bm.desc || "";
+    document.getElementById('bmFavicon').value = bm.favicon || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(bm.url)}`;
+    
+    const previewImg = document.getElementById('bmFaviconPreview');
+    previewImg.src = bm.favicon || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(bm.url)}`;
+    previewImg.classList.remove('hidden');
+
+    document.getElementById('bmFormTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-indigo-400"></i> Chỉnh Sửa Bookmark`;
+    document.getElementById('bmCancelEditBtn').classList.remove('hidden');
+}
+
+function deleteBookmark(index) {
+    if (confirm("Bạn có chắc chắn muốn xóa bookmark này?")) {
+        bookmarks.splice(index, 1);
+        localStorage.setItem('glass_bookmarks', JSON.stringify(bookmarks));
+        renderBookmarks();
+        renderQuickBookmarks();
         
-        const previewImg = document.getElementById('bmFaviconPreview');
-        previewImg.src = bm.favicon || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(bm.url)}`;
-        previewImg.classList.remove('hidden');
-
-        document.getElementById('bmFormTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-indigo-400"></i> Chỉnh Sửa Bookmark`;
-        document.getElementById('bmCancelEditBtn').classList.remove('hidden');
-    }
-
-    function deleteBookmark(index) {
-        if (confirm("Bạn có chắc chắn muốn xóa bookmark này?")) {
-            bookmarks.splice(index, 1);
-            localStorage.setItem('glass_bookmarks', JSON.stringify(bookmarks));
-            renderBookmarks();
-            renderQuickBookmarks();
+        if (typeof updateStats === 'function') {
             updateStats();
         }
     }
+}
 
-    function renderBookmarks() {
-        const container = document.getElementById('bookmarkListContainer');
-        const search = document.getElementById('bmSearchInput').value.toLowerCase();
-        const filterCat = document.getElementById('bmFilterCategory').value;
+function renderBookmarks() {
+    const container = document.getElementById('bookmarkListContainer');
+    if (!container) return;
 
-        container.innerHTML = "";
+    const searchInput = document.getElementById('bmSearchInput');
+    const filterCatInput = document.getElementById('bmFilterCategory');
 
-        const filtered = bookmarks.map((bm, originalIndex) => ({ ...bm, originalIndex })).filter(bm => {
-            const matchSearch = bm.title.toLowerCase().includes(search) || bm.url.toLowerCase().includes(search) || (bm.desc && bm.desc.toLowerCase().includes(search));
-            const matchCat = filterCat === "" || bm.category === filterCat;
-            return matchSearch && matchCat;
-        });
+    const search = searchInput ? searchInput.value.toLowerCase() : "";
+    const filterCat = filterCatInput ? filterCatInput.value : "";
 
-        if (filtered.length === 0) {
-            container.innerHTML = `<div class="text-center py-6 text-gray-400 text-xs italic">Không tìm thấy bookmark nào phù hợp.</div>`;
-            return;
-        }
+    container.innerHTML = "";
 
-        filtered.forEach(bm => {
-            let domain = "";
-            try { domain = new URL(bm.url).hostname; } catch(e) { domain = bm.url; }
-            const faviconSrc = bm.favicon || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(bm.url)}`;
+    const filtered = bookmarks.map((bm, originalIndex) => ({ ...bm, originalIndex })).filter(bm => {
+        const matchSearch = bm.title.toLowerCase().includes(search) || bm.url.toLowerCase().includes(search) || (bm.desc && bm.desc.toLowerCase().includes(search));
+        const matchCat = filterCat === "" || bm.category === filterCat;
+        return matchSearch && matchCat;
+    });
 
-            const card = document.createElement('div');
-            card.className = "bg-white/5 p-3 rounded-2xl border border-white/10 hover:border-indigo-500/40 transition flex items-center justify-between gap-3";
-            card.innerHTML = `
-                <div class="flex items-start gap-3 min-w-0">
-                    <div class="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
-                        <img src="${faviconSrc}" class="w-4 h-4 object-contain" onerror="this.onerror=null;this.src='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/svgs/solid/globe.svg';" alt="icon">
-                    </div>
-                    <div class="min-w-0">
-                        <div class="flex items-center gap-2">
-                            <h4 class="text-xs font-bold text-white truncate">${bm.title}</h4>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/10 text-gray-300">${bm.category}</span>
-                        </div>
-                        <p class="text-[11px] text-gray-400 truncate">${bm.desc || domain}</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-1.5 shrink-0">
-                    <a href="${bm.url}" target="_blank" class="w-7 h-7 rounded-lg bg-white/5 text-gray-300 hover:bg-indigo-500/20 hover:text-indigo-300 flex items-center justify-center transition" title="Mở liên kết"><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>
-                    <button onclick="editBookmark(${bm.originalIndex})" class="w-7 h-7 rounded-lg bg-white/5 text-gray-300 hover:bg-blue-500/20 hover:text-blue-300 flex items-center justify-center transition" title="Sửa"><i class="fa-solid fa-pen text-[10px]"></i></button>
-                    <button onclick="deleteBookmark(${bm.originalIndex})" class="w-7 h-7 rounded-lg bg-white/5 text-gray-300 hover:bg-red-500/20 hover:text-red-300 flex items-center justify-center transition" title="Xóa"><i class="fa-solid fa-trash text-[10px]"></i></button>
-                </div>
-            `;
-            container.appendChild(card);
-        });
+    if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-center py-6 text-gray-400 text-xs italic">Không tìm thấy bookmark nào phù hợp.</div>`;
+        return;
     }
 
-    function renderQuickBookmarks() {
-        const quickContainer = document.getElementById('quickBookmarkList');
-        if (!quickContainer) return;
+    filtered.forEach(bm => {
+        let domain = "";
+        try { domain = new URL(bm.url).hostname; } catch(e) { domain = bm.url; }
+        const faviconSrc = bm.favicon || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(bm.url)}`;
 
-        quickContainer.innerHTML = "";
-        const topBms = bookmarks.slice(0, 3);
-
-        if (topBms.length === 0) {
-            quickContainer.innerHTML = `<div class="col-span-full text-center py-4 text-gray-400 text-xs italic">Chưa có bookmark thiết kế nào.</div>`;
-            return;
-        }
-
-        topBms.forEach(bm => {
-            let domain = "";
-            try { domain = new URL(bm.url).hostname; } catch(e) { domain = bm.url; }
-            const faviconSrc = bm.favicon || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(bm.url)}`;
-
-            const item = document.createElement('div');
-            item.className = "glass-card p-3 rounded-2xl flex flex-col justify-between gap-2";
-            item.innerHTML = `
-                <div>
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-[10px] font-semibold text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-md truncate max-w-[120px]">${bm.category}</span>
-                        <a href="${bm.url}" target="_blank" class="text-gray-400 hover:text-indigo-300 transition text-xs"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                    </div>
-                    <div class="flex items-center gap-2 mb-0.5">
-                        <img src="${faviconSrc}" class="w-4 h-4 rounded object-contain shrink-0" alt="icon">
+        const card = document.createElement('div');
+        card.className = "bg-white/5 p-3 rounded-2xl border border-white/10 hover:border-indigo-500/40 transition flex items-center justify-between gap-3";
+        card.innerHTML = `
+            <div class="flex items-start gap-3 min-w-0">
+                <div class="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
+                    <img src="${faviconSrc}" class="w-4 h-4 object-contain" onerror="this.onerror=null;this.src='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/svgs/solid/globe.svg';" alt="icon">
+                </div>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2">
                         <h4 class="text-xs font-bold text-white truncate">${bm.title}</h4>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/10 text-gray-300">${bm.category}</span>
                     </div>
                     <p class="text-[11px] text-gray-400 truncate">${bm.desc || domain}</p>
                 </div>
-            `;
-            quickContainer.appendChild(item);
-        });
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+                <a href="${bm.url}" target="_blank" class="w-7 h-7 rounded-lg bg-white/5 text-gray-300 hover:bg-indigo-500/20 hover:text-indigo-300 flex items-center justify-center transition" title="Mở liên kết"><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>
+                <button onclick="editBookmark(${bm.originalIndex})" class="w-7 h-7 rounded-lg bg-white/5 text-gray-300 hover:bg-blue-500/20 hover:text-blue-300 flex items-center justify-center transition" title="Sửa"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                <button onclick="deleteBookmark(${bm.originalIndex})" class="w-7 h-7 rounded-lg bg-white/5 text-gray-300 hover:bg-red-500/20 hover:text-red-300 flex items-center justify-center transition" title="Xóa"><i class="fa-solid fa-trash text-[10px]"></i></button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function renderQuickBookmarks() {
+    const quickContainer = document.getElementById('quickBookmarkList');
+    if (!quickContainer) return;
+
+    quickContainer.innerHTML = "";
+    const topBms = bookmarks.slice(0, 3);
+
+    if (topBms.length === 0) {
+        quickContainer.innerHTML = `<div class="col-span-full text-center py-4 text-gray-400 text-xs italic">Chưa có bookmark thiết kế nào.</div>`;
+        return;
     }
 
-    // Khởi chạy khi tải trang
-    document.addEventListener("DOMContentLoaded", () => {
-        renderNotes();
-        renderQuickBookmarks();
-        updateStats();
+    topBms.forEach(bm => {
+        let domain = "";
+        try { domain = new URL(bm.url).hostname; } catch(e) { domain = bm.url; }
+        const faviconSrc = bm.favicon || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(bm.url)}`;
+
+        const item = document.createElement('div');
+        item.className = "glass-card p-3 rounded-2xl flex flex-col justify-between gap-2";
+        item.innerHTML = `
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-[10px] font-semibold text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-md truncate max-w-[120px]">${bm.category}</span>
+                    <a href="${bm.url}" target="_blank" class="text-gray-400 hover:text-indigo-300 transition text-xs"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                </div>
+                <div class="flex items-center gap-2 mb-0.5">
+                    <img src="${faviconSrc}" class="w-4 h-4 rounded object-contain shrink-0" alt="icon">
+                    <h4 class="text-xs font-bold text-white truncate">${bm.title}</h4>
+                </div>
+                <p class="text-[11px] text-gray-400 truncate">${bm.desc || domain}</p>
+            </div>
+        `;
+        quickContainer.appendChild(item);
     });
+}
+
+// Khởi chạy khi tải trang
+document.addEventListener("DOMContentLoaded", () => {
+    if (typeof renderNotes === 'function') renderNotes();
+    renderQuickBookmarks();
+    if (typeof updateStats === 'function') updateStats();
+});
 
 
     // --- XỬ LÝ QUẢN LÝ LOẠI NỘI DUNG MÃ QR (Đã thêm tùy chọn Mặc định - Nhập nội dung văn bản) ---
