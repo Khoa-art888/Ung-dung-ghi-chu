@@ -5572,29 +5572,142 @@ function getVietnameseTietKhi(jieQi){
 
 //================ NGÀY LỄ =================
 
-const VN_HOLIDAYS_SOLAR={
-"1-1":"Tết Dương Lịch",
-"30-4":"Giải Phóng Miền Nam",
-"1-5":"Quốc tế Lao Động",
-"2-9":"Quốc Khánh Việt Nam",
-"20-10":"Ngày Phụ Nữ Việt Nam",
-"20-11":"Ngày Nhà Giáo Việt Nam",
-"22-12":"Ngày Thành Lập QĐND Việt Nam",
-"25-12":"🎄 Giáng Sinh (Noel)"
+const VN_HOLIDAYS_SOLAR = {
+    // ===== THÁNG 1 =====
+    "1-1": "🎉 Tết Dương Lịch",
+    "9-1": "🎓Ngày Học sinh - Sinh viên Việt Nam",
+
+    // ===== THÁNG 2 =====
+    "3-2": "🚩 Ngày Thành lập Đảng Cộng sản Việt Nam",
+    "14-2": "❤️ Lễ Tình nhân (Valentine)",
+    "27-2": "🩺 Ngày Thầy thuốc Việt Nam",
+
+    // ===== THÁNG 3 =====
+    "8-3": "🌹 Ngày Quốc tế Phụ nữ",
+    "20-3": "😊 Ngày Quốc tế Hạnh phúc",
+    "26-3": "🎓 Ngày Thành lập Đoàn TNCS Hồ Chí Minh",
+
+    // ===== THÁNG 4 =====
+    "21-4": "📖 Ngày Sách và Văn hóa đọc Việt Nam",
+    "30-4": "🕊️ Ngày Giải phóng miền Nam, Thống nhất đất nước",
+
+    // ===== THÁNG 5 =====
+    "1-5": "👷 Quốc tế Lao động",
+    "7-5": "🎖️ Chiến thắng Điện Biên Phủ",
+    "19-5": "🌺 Ngày sinh Chủ tịch Hồ Chí Minh",
+
+    // ===== THÁNG 6 =====
+    "1-6": "🧒 Quốc tế Thiếu nhi",
+    "5-6": "🌱 Ngày Môi trường Thế giới",
+    "21-6": "📰 Ngày Báo chí Cách mạng Việt Nam",
+    "28-6": "👨‍👩‍👧‍👦 Ngày Gia đình Việt Nam",
+
+    // ===== THÁNG 7 =====
+    "27-7": "🕊️ Ngày Thương binh - Liệt sĩ",
+
+    // ===== THÁNG 8 =====
+    "19-8": "🏛️ Cách mạng Tháng Tám thành công",
+
+    // ===== THÁNG 9 =====
+    "2-9": "🎆 Quốc khánh Việt Nam",
+    "10-9": "🌍 Ngày Phòng chống tự tử Thế giới",
+
+    // ===== THÁNG 10 =====
+    "1-10": "👴 Ngày Quốc tế Người cao tuổi",
+    "10-10": "🏙️ Ngày Giải phóng Thủ đô",
+    "13-10": "💼 Ngày Doanh nhân Việt Nam",
+    "15-10": "🤝 Ngày truyền thống Hội Liên hiệp Thanh niên Việt Nam",
+    "20-10": "🌷 Ngày Phụ nữ Việt Nam",
+    "31-10": "🎃 Halloween",
+
+    // ===== THÁNG 11 =====
+    "9-11": "⚖️ Ngày Pháp luật Việt Nam",
+    "20-11": "🍎 Ngày Nhà giáo Việt Nam",
+
+    // ===== THÁNG 12 =====
+    "1-12": "🎗️ Ngày Thế giới phòng chống AIDS",
+    "19-12": "🛡️ Ngày Toàn quốc kháng chiến",
+    "22-12": "🎖️ Ngày Thành lập Quân đội Nhân dân Việt Nam",
+    "24-12": "🎄 Đêm Giáng Sinh",
+    "25-12": "🎄 Lễ Giáng Sinh (Noel)"
 };
 
 
-const VN_HOLIDAYS_LUNAR={
-"1-1":"Tết Nguyên Đán",
-"2-1":"Tết Nguyên Đán Mùng 2",
-"3-1":"Tết Nguyên Đán Mùng 3",
-"15-1":"Tết Nguyên Tiêu",
-"10-3":"Giỗ Tổ Hùng Vương",
-"15-4":"Lễ Phật Đản",
-"5-5":"Tết Đoan Ngọ",
-"15-7":"Lễ Vu Lan",
-"15-8":"Tết Trung Thu",
-"23-12":"Ông Công Ông Táo"
+const VN_HOLIDAYS_LUNAR = {
+    // ===== THÁNG GIÊNG =====
+    "1-1": "🧧 Tết Nguyên Đán",
+    "2-1": "🧧 Mùng 2 Tết",
+    "3-1": "🧧 Mùng 3 Tết",
+    "4-1": "🧧 Mùng 4 Tết",
+    "5-1": "🧧 Mùng 5 Tết (Hóa Vàng)",
+    "7-1": "🙏 Khai Hạ",
+    "9-1": "🙏 Vía Ngọc Hoàng",
+    "10-1": "💰 Vía Thần Tài",
+    "15-1": "🏮 Tết Nguyên Tiêu (Rằm Tháng Giêng)",
+    "19-1": "🙏 Vía Quan Thế Âm",
+
+    // ===== THÁNG HAI =====
+    "2-2": "🐉 Long Đầu (Rồng ngẩng đầu)",
+    "8-2": "🙏 Đức Phật Xuất Gia",
+    "15-2": "🕯️ Đức Phật Nhập Niết Bàn",
+    "19-2": "🙏 Vía Quan Thế Âm Đản Sinh",
+    "21-2": "🙏 Vía Phổ Hiền Bồ Tát",
+
+    // ===== THÁNG BA =====
+    "3-3": "🍡 Tết Hàn Thực",
+    "10-3": "🏛️ Giỗ Tổ Hùng Vương",
+    "16-3": "🙏 Vía Chuẩn Đề Bồ Tát",
+    "23-3": "🙏 Vía Thiên Hậu Thánh Mẫu",
+    "28-3": "🙏 Vía Địa Tạng Vương Bồ Tát",
+
+    // ===== THÁNG TƯ =====
+    "4-4": "🙏 Văn Thù Bồ Tát Đản Sinh",
+    "8-4": "☸️ Lễ Phật Đản (truyền thống)",
+    "15-4": "☸️ Đại Lễ Phật Đản (Vesak)",
+    "28-4": "🙏 Vía Dược Sư Phật",
+
+    // ===== THÁNG NĂM =====
+    "5-5": "🍶 Tết Đoan Ngọ",
+    "13-5": "🙏 Vía Già Lam Thánh Chúng",
+
+    // ===== THÁNG SÁU =====
+    "3-6": "🙏 Vía Hộ Pháp",
+    "6-6": "💰 Vía Thiên Khố",
+    "19-6": "🙏 Vía Quan Thế Âm Thành Đạo",
+
+    // ===== THÁNG BẢY =====
+    "7-7": "💕 Thất Tịch",
+    "13-7": "🙏 Vía Đại Thế Chí Bồ Tát",
+    "15-7": "🌕 Lễ Vu Lan - Xá Tội Vong Nhân",
+    "24-7": "🙏 Vía Long Thọ Bồ Tát",
+    "30-7": "🙏 Vía Địa Tạng Vương Bồ Tát",
+
+    // ===== THÁNG TÁM =====
+    "1-8": "🙏 Vía Thiên Y A Na Thánh Mẫu",
+    "15-8": "🥮 Tết Trung Thu",
+    "22-8": "🙏 Vía Nhiên Đăng Cổ Phật",
+
+    // ===== THÁNG CHÍN =====
+    "9-9": "🌼 Tết Trùng Cửu",
+    "19-9": "🙏 Vía Quan Thế Âm Xuất Gia",
+    "30-9": "🙏 Vía Dược Sư Lưu Ly Quang Phật",
+
+    // ===== THÁNG MƯỜI =====
+    "5-10": "🙏 Vía Đạt Ma Sư Tổ",
+    "10-10": "🍚 Tết Thường Tân",
+    "15-10": "🌕 Tết Hạ Nguyên",
+    "30-10": "🙏 Vía Hoa Nghiêm Bồ Tát",
+
+    // ===== THÁNG MƯỜI MỘT =====
+    "4-11": "🙏 A Di Đà Phật Đản Sinh",
+    "17-11": "🙏 Vía A Di Đà Phật",
+    "19-11": "🙏 Nhật Quang Bồ Tát",
+
+    // ===== THÁNG CHẠP =====
+    "8-12": "☸️ Đức Phật Thành Đạo",
+    "23-12": "🔥 Ông Công Ông Táo",
+    "29-12": "🧹 Tất Niên",
+    "30-12": "🎆 Giao Thừa"
 };
 
 //================ NGÀY HOÀNG ĐẠO =================
@@ -5770,14 +5883,14 @@ selectedDayInfo.innerHTML=`
 <div class="glass-box">
 ☀ <b>Dương:</b> ${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}<br>
 🌙 <b>Âm:</b> ${l.getDay()}/${l.getMonth()}/${l.getYear()}<br>
-🐉 <b>Năm:</b> ${translateGanZhi(l.getYearInGanZhi())}<br>
+🧧 <b>Năm:</b> ${translateGanZhi(l.getYearInGanZhi())}<br>
 📅 <b>Ngày:</b> ${translateGanZhi(l.getDayInGanZhi())}
 </div>
 <div class="glass-box">
 <div class="glass-sky">🌤 ${tiet}</div>
 <div class="${tot.class}">${tot.text}</div>
-${solar?`<div class="glass-red">🎉 ${solar}</div>`:""}
-${lunar?`<div class="glass-blue">🎊 ${lunar}</div>`:""}
+${solar?`<div class="glass-red"> ${solar}</div>`:""}
+${lunar?`<div class="glass-blue"> ${lunar}</div>`:""}
 </div>
 </div>`;
 
