@@ -810,7 +810,25 @@ to{
             </div>
         </div>
         
-        <input id="title" type="text" placeholder="Tiêu đề..." class="w-full p-3 mb-2 border rounded-xl outline-none">
+        <div class="relative mb-2">
+    <input id="title"
+           type="text"
+           placeholder="Tiêu đề..."
+           class="w-full p-3 pr-12 border rounded-xl outline-none">
+
+    <button onclick="toggleDraftModal()"
+            class="absolute right-2 top-1/2 -translate-y-1/2
+                   w-8 h-8 flex items-center justify-center
+                   rounded-lg
+                   text-[#D4AF37]
+                   hover:bg-amber-100
+                   active:bg-amber-200
+                   transition-all"
+            title="Tạo bản nháp">
+
+        <i class="fa-solid fa-paste"></i>
+    </button>
+</div>
         
         <div class="flex flex-wrap gap-2 mb-2 items-center">
 <div class="relative">
@@ -1277,7 +1295,6 @@ title="Chuyển giọng nói thành văn bản">
    <i class="fa-solid fa-file-audio text-lg text-cyan-500"></i>
 </button>
 </div>
-
         <div id="editor" class="h-40 mb-4 rounded-xl overflow-hidden border"></div>
         
         <div class="flex flex-wrap gap-3 mb-8">
@@ -2393,6 +2410,33 @@ class="hidden bg-white/50 backdrop-blur-md p-3 rounded-xl border border-white/60
             <button onclick="closeAudioModal()"
                 class="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-xl">
                 Hủy bỏ
+            </button>
+        </div>
+    </div>
+</div>
+<!-- MODAL CỬA SỔ BẢN NHÁP (HIỆU ỨNG GLASSMORPHISM) -->
+<div id="draftModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all">
+    <div class="bg-white/70 backdrop-blur-xl border border-white/40 rounded-3xl p-6 w-full max-w-xl shadow-2xl">
+        <div class="flex justify-between items-center mb-4 border-b border-gray-200/50 pb-3">
+            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <i class="fa-solid fa-clipboard text-[#D4AF37]"></i> Tạo ghi chú nháp
+            </h2>
+            <button onclick="toggleDraftModal()" class="text-gray-400 hover:text-gray-600 text-xl transition-colors">✕</button>
+        </div>
+        
+        <p class="text-xs text-gray-600 mb-2">Dán văn bản bất kỳ vào đây để  trước khi thêm vào ghi chú:</p>
+        
+        <textarea id="draftArea" class="w-full p-3 border border-gray-200/60 rounded-xl outline-none focus:ring-2 focus:ring-indigo-400 font-sans text-sm h-40 mb-4 bg-white/50 backdrop-blur-sm transition" placeholder="Thực hiện dán văn bản (Ctrl + V) tại đây..."></textarea>
+        
+        <div class="flex flex-wrap gap-2 justify-between">
+            <div class="flex gap-2">
+                <button onclick="clearDraftArea()" class="bg-gray-200/80 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded-xl text-sm font-semibold transition backdrop-blur-sm">
+                    <i class="fa-solid fa-eraser"></i> Xóa
+                </button>
+            </div>
+            
+            <button onclick="addDraftToEditor()" class="bg-gray-200/80 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded-xl text-sm font-semibold transition backdrop-blur-sm">
+                <i class="fa-solid fa-file-circle-plus"></i> Thêm vào
             </button>
         </div>
     </div>
@@ -4848,6 +4892,64 @@ async function exportMergedPdf(){
 
             return new Blob([arrayBuffer], { type: mimeType });
         }
+
+    // --- CÁC CHỨC NĂNG BẢN NHÁP MỚI TẠO ---
+    
+    // Bật / Tắt Modal Cửa Sổ Bản Nháp
+    function toggleDraftModal() {
+        const modal = document.getElementById('draftModal');
+        modal.classList.toggle('hidden');
+        if (!modal.classList.contains('hidden')) {
+            document.getElementById('draftArea').focus();
+        }
+    }
+
+    // Làm sạch nội dung khung nháp
+    function clearDraftArea() {
+        document.getElementById('draftArea').value = '';
+    }
+
+    // Cho phép tập trung chỉnh sửa văn bản trong khung nháp
+    function editDraftContent() {
+        const textarea = document.getElementById('draftArea');
+        textarea.focus();
+        textarea.classList.remove('bg-gray-50');
+        textarea.classList.add('bg-white');
+    }
+
+// Add Bản Nháp vào Ghi chú (chỉ tạo ngày giờ khi nhấn Thêm)
+function addDraftToEditor() {
+    const draftText = document.getElementById('draftArea').value.trim();
+
+    if (!draftText) {
+        alert("Vui lòng nhập hoặc dán (Ctrl+V) nội dung bản nháp!");
+        return;
+    }
+
+    // Tạo ngày giờ ngay lúc nhấn nút Thêm
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('vi-VN');
+    const timeStr = now.toLocaleTimeString('vi-VN');
+
+    const finalInsertContent =
+`${draftText}
+
+[Tạo lúc: ${timeStr} - ${dateStr}]`;
+
+    // Chèn vào Quill
+    const range = quill.getSelection();
+    const length = quill.getLength();
+
+    if (range) {
+        quill.insertText(range.index, finalInsertContent);
+        quill.setSelection(range.index + finalInsertContent.length);
+    } else {
+        quill.insertText(length - 1, (length > 1 ? '\n' : '') + finalInsertContent);
+    }
+
+    // Đóng modal (không sửa nội dung draftArea)
+    toggleDraftModal();
+}
 // --- LOGIC QUẢN LÝ BOOKMARK & GOOGLE FAVICON API ---
 let bookmarks = JSON.parse(localStorage.getItem('glass_bookmarks')) || [];
 
@@ -5570,6 +5672,35 @@ function getVietnameseTietKhi(jieQi){
 
 }
 
+//================ Lấy tiết khí hiện hành =================
+function getCurrentTietKhi(date) {
+
+    // Dò ngược tối đa 20 ngày
+    for (let i = 0; i <= 20; i++) {
+
+        const d = new Date(date);
+        d.setDate(d.getDate() - i);
+
+        try {
+
+            const lunar = Solar.fromYmd(
+                d.getFullYear(),
+                d.getMonth() + 1,
+                d.getDate()
+            ).getLunar();
+
+            const jq = lunar.getJieQi();
+
+            if (jq) {
+                return getVietnameseTietKhi(jq);
+            }
+
+        } catch (e) {}
+
+    }
+
+    return "Không có";
+}
 //================ NGÀY LỄ =================
 
 const VN_HOLIDAYS_SOLAR = {
@@ -5781,6 +5912,27 @@ r+=CAN_VIET[c]?CAN_VIET[c]+" ":CHI_VIET[c]?CHI_VIET[c]+" ":"";
 return r.trim();
 }
 
+//================ ICON 12 CON GIÁP =================
+function getDayZodiacIcon(ganZhi){
+    const chi = ganZhi.split(" ").pop();
+
+    const icons = {
+        "Tý":"🐭",
+        "Sửu":"🐮",
+        "Dần":"🐯",
+        "Mão":"🐱",
+        "Thìn":"🐲",
+        "Tỵ":"🐍",
+        "Ngọ":"🐴",
+        "Mùi":"🐐",
+        "Thân":"🐵",
+        "Dậu":"🐔",
+        "Tuất":"🐶",
+        "Hợi":"🐷"
+    };
+
+    return icons[chi] || "📅";
+}
 
 //================ BIẾN =================
 
@@ -5875,8 +6027,8 @@ try{
 let l=Solar.fromYmd(date.getFullYear(),date.getMonth()+1,date.getDate()).getLunar(),
 solar=VN_HOLIDAYS_SOLAR[`${date.getDate()}-${date.getMonth()+1}`]||"",
 lunar=VN_HOLIDAYS_LUNAR[`${l.getDay()}-${l.getMonth()}`]||"",
-tot=getNgayTotXau(l),
-tiet=typeof l.getJieQi=="function"?getVietnameseTietKhi(l.getJieQi()):"Không có";
+tot = getNgayTotXau(l),
+tiet = getCurrentTietKhi(date);
 
 selectedDayInfo.innerHTML=`
 <div class="grid grid-cols-2 gap-3 mt-3">
@@ -5884,7 +6036,7 @@ selectedDayInfo.innerHTML=`
 ☀ <b>Dương:</b> ${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}<br>
 🌙 <b>Âm:</b> ${l.getDay()}/${l.getMonth()}/${l.getYear()}<br>
 🧧 <b>Năm:</b> ${translateGanZhi(l.getYearInGanZhi())}<br>
-📅 <b>Ngày:</b> ${translateGanZhi(l.getDayInGanZhi())}
+${getDayZodiacIcon(translateGanZhi(l.getDayInGanZhi()))} <b>Ngày:</b> ${translateGanZhi(l.getDayInGanZhi())}
 </div>
 <div class="glass-box">
 <div class="glass-sky">🌤 ${tiet}</div>
@@ -5940,9 +6092,9 @@ let lunar=VN_HOLIDAYS_LUNAR[`${l.getDay()}-${l.getMonth()}`]||"";
 text=
 `📅 Dương: ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}
 🌙 Âm: ${l.getDay()}/${l.getMonth()}/${l.getYear()}
-🐉 Năm: ${translateGanZhi(l.getYearInGanZhi())}
-📆 Ngày: ${translateGanZhi(l.getDayInGanZhi())}
-🌤 Tiết khí: ${getVietnameseTietKhi(l.getJieQi())}
+🧧 Năm: ${translateGanZhi(l.getYearInGanZhi())}
+${getDayZodiacIcon(translateGanZhi(l.getDayInGanZhi()))} Ngày: ${translateGanZhi(l.getDayInGanZhi())}
+🌤 Tiết khí: ${getCurrentTietKhi(d)}
 ${getNgayTotXau(l).text}`;
 
 if(solar) text+=`\n🎉 ${solar}`;
