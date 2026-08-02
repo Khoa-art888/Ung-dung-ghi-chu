@@ -7,6 +7,8 @@
 
     <!-- CSS -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill-better-table@1.2.10/dist/quill-better-table.css">
+   <script src="https://cdn.jsdelivr.net/npm/quill-better-table@1.2.10/dist/quill-better-table.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
@@ -653,6 +655,62 @@ to{
         .glass-input::placeholder {
             color: #94a3b8;
         }
+/* ====================== */
+/* Quill Toolbar Blue */
+/* ====================== */
+
+.ql-snow .ql-stroke{
+    stroke:#2563eb !important;
+}
+
+.ql-snow .ql-fill{
+    fill:#2563eb !important;
+}
+
+.ql-snow .ql-picker{
+    color:#2563eb !important;
+}
+
+.ql-snow .ql-picker-label{
+    color:#2563eb !important;
+}
+
+.ql-snow .ql-picker-label svg,
+.ql-snow .ql-picker-item svg{
+    stroke:#2563eb !important;
+    fill:#2563eb !important;
+}
+
+.ql-snow .ql-picker-options{
+    color:#2563eb;
+}
+
+/* Hover */
+.ql-snow .ql-picker-label:hover,
+.ql-snow button:hover{
+    color:#3b82f6 !important;
+}
+
+.ql-snow button:hover .ql-stroke,
+.ql-snow .ql-picker-label:hover .ql-stroke{
+    stroke:#3b82f6 !important;
+}
+
+.ql-snow button:hover .ql-fill,
+.ql-snow .ql-picker-label:hover .ql-fill{
+    fill:#3b82f6 !important;
+}
+
+/* Active */
+.ql-snow button.ql-active .ql-stroke,
+.ql-snow .ql-picker-label.ql-active .ql-stroke{
+    stroke:#1d4ed8 !important;
+}
+
+.ql-snow button.ql-active .ql-fill,
+.ql-snow .ql-picker-label.ql-active .ql-fill{
+    fill:#1d4ed8 !important;
+}
     </style>
 </head>
 <body class="bg-gray-100 p-4 md:p-10 font-sans">
@@ -2935,23 +2993,106 @@ function checkAuthStatus() {
 // Quill Editor
 //======================
 
+// Icon Undo / Redo
+const icons = Quill.import("ui/icons");
+
+icons.undo = '<i class="fa-solid fa-rotate-left text-blue-600"></i>';
+icons.redo = '<i class="fa-solid fa-rotate-right text-blue-600"></i>';
+
 const quill = new Quill("#editor", {
     theme: "snow",
+
     modules: {
-        toolbar: [
-            [{ header: ["1", "2", "3", false] }],
-            [{ size: ["small", false, "large", "huge"] }],
-            ["bold", "italic", "underline", "strike"],
-            [{ script: "sub" }, { script: "super" }],
-            [{ color: [] }, { background: [] }],
-            [{ align: [] }],
-            [{ list: "ordered" }, { list: "bullet" }],
-            ["link", "image"]
-        ]
+
+        history: {
+            delay: 1000,
+            maxStack: 100,
+            userOnly: true
+        },
+
+        toolbar: {
+
+            container: [
+                [{ header: ["1", "2", "3", false] }],
+                [{ size: ["small", false, "large", "huge"] }],
+                ["bold", "italic", "underline", "strike"],
+                [{ script: "sub" }, { script: "super" }],
+                [{ color: [] }, { background: [] }],
+                [{ align: [] }],
+                [{ list: "ordered" }, { list: "bullet" }],
+                ["link", "image"],
+                ["undo", "redo"]
+            ],
+
+            handlers: {
+
+                undo() {
+                    this.quill.history.undo();
+                },
+
+                redo() {
+                    this.quill.history.redo();
+                }
+
+            }
+
+        }
+
     }
+
 });
 
 //======================
+// Tooltip Toolbar
+//======================
+
+setTimeout(() => {
+
+    const tips = {
+
+        ".ql-header": "Tiêu đề",
+
+        ".ql-size": "Cỡ chữ",
+
+        ".ql-bold": "In đậm (Ctrl+B)",
+
+        ".ql-italic": "In nghiêng (Ctrl+I)",
+
+        ".ql-underline": "Gạch chân (Ctrl+U)",
+
+        ".ql-strike": "Gạch ngang",
+
+        ".ql-script[value='sub']": "Chỉ số dưới",
+
+        ".ql-script[value='super']": "Chỉ số trên",
+
+        ".ql-color": "Màu chữ",
+
+        ".ql-background": "Màu nền",
+
+        ".ql-align": "Căn lề",
+
+        ".ql-list[value='ordered']": "Danh sách đánh số",
+
+        ".ql-list[value='bullet']": "Danh sách ký hiệu",
+
+        ".ql-link": "Chèn liên kết",
+
+        ".ql-image": "Chèn hình ảnh",
+
+        ".ql-undo": "Hoàn tác (Ctrl+Z)",
+
+        ".ql-redo": "Làm lại (Ctrl+Y)"
+
+    };
+
+    Object.entries(tips).forEach(([selector, title]) => {
+        document.querySelectorAll(selector).forEach(el => {
+            el.title = title;
+        });
+    });
+
+}, 100);
 // Modal
 //======================
 
@@ -3561,7 +3702,102 @@ function showIconTab(type){
                 </div>
             `;
         }
+//======================
+// Reminder Sound
+//======================
+const reminderSound = new Audio("messenger.mp3");
+reminderSound.preload = "auto";
+reminderSound.volume = 0.6;
 
+
+//======================
+// Reminder Toast
+//======================
+
+function showReminderToast(title){
+
+    const toast = document.createElement("div");
+
+    toast.className =
+        "fixed bottom-5 right-5 z-[99999] " +
+        "bg-white shadow-2xl rounded-2xl border " +
+        "border-blue-100 p-4 w-80 animate-bounce";
+
+    toast.innerHTML = `
+        <div class="flex gap-3 items-start">
+
+            <div class="w-10 h-10 rounded-full bg-blue-100
+                        flex items-center justify-center">
+                🔔
+            </div>
+
+            <div class="flex-1">
+
+                <div class="font-bold text-gray-800">
+                    Nhắc nhở
+                </div>
+
+                <div class="text-sm text-gray-600 mt-1">
+                    ${title}
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 6000);
+
+}
+
+//======================
+// Blink Browser Tab
+//======================
+
+const originalTitle = document.title;
+
+let blinkTimer = null;
+
+function startBlinkTitle(text = "🔔 Có nhắc nhở mới") {
+
+    if (blinkTimer) return;
+
+    blinkTimer = setInterval(() => {
+
+        document.title =
+            document.title === originalTitle
+                ? text
+                : originalTitle;
+
+    }, 1000);
+
+}
+
+function stopBlinkTitle() {
+
+    clearInterval(blinkTimer);
+
+    blinkTimer = null;
+
+    document.title = originalTitle;
+
+}
+
+// Người dùng quay lại tab -> dừng nhấp nháy
+document.addEventListener("visibilitychange", () => {
+
+    if (!document.hidden) {
+        stopBlinkTitle();
+    }
+
+});
+//======================
+// Reminder
+//======================
 async function checkReminders() {
     const notes = await getAllNotes();
     const now = new Date();
@@ -3578,7 +3814,10 @@ async function checkReminders() {
                         icon: "https://cdn-icons-png.flaticon.com/512/1827/1827392.png"
                     });
                 } else {
-                    alert(`⏰ Nhắc nhở: ${note.title}`);
+	reminderSound.currentTime = 0;
+                  reminderSound.play().catch(() => {});
+	showReminderToast(note.title);
+	document.hidden && startBlinkTitle("🔔 " + note.title);
                 }
 
             }
@@ -3586,7 +3825,7 @@ async function checkReminders() {
     });
 }
 
-setInterval(checkReminders, 30000);
+setInterval(checkReminders, 10000);
 
         // =================================================================
         // LOGIC XỬ LÝ CHUYỂN ĐỔI ĐUÔI FILE ẢNH (CONVERTER CORE ENGINE)
