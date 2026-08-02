@@ -3798,26 +3798,52 @@ document.addEventListener("visibilitychange", () => {
 //======================
 // Reminder
 //======================
+
 async function checkReminders() {
+
     const notes = await getAllNotes();
     const now = new Date();
 
     notes.forEach(note => {
+
         if (note.date && !note.deleted) {
+
             const noteDate = new Date(note.date);
+            const diffTime = noteDate - now;
 
-            if (noteDate > now && noteDate - now < 60000) {
+            if (diffTime > 0 && diffTime < 60000) {
 
-                if ("Notification" in window && Notification.permission === "granted") {
+
+                // Luôn phát âm thanh
+                if (typeof reminderSound !== "undefined") {
+                    reminderSound.currentTime = 0;
+                    reminderSound.play().catch(err => console.log(err));
+                }
+
+
+                // Luôn hiện Toast
+                if (typeof showReminderToast === "function") {
+                    showReminderToast(note.title);
+                }
+
+
+                // Nếu đang ở tab khác thì nhấp nháy tiêu đề
+                if (document.hidden &&
+                    typeof startBlinkTitle === "function") {
+
+                    startBlinkTitle("🔔 " + note.title);
+                }
+
+
+                // Nếu được cấp quyền thì hiện Notification Windows
+                if ("Notification" in window &&
+                    Notification.permission === "granted") {
+
                     new Notification("⏰ Nhắc nhở", {
                         body: note.title,
                         icon: "https://cdn-icons-png.flaticon.com/512/1827/1827392.png"
                     });
-                } else {
-	reminderSound.currentTime = 0;
-                  reminderSound.play().catch(() => {});
-	showReminderToast(note.title);
-	document.hidden && startBlinkTitle("🔔 " + note.title);
+
                 }
 
             }
@@ -3825,6 +3851,8 @@ async function checkReminders() {
     });
 }
 
+
+// Kiểm tra mỗi 10 giây
 setInterval(checkReminders, 10000);
 
         // =================================================================
