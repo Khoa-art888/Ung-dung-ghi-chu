@@ -11,7 +11,8 @@
    <script src="https://cdn.jsdelivr.net/npm/quill-better-table@1.2.10/dist/quill-better-table.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
+   
+ 
     <!-- Emoji -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
@@ -711,6 +712,121 @@ to{
 .ql-snow .ql-picker-label.ql-active .ql-fill{
     fill:#1d4ed8 !important;
 }
+        /* Styling Bảng trong Editor */
+        .ql-editor tbody.custom-quill-tbody {
+            display: table-row-group;
+            width: 100%;
+        }
+        .custom-quill-table-wrapper {
+            margin: 12px 0;
+            width: 100%;
+            overflow-x: auto;
+        }
+        .custom-quill-table-wrapper table {
+            width: 100%;
+            border-collapse: collapse;
+            user-select: none; /* Ngăn bôi đen văn bản mặc định của trình duyệt khi kéo chuột chọn ô */
+        }
+        .ql-editor td {
+            border: 1px solid #cbd5e1;
+            padding: 6px 10px;
+            min-width: 40px;
+            min-height: 24px;
+            vertical-align: top;
+            outline: none;
+        }
+        .ql-editor td.selected-cell {
+            background-color: #dbeafe !important;
+            border-color: #3b82f6 !important;
+        }
+
+        /* Popup Chọn Bảng Kiểu Word */
+        .table-picker-popup {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 100;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            padding: 10px;
+            border-radius: 12px;
+            width: 210px;
+        }
+        .table-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 3px;
+        }
+        .table-picker-cell {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #cbd5e1;
+            background-color: #f8fafc;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+        .table-picker-cell.active {
+            background-color: #93c5fd;
+            border-color: #2563eb;
+        }
+
+        /* Context Menu Chuột Phải */
+        #tableContextMenu {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 6px;
+            width: 190px;
+        }
+        #tableContextMenu button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            text-align: left;
+            padding: 6px 12px;
+            font-size: 13px;
+            color: #334155;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+        #tableContextMenu button:hover {
+            background-color: #f1f5f9;
+            color: #2563eb;
+        }
+        #tableContextMenu .menu-separator {
+            height: 1px;
+            background-color: #e2e8f0;
+            margin: 4px 0;
+        }
+
+        @media print {
+            body > * { display: none !important; }
+            #printArea {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 15px !important;
+                padding: 10px !important;
+                width: 100% !important;
+            }
+            .print-card {
+                border: 1px dashed #ccc !important;
+                padding: 10px !important;
+                text-align: center !important;
+                page-break-inside: avoid;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+            .print-card img { max-width: 100% !important; height: auto !important; }
+        }
     </style>
 </head>
 <body class="bg-gray-100 p-4 md:p-10 font-sans">
@@ -2633,7 +2749,21 @@ class="hidden bg-white/50 backdrop-blur-md p-3 rounded-xl border border-white/60
         </div>
     </div>
 </div>
-
+    <!-- Modals & Context Menu -->
+    <div id="tableContextMenu">
+        <button onclick="ctxInsertRowAbove()"><i class="fa-solid fa-arrow-up text-blue-500"></i> Insert Row Above</button>
+        <button onclick="ctxInsertRowBelow()"><i class="fa-solid fa-arrow-down text-blue-500"></i> Insert Row Below</button>
+        <div class="menu-separator"></div>
+        <button onclick="ctxInsertColLeft()"><i class="fa-solid fa-arrow-left text-green-500"></i> Insert Column Left</button>
+        <button onclick="ctxInsertColRight()"><i class="fa-solid fa-arrow-right text-green-500"></i> Insert Column Right</button>
+        <div class="menu-separator"></div>
+        <button onclick="ctxDeleteRow()"><i class="fa-solid fa-trash-can text-red-400"></i> Delete Row</button>
+        <button onclick="ctxDeleteCol()"><i class="fa-solid fa-trash-can text-red-400"></i> Delete Column</button>
+        <button onclick="ctxDeleteTable()"><i class="fa-solid fa-xmark text-red-600 font-bold"></i> Delete Table</button>
+        <div class="menu-separator"></div>
+        <button onclick="ctxMergeCells()"><i class="fa-solid fa-object-group text-purple-500"></i> Merge Cells</button>
+        <button onclick="ctxUnmergeCells()"><i class="fa-solid fa-object-ungroup text-purple-500"></i> Unmerge Cells</button>
+    </div>
 <!-- Khu vực dùng để in -->
 <div id="printArea"></div>
 
@@ -2999,7 +3129,58 @@ const icons = Quill.import("ui/icons");
 icons.undo = '<i class="fa-solid fa-rotate-left text-blue-600"></i>';
 icons.redo = '<i class="fa-solid fa-rotate-right text-blue-600"></i>';
 
+//======================
+// Custom Table Blot
+//======================
+
+const BlockEmbed = Quill.import("blots/block/embed");
+
+class CustomTableBlot extends BlockEmbed {
+
+    static create(value) {
+
+        const node = super.create();
+
+        node.className = "custom-quill-table-wrapper";
+
+        let html = '<table><tbody class="custom-quill-tbody">';
+
+        for (let i = 0; i < value.rows; i++) {
+
+            html += "<tr>";
+
+            for (let j = 0; j < value.cols; j++) {
+
+                html += '<td contenteditable="true"><br></td>';
+
+            }
+
+            html += "</tr>";
+
+        }
+
+        html += "</tbody></table>";
+
+        node.innerHTML = html;
+
+        return node;
+
+    }
+
+}
+
+CustomTableBlot.blotName = "customTable";
+CustomTableBlot.tagName = "div";
+
+Quill.register(CustomTableBlot);
+
+
+//======================
+// Quill
+//======================
+
 const quill = new Quill("#editor", {
+
     theme: "snow",
 
     modules: {
@@ -3013,15 +3194,44 @@ const quill = new Quill("#editor", {
         toolbar: {
 
             container: [
-                [{ header: ["1", "2", "3", false] }],
-                [{ size: ["small", false, "large", "huge"] }],
-                ["bold", "italic", "underline", "strike"],
-                [{ script: "sub" }, { script: "super" }],
-                [{ color: [] }, { background: [] }],
-                [{ align: [] }],
-                [{ list: "ordered" }, { list: "bullet" }],
-                ["link", "image"],
-                ["undo", "redo"]
+
+                [
+                    { header: ["1", "2", "3", false] },
+                    { size: ["small", false, "large", "huge"] }
+                ],
+
+                [
+                    "bold",
+                    "italic",
+                    "underline",
+                    "strike"
+                ],
+
+                [
+                    { script: "sub" },
+                    { script: "super" },
+                    { color: [] },
+                    { background: [] }
+                ],
+
+                [
+                    { align: [] },
+                    { list: "ordered" },
+                    { list: "bullet" }
+                ],
+
+                [
+                    { indent: "-1" },
+                    { indent: "+1" }
+                ],
+
+                [
+                    "link",
+                    "image",
+                    "undo",
+                    "redo"
+                ]
+
             ],
 
             handlers: {
@@ -3032,7 +3242,7 @@ const quill = new Quill("#editor", {
 
                 redo() {
                     this.quill.history.redo();
-                }
+                },
 
             }
 
@@ -3041,6 +3251,19 @@ const quill = new Quill("#editor", {
     }
 
 });
+
+// Khởi tạo Table Picker
+
+
+//======================
+// Table Variables
+//======================
+
+let activeCell = null;
+let selectedCells = [];
+let isSelecting = false;
+let startCell = null;
+
 
 //======================
 // Tooltip Toolbar
@@ -3076,6 +3299,10 @@ setTimeout(() => {
 
         ".ql-list[value='bullet']": "Danh sách ký hiệu",
 
+        ".ql-indent[value='-1']": "Giảm thụt lề",
+
+        ".ql-indent[value='+1']": "Tăng thụt lề",
+
         ".ql-link": "Chèn liên kết",
 
         ".ql-image": "Chèn hình ảnh",
@@ -3087,12 +3314,287 @@ setTimeout(() => {
     };
 
     Object.entries(tips).forEach(([selector, title]) => {
+
         document.querySelectorAll(selector).forEach(el => {
+
             el.title = title;
+
         });
+
     });
 
 }, 100);
+    // --- SETUP TABLE PICKER ---
+    function setupTablePicker() {
+        const toolbar = quill.getModule('toolbar').container;
+        const container = document.createElement('span');
+        container.className = 'ql-formats relative inline-block';
+        
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.innerHTML = '<i class="fa-solid fa-table-cells text-blue-600"></i>';
+        btn.title = 'Chèn bảng';
+        
+        const popup = document.createElement('div');
+        popup.className = 'table-picker-popup';
+        
+        const title = document.createElement('div');
+        title.className = 'text-xs text-gray-500 mb-2 font-medium text-center';
+        title.innerText = '0 × 0 Table';
+        
+        const grid = document.createElement('div');
+        grid.className = 'table-picker-grid';
+        
+        for (let r = 1; r <= 10; r++) {
+            for (let c = 1; c <= 10; c++) {
+                const cell = document.createElement('div');
+                cell.className = 'table-picker-cell';
+                cell.dataset.row = r;
+                cell.dataset.col = c;
+                
+                cell.addEventListener('mouseover', () => {
+                    highlightPicker(r, c);
+                    title.innerText = `${r} × ${c} Table`;
+                });
+                
+                cell.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    insertWordTable(r, c);
+                    popup.style.display = 'none';
+                });
+                
+                grid.appendChild(cell);
+            }
+        }
+        
+        popup.appendChild(title);
+        popup.appendChild(grid);
+        container.appendChild(btn);
+        container.appendChild(popup);
+        toolbar.appendChild(container);
+        
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = popup.style.display === 'block';
+            popup.style.display = isVisible ? 'none' : 'block';
+            if (!isVisible) highlightPicker(0, 0);
+        });
+        
+        document.addEventListener('click', () => {
+            popup.style.display = 'none';
+        });
+    }
+
+    function highlightPicker(rows, cols) {
+        document.querySelectorAll('.table-picker-cell').forEach(c => {
+            const r = parseInt(c.dataset.row);
+            const cl = parseInt(c.dataset.col);
+            if (r <= rows && cl <= cols) c.classList.add('active');
+            else c.classList.remove('active');
+        });
+    }
+
+    // --- HÀM CHÈN BẢNG VÀO CỦA QUILL ---
+    function insertWordTable(rows, cols) {
+        const range = quill.getSelection(true) || { index: quill.getLength() };
+        quill.insertEmbed(range.index, 'customTable', { rows, cols }, Quill.sources.USER);
+        quill.setSelection(range.index + 1, Quill.sources.SILENT);
+    }
+
+    setupTablePicker();
+
+    // --- XỬ LÝ CHỌN VÀ BÔI ĐEN Ô TRÊN BẢNG ---
+    const editorEl = document.querySelector('.ql-editor');
+    const menu = document.getElementById('tableContextMenu');
+
+    // Bắt đầu kéo chọn ô
+    editorEl.addEventListener('mousedown', (e) => {
+        const cell = e.target.closest('td');
+        if (cell && e.button === 0) { // Chuột trái
+            isSelecting = true;
+            startCell = cell;
+            clearCellSelection();
+            cell.classList.add('selected-cell');
+            selectedCells = [cell];
+        }
+    });
+
+    // Kéo chuột qua các ô để bôi đen
+    editorEl.addEventListener('mouseover', (e) => {
+        if (!isSelecting) return;
+        const cell = e.target.closest('td');
+        if (cell && startCell && cell.closest('table') === startCell.closest('table')) {
+            highlightCellRange(startCell, cell);
+        }
+    });
+
+    // Thả chuột
+    document.addEventListener('mouseup', () => {
+        isSelecting = false;
+    });
+
+    // Hàm chọn vùng chữ nhật giữa 2 ô
+    function highlightCellRange(start, end) {
+        clearCellSelection();
+        const table = start.closest('table');
+        const startRow = start.parentElement.rowIndex;
+        const startCol = start.cellIndex;
+        const endRow = end.parentElement.rowIndex;
+        const endCol = end.cellIndex;
+
+        const minRow = Math.min(startRow, endRow);
+        const maxRow = Math.max(startRow, endRow);
+        const minCol = Math.min(startCol, endCol);
+        const maxCol = Math.max(startCol, endCol);
+
+        const rows = table.querySelectorAll('tr');
+        for (let r = minRow; r <= maxRow; r++) {
+            const cells = rows[r].cells;
+            for (let c = minCol; c <= maxCol; c++) {
+                if (cells[c] && cells[c].style.display !== 'none') {
+                    cells[c].classList.add('selected-cell');
+                    selectedCells.push(cells[c]);
+                }
+            }
+        }
+    }
+
+    // --- CONTEXT MENU VÀ THAO TÁC BẢNG ---
+    editorEl.addEventListener('contextmenu', (e) => {
+        const cell = e.target.closest('td');
+        if (cell) {
+            e.preventDefault();
+            activeCell = cell;
+            if (!selectedCells.includes(cell)) {
+                clearCellSelection();
+                cell.classList.add('selected-cell');
+                selectedCells = [cell];
+            }
+            menu.style.display = 'block';
+            menu.style.left = e.clientX + 'px';
+            menu.style.top = e.clientY + 'px';
+        } else {
+            menu.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!menu.contains(e.target)) menu.style.display = 'none';
+    });
+
+    function getTableContainer(cell) {
+        return cell.closest('table');
+    }
+
+    function clearCellSelection() {
+        document.querySelectorAll('.ql-editor td.selected-cell').forEach(td => td.classList.remove('selected-cell'));
+        selectedCells = [];
+    }
+    // --- LOGIC CONTEXT MENU ---
+    function ctxInsertRowAbove() {
+        if (!activeCell) return;
+        const tr = activeCell.parentElement;
+        const newTr = tr.cloneNode(true);
+        Array.from(newTr.cells).forEach(cell => {
+            cell.innerHTML = '<br>';
+            cell.removeAttribute('colspan');
+            cell.removeAttribute('rowspan');
+            cell.classList.remove('selected-cell');
+        });
+        tr.parentNode.insertBefore(newTr, tr);
+        menu.style.display = 'none';
+    }
+
+    function ctxInsertRowBelow() {
+        if (!activeCell) return;
+        const tr = activeCell.parentElement;
+        const newTr = tr.cloneNode(true);
+        Array.from(newTr.cells).forEach(cell => {
+            cell.innerHTML = '<br>';
+            cell.removeAttribute('colspan');
+            cell.removeAttribute('rowspan');
+            cell.classList.remove('selected-cell');
+        });
+        tr.parentNode.insertBefore(newTr, tr.nextSibling);
+        menu.style.display = 'none';
+    }
+
+    function ctxInsertColLeft() {
+        if (!activeCell) return;
+        const table = getTableContainer(activeCell);
+        const colIndex = activeCell.cellIndex;
+        Array.from(table.querySelectorAll('tr')).forEach(row => {
+            const newCell = row.insertCell(colIndex);
+            newCell.setAttribute('contenteditable', 'true');
+            newCell.innerHTML = '<br>';
+        });
+        menu.style.display = 'none';
+    }
+
+    function ctxInsertColRight() {
+        if (!activeCell) return;
+        const table = getTableContainer(activeCell);
+        const colIndex = activeCell.cellIndex;
+        Array.from(table.querySelectorAll('tr')).forEach(row => {
+            const newCell = row.insertCell(colIndex + 1);
+            newCell.setAttribute('contenteditable', 'true');
+            newCell.innerHTML = '<br>';
+        });
+        menu.style.display = 'none';
+    }
+
+    function ctxDeleteRow() {
+        if (!activeCell) return;
+        const tr = activeCell.parentElement;
+        const wrapper = activeCell.closest('.custom-quill-table-wrapper');
+        tr.remove();
+        if (wrapper && wrapper.querySelectorAll('tr').length === 0) wrapper.remove();
+        menu.style.display = 'none';
+    }
+
+    function ctxDeleteCol() {
+        if (!activeCell) return;
+        const table = getTableContainer(activeCell);
+        const colIndex = activeCell.cellIndex;
+        const rows = table.querySelectorAll('tr');
+        rows.forEach(row => { if (row.cells[colIndex]) row.deleteCell(colIndex); });
+        const wrapper = activeCell.closest('.custom-quill-table-wrapper');
+        if (wrapper && table.querySelectorAll('td').length === 0) wrapper.remove();
+        menu.style.display = 'none';
+    }
+
+    function ctxDeleteTable() {
+        if (!activeCell) return;
+        const wrapper = activeCell.closest('.custom-quill-table-wrapper');
+        if (wrapper) wrapper.remove();
+        menu.style.display = 'none';
+    }
+
+    function ctxMergeCells() {
+        if (selectedCells.length <= 1) return alert("Vui lòng bôi đen từ 2 ô trở lên để gộp!");
+        const firstCell = selectedCells[0];
+        let mergedHTML = "";
+        selectedCells.forEach((cell, idx) => {
+            if (cell.innerHTML !== '<br>') mergedHTML += (mergedHTML ? " " : "") + cell.innerHTML;
+            if (idx > 0) cell.style.display = 'none';
+        });
+        firstCell.innerHTML = mergedHTML || '<br>';
+        firstCell.setAttribute('colspan', selectedCells.length);
+        clearCellSelection();
+        menu.style.display = 'none';
+    }
+
+    function ctxUnmergeCells() {
+        if (!activeCell) return;
+        const table = getTableContainer(activeCell);
+        Array.from(table.querySelectorAll('td')).forEach(td => {
+            td.style.display = '';
+            td.removeAttribute('colspan');
+            td.removeAttribute('rowspan');
+        });
+        clearCellSelection();
+        menu.style.display = 'none';
+    }
 // Modal
 //======================
 
@@ -3237,182 +3739,143 @@ const saveNotesToDB = notes => {
     notes.forEach(n => store.put(n));
 };
 
+//====================================================
 // FILE ATTACHMENT BLOT (OneNote Style)
 //====================================================
 
 const Embed = Quill.import("blots/embed");
 
-
 class FileAttachmentBlot extends Embed {
 
+    static create(value) {
 
-    static create(value){
+        value = value || {};
 
         const node = super.create();
 
-
         node.className = "onenote-file-blot";
-
         node.contentEditable = false;
 
-
         node.dataset.name = value.name || "File";
-
         node.dataset.size = value.size || "";
-
-        node.dataset.url  = value.url || "";
-
-
+        node.dataset.url = value.url || "";
 
         const ext = (value.name || "")
             .split(".")
             .pop()
             .toLowerCase();
 
-
-
         const icons = {
 
-            pdf:"fa-solid fa-file-pdf text-red-500",
+            pdf: "fa-solid fa-file-pdf text-red-500",
 
-            doc:"fa-solid fa-file-word text-blue-600",
-            docx:"fa-solid fa-file-word text-blue-600",
+            doc: "fa-solid fa-file-word text-blue-600",
+            docx: "fa-solid fa-file-word text-blue-600",
 
-            xls:"fa-solid fa-file-excel text-green-600",
-            xlsx:"fa-solid fa-file-excel text-green-600",
-            csv:"fa-solid fa-file-excel text-green-600",
+            xls: "fa-solid fa-file-excel text-green-600",
+            xlsx: "fa-solid fa-file-excel text-green-600",
+            csv: "fa-solid fa-file-excel text-green-600",
 
-            ppt:"fa-solid fa-file-powerpoint text-orange-500",
-            pptx:"fa-solid fa-file-powerpoint text-orange-500",
+            ppt: "fa-solid fa-file-powerpoint text-orange-500",
+            pptx: "fa-solid fa-file-powerpoint text-orange-500",
 
-            zip:"fa-solid fa-file-zipper text-yellow-500",
-            rar:"fa-solid fa-file-zipper text-yellow-500",
-            "7z":"fa-solid fa-file-zipper text-yellow-500",
+            zip: "fa-solid fa-file-zipper text-yellow-500",
+            rar: "fa-solid fa-file-zipper text-yellow-500",
+            "7z": "fa-solid fa-file-zipper text-yellow-500",
 
-            mp3:"fa-solid fa-file-audio text-purple-500",
-            wav:"fa-solid fa-file-audio text-purple-500",
+            mp3: "fa-solid fa-file-audio text-purple-500",
+            wav: "fa-solid fa-file-audio text-purple-500",
 
-            mp4:"fa-solid fa-file-video text-pink-500",
-            mov:"fa-solid fa-file-video text-pink-500",
+            mp4: "fa-solid fa-file-video text-pink-500",
+            mov: "fa-solid fa-file-video text-pink-500",
 
-            jpg:"fa-solid fa-file-image text-cyan-500",
-            jpeg:"fa-solid fa-file-image text-cyan-500",
-            png:"fa-solid fa-file-image text-cyan-500",
+            jpg: "fa-solid fa-file-image text-cyan-500",
+            jpeg: "fa-solid fa-file-image text-cyan-500",
+            png: "fa-solid fa-file-image text-cyan-500",
 
-            html:"fa-brands fa-html5 text-orange-600",
-            css:"fa-brands fa-css3-alt text-blue-500",
-            js:"fa-brands fa-js text-yellow-500",
+            gif: "fa-solid fa-file-image text-cyan-500",
+            webp: "fa-solid fa-file-image text-cyan-500",
+            svg: "fa-solid fa-file-image text-cyan-500",
 
-            apk:"fa-brands fa-android text-green-600",
+            html: "fa-brands fa-html5 text-orange-600",
+            css: "fa-brands fa-css3-alt text-blue-500",
+            js: "fa-brands fa-js text-yellow-500",
 
-            txt:"fa-solid fa-file-lines text-gray-500"
+            json: "fa-solid fa-code text-amber-500",
+            xml: "fa-solid fa-code text-amber-500",
+
+            apk: "fa-brands fa-android text-green-600",
+
+            exe: "fa-solid fa-gears text-gray-600",
+
+            txt: "fa-solid fa-file-lines text-gray-500",
+
+            default: "fa-solid fa-file text-gray-500"
 
         };
 
-
-        const iconClass =
-            icons[ext] || "fa-solid fa-file text-gray-500";
-
-
+        const iconClass = icons[ext] || icons.default;
 
         node.innerHTML = `
-
             <div class="onenote-file-icon">
-
                 <i class="${iconClass}"></i>
-
             </div>
-
 
             <div class="onenote-file-info">
-
-                <div class="onenote-file-name">
-                    ${value.name}
-                </div>
-
-
-                <div class="onenote-file-size">
-                    ${value.size}
-                </div>
-
+                <div class="onenote-file-name"></div>
+                <div class="onenote-file-size"></div>
             </div>
-
         `;
 
-
+        node.querySelector(".onenote-file-name").textContent = node.dataset.name;
+        node.querySelector(".onenote-file-size").textContent = node.dataset.size;
 
         // Click tải file
-
-        node.onclick = function(e){
+        node.onclick = function (e) {
 
             e.preventDefault();
-
             e.stopPropagation();
 
+            const { url, name } = node.dataset;
 
-            const url = node.dataset.url;
-
-            const name = node.dataset.name;
-
-
-            if(!url){
-
+            if (!url) {
                 alert("Không tìm thấy file!");
-
                 return;
-
             }
-
 
             const a = document.createElement("a");
 
-
             a.href = url;
-
-            a.download = name;
-
+            a.download = name || "";
+            a.target = "_blank";
+            a.rel = "noopener";
 
             document.body.appendChild(a);
-
-
             a.click();
-
-
             document.body.removeChild(a);
 
         };
 
-
-
         return node;
-
     }
 
+    // Lưu dữ liệu vào Delta
+    static value(node) {
 
-
-    static value(node){
+        const { name, size, url } = node.dataset;
 
         return {
-
-            name:node.dataset.name,
-
-            size:node.dataset.size,
-
-            url:node.dataset.url
-
+            name,
+            size,
+            url
         };
 
     }
 
-
 }
 
-
-
 FileAttachmentBlot.blotName = "fileAttachment";
-
 FileAttachmentBlot.tagName = "div";
-
 
 Quill.register(FileAttachmentBlot);
 
